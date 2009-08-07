@@ -1,0 +1,28 @@
+<beans
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
+
+  <!-- This will try to locate a BrokerServiceFactory and initialize all brokers there -->
+  <bean id="brokerServicesFactory" class="com.fusesource.forge.jmstest.config.impl.DynamicBrokerServicesFactory" >
+  	<property name="numBrokers" value="4" />
+  	<property name="networkTTL" value="4" />
+  	<property name="networkPrefetchSize" value="1" />
+  	<property name="discoveryUri" value="multicast://default" />
+  	<property name="jmxBasePort" value="1099" />
+  	<property name="decreaseNetworkConsumerPriority" value="false" />
+  </bean>
+  
+  <!-- A Connection provider is needed to establish the JMS Connections used by the test framework -->
+  <bean id="connectionProviderTemplate" class="com.fusesource.forge.jmstest.config.impl.DynamicJMSConnectionProvider" scope="prototype" >
+ 	<property name="brokerServicesFactory" ref="brokerServicesFactory" /> 
+  </bean> 
+
+  <!-- A factory to create a connection provider -->  
+  <bean id="connectionProviderFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+    <property name="targetBeanName">
+      <idref local="connectionProviderTemplate" />
+    </property>
+  </bean>
+    
+</beans>

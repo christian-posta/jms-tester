@@ -1,0 +1,44 @@
+<beans
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
+
+  <!--  The message Factory responsible to create the test messages -->  
+  <bean id="messageFactory" class="com.fusesource.forge.jmstest.message.DefaultMessageFactory">
+    <property name="messageSize" value="100" />
+    <property name="prefix" value="Hello" />
+  </bean>
+
+  <!--  A Destination Provider is needed to create the Destinations for Producers / Consumers -->
+  <bean id="destinationProvider" class="com.fusesource.forge.jmstest.config.impl.DefaultDestinationProvider" />
+
+  <bean id="AsyncProducerTemplate" class="com.fusesource.forge.jmstest.tests.AsyncProducer" scope="prototype">
+    <property name="destinationProvider" ref="destinationProvider" />
+    <property name="deliveryMode" value="NON_PERSISTENT" />
+    <property name="messagesToSend" value="0" />
+    <property name="messageFactory" ref="messageFactory" />
+    <property name="expectReply" value="true" />
+    <property name="sleep" value="500" />
+    <property name="replyTimeOut" value="5000" />
+    <property name="TTL" value="0" />
+    <property name="destinationName" value="queue:test" />
+  </bean>
+  
+  <bean id="AsyncProducerFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+    <property name="targetBeanName">
+      <idref local="AsyncProducerTemplate" />
+    </property>
+  </bean>
+
+  <bean id="AsyncConsumerTemplate" class="com.fusesource.forge.jmstest.tests.AsyncConsumer" scope="prototype" >
+    <property name="destinationProvider" ref="destinationProvider" />
+    <!--property name="destinationName" value="queue:test?consumer.priority=0" / -->
+    <property name="destinationName" value="queue:test?consumer.priority=100" />
+  </bean>
+
+  <bean id="AsyncConsumerFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+    <property name="targetBeanName">
+      <idref local="AsyncConsumerTemplate" />
+    </property>
+  </bean>
+</beans>

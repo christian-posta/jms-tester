@@ -1,0 +1,25 @@
+<beans
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
+    
+  <bean id="testProfile" class="com.fusesource.forge.jmstest.scenario.BenchmarkProfile" init-method="initialise">
+    <property name="name" value="testProfile" />
+    <property name="iterations">
+      <list>
+        <bean class="com.fusesource.forge.jmstest.scenario.BenchmarkIteration">
+          <property name="duration"    value="20"/>
+          <property name="initialRate" value="5"/>
+          <property name="maxRate"     value="10" />
+          <property name="increment"   value="2" />
+          <property name="measured"    value="true"/>
+        </bean>
+        <!-- bean class="com.fusesource.forge.jmstest.scenario.BenchmarkIteration">
+          <property name="duration"    value="180"/>
+          <property name="initialRate" value="10"/>
+          <property name="measured"    value="true"/> 
+        </bean> -->     
+      </list>
+    </property>
+  </bean>
+</beans>

@@ -1,0 +1,15 @@
+<project name="JMS Test Framework">
+    <publishDate format="dd MMM yyyy"/>
+    <body>
+        <links>
+            <item name="FUSE" href="http://www.fusesource.com/"/>
+            <item name="Progress Software" href="http://www.progress.com/"/>
+            <item name="Apache" href="http://www.apache.org" />
+        </links>
+        <menu name="JMS Test Framework">
+            <item name="Home" href="index.html"/>
+        </menu>
+    
+    ${reports}
+  </body>
+</project>
