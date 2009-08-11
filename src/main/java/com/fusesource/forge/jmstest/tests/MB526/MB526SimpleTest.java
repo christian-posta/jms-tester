@@ -4,7 +4,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
 import com.fusesource.forge.jmstest.config.TestRunConfig;
-import com.fusesource.forge.jmstest.executor.BenchmarkConsumerWrapper;
 import com.fusesource.forge.jmstest.executor.BenchmarkProducerWrapper;
 import com.fusesource.forge.jmstest.executor.ConsumerToProducerListener;
 import com.fusesource.forge.jmstest.executor.JMSTest;

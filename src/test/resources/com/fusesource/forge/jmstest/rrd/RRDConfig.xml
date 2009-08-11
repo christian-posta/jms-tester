@@ -1,0 +1,14 @@
+<beans
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
+
+  <bean id="RRDDatabase" class="com.fusesource.forge.jmstest.rrd.RRDController">
+    <property name="fileName" value="target/Simple.rrd" />
+  </bean>
+
+  <bean id="RRDRecorder1" class="com.fusesource.forge.jmstest.rrd.RRDRecorder">
+    <property name="name" value="Recorder1" />
+    <property name="dsType" value="COUNTER" />
+  </bean>
+</beans>
