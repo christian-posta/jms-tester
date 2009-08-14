@@ -7,8 +7,6 @@
  */
 package com.fusesource.forge.jmstest.benchmark;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
@@ -32,43 +30,31 @@ public class ReleaseManager extends Thread {
     private Vector<Releaseable> releaseables;
 
     public ReleaseManager() {
-    }
-
-    public void initialise() {
-        //Runtime.getRuntime().addShutdownHook(this);
         releaseables = new Vector<Releaseable>();
     }
 
     public void register(Releaseable releaseable) {
-        releaseables.add(releaseable);
+    	synchronized (releaseables) {
+            releaseables.add(releaseable);
+		}
     }
 
     public void deregister(Releaseable releaseable) {
-        releaseables.remove(releaseable);
+    	synchronized (releaseable) {
+            releaseables.remove(releaseable);
+		}
     }
 
     @Override
     public void run() {
         log().info("ShutdownHook called, attempting to sweep up resources");
-        
-        List<Releaseable> toRelease = new ArrayList<Releaseable>();
-        toRelease.addAll(releaseables);
-        List<Releaseable> released = new ArrayList<Releaseable>();
-        
-        for (Releaseable releaseable : toRelease) {
-            releaseable.release();
-            released.add(releaseable);
-        }
-        
-        for (Releaseable releaseable : released) {
-            if (releaseables.contains(releaseable)) {
-                releaseables.remove(releaseable);
-            }
-        }
-        
-        toRelease.clear();
-        
-        log().info("sweeping complete");
+
+        synchronized (releaseables) {
+        	while (releaseables != null && releaseables.size() > 0) {
+        		Releaseable r = releaseables.remove(0);
+        		r.release();
+        	}
+		}
     }
 
     protected Log log() {

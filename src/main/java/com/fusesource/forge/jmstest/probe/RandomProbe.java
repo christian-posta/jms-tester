@@ -5,8 +5,9 @@ import java.util.Random;
 public class RandomProbe extends AbstractProbe {
 	
 	private Random rnd;
-	
+
 	public RandomProbe() {
+		super();
 		rnd = new Random(System.currentTimeMillis());
 	}
 	

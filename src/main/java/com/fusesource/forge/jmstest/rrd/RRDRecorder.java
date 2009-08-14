@@ -1,24 +1,17 @@
 package com.fusesource.forge.jmstest.rrd;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.rrd4j.DsType;
 
-import com.fusesource.forge.jmstest.probe.ProbeDataConsumer;
+import com.fusesource.forge.jmstest.probe.AbstractProbeDataConsumer;
 
-public class RRDRecorder implements ProbeDataConsumer {
+public class RRDRecorder extends AbstractProbeDataConsumer {
 	
-	private String name;
 	private RRDController controller;
 	private DsType dsType = DsType.COUNTER;
 	
 	public RRDRecorder() {}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	public RRDController getController() {
 		return controller;
@@ -26,6 +19,7 @@ public class RRDRecorder implements ProbeDataConsumer {
 
 	public void setController(RRDController controller) {
 		this.controller = controller;
+		controller.addRrdRecorder(this);
 	}
 
 	public DsType getDsType() {
@@ -41,6 +35,36 @@ public class RRDRecorder implements ProbeDataConsumer {
 	}
 	
 	public void record(long timestamp, Number value) {
+		log().debug(toString() + " recording : " + timestamp + ":" + value);
 		controller.record(this, timestamp, value);
+	}
+	
+	@Override
+	public String toString() {
+		StringBuffer buf = new StringBuffer("RRDRecorder[");
+		buf.append(getName());
+		buf.append(",");
+		switch (getDsType()) {
+		case ABSOLUTE:
+			buf.append("ABSOLUTE");
+			break;
+		case COUNTER:
+			buf.append("COUNTER");
+			break;
+		case GAUGE:
+			buf.append("GAUGE");
+			break;
+		case DERIVE:
+			buf.append("DERIVE");
+			break;
+		default:
+			buf.append("UNKNOWN");
+		}
+		buf.append("]");
+		return buf.toString();
+	}
+	
+	private Log log() {
+		return LogFactory.getLog(this.getClass());
 	}
 }

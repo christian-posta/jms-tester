@@ -12,18 +12,16 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.ObjectFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
+import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
-import com.fusesource.forge.jmstest.benchmark.results.ProducerMetricCollector;
-import com.fusesource.forge.jmstest.config.MeasureTimeUnit;
 import com.fusesource.forge.jmstest.config.TestRunConfig;
+import com.fusesource.forge.jmstest.probe.CountingProbe;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
 public class IterationRunner extends ExecutableBenchmarkComponent implements Runnable {
 
     private transient Log log;
 
-    private ReleaseManager releaseManager;
-    
     private ScheduledThreadPoolExecutor executor;
     private ObjectFactory producerFactory;
     private BenchmarkIteration iteration;
@@ -33,6 +31,7 @@ public class IterationRunner extends ExecutableBenchmarkComponent implements Run
     private CountDownLatch benchmarkIterationLatch;
     private long maxRatePerProducerThread = 5000; //default
     private TestRunConfig testRunConfig;
+    private CountingProbe probe;
     
     public TestRunConfig getTestRunConfig() {
 		return testRunConfig;
@@ -43,11 +42,7 @@ public class IterationRunner extends ExecutableBenchmarkComponent implements Run
 	}
 
 	public ReleaseManager getReleaseManager() {
-		return releaseManager;
-	}
-
-	public void setReleaseManager(ReleaseManager releaseManager) {
-		this.releaseManager = releaseManager;
+		return BenchmarkContext.getInstance().getReleaseManager();
 	}
 
     public void setProducerFactory(ObjectFactory producerFactory) {
@@ -66,7 +61,15 @@ public class IterationRunner extends ExecutableBenchmarkComponent implements Run
         this.maxRatePerProducerThread = maxRatePerProducerThread;
     }
 
-    private void runProducers(long rate, long duration) {
+    public CountingProbe getProbe() {
+		return probe;
+	}
+
+	public void setProbe(CountingProbe probe) {
+		this.probe = probe;
+	}
+
+	private void runProducers(long rate, long duration) {
 
     	BigDecimal bd = new BigDecimal(1000000).divide(new BigDecimal(rate), BigDecimal.ROUND_HALF_DOWN);
         long delayInMicroSeconds;
@@ -85,7 +88,6 @@ public class IterationRunner extends ExecutableBenchmarkComponent implements Run
         }
         
         log.debug("Running " + producersNeeded + " producers for " + duration + "s");
-        ProducerMetricCollector messageCounter = new ProducerMetricCollector();
         producers = new ArrayList<BenchmarkProducer>(producersNeeded);
         sendingDelay = delayInMicroSeconds * producersNeeded;
         executor = new ScheduledThreadPoolExecutor(producersNeeded);
@@ -94,7 +96,7 @@ public class IterationRunner extends ExecutableBenchmarkComponent implements Run
             try {
                 BenchmarkProducer producer = (BenchmarkProducer) producerFactory.getObject();
                 producer.initialise(getTestRunConfig());
-                producer.setMessageCounter(messageCounter);
+                producer.setMessageCounter(getProbe());
                 producer.observeStatus(this.getBenchmarkStatus());
                 producers.add(producer);
             } catch (Exception e) {
@@ -121,7 +123,6 @@ public class IterationRunner extends ExecutableBenchmarkComponent implements Run
 	    
 	    try {
             latch.await();
-            log.info(messageCounter.getThroughput(MeasureTimeUnit.SECONDS));
         } catch(InterruptedException ie) {}
     }
 
@@ -134,7 +135,7 @@ public class IterationRunner extends ExecutableBenchmarkComponent implements Run
         iteration.startIteration();
     	while(iteration.needsMoreRuns()) {
     		long rate = iteration.nextEffectiveRate();
-    		long duration = iteration.getDuration();
+    		long duration = iteration.getCurrentDuration();
     		
             log().debug("BenchmarkIteration [" + iteration.getName() + "] stepping to " + rate +  " msg/s for "
                     + duration + " s] starting");

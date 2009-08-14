@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
+import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
@@ -24,7 +25,6 @@ import com.fusesource.forge.jmstest.config.TestRunConfig;
 
 public class ProducerToConsumerListener implements MessageListener, Releaseable {
 
-	private TestRunConfig testRunConfig;
 	private BenchmarkConsumerWrapper consumerWrapper;
 	private JMSConnectionProvider connectionProvider;
 	private JMSDestinationProvider destinationProvider;
@@ -54,11 +54,7 @@ public class ProducerToConsumerListener implements MessageListener, Releaseable 
 	}
 
 	public ReleaseManager getReleaseManager() {
-		return releaseManager;
-	}
-
-	public void setReleaseManager(ReleaseManager releaseManager) {
-		this.releaseManager = releaseManager;
+		return BenchmarkContext.getInstance().getReleaseManager();
 	}
 
 	public BenchmarkConsumerWrapper getConsumerWrapper() {
@@ -70,7 +66,6 @@ public class ProducerToConsumerListener implements MessageListener, Releaseable 
 	}
 
 	public void initialize(TestRunConfig testRunConfig) {
-    	this.testRunConfig = testRunConfig;
     	release();
         log().debug(">>> Initialising ProducerToConsumerListener");
         try {

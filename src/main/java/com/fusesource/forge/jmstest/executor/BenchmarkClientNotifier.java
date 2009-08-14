@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
+import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.benchmark.BenchmarkExecutionException;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 import com.fusesource.forge.jmstest.config.AcknowledgeMode;
@@ -26,14 +27,8 @@ public class BenchmarkClientNotifier implements Releaseable {
 
     private transient Log log;
 
-    /**
-	 * @uml.property  name="testRunConfig"
-	 * @uml.associationEnd  
-	 */
-    private TestRunConfig testRunConfig;
     private JMSConnectionProvider connectionProvider;
     private JMSDestinationProvider destinationProvider;
-    private ReleaseManager releaseManager;
     	
     private Connection conn;
     private Session session;
@@ -57,15 +52,10 @@ public class BenchmarkClientNotifier implements Releaseable {
 	}
 
 	public ReleaseManager getReleaseManager() {
-		return releaseManager;
-	}
-
-	public void setReleaseManager(ReleaseManager releaseManager) {
-		this.releaseManager = releaseManager;
+		return BenchmarkContext.getInstance().getReleaseManager();
 	}
 
 	public void initialise(TestRunConfig testRunConfig) {
-    	this.testRunConfig = testRunConfig;
         try {
             getReleaseManager().register(this);
             conn = getConnectionProvider().getConnection();

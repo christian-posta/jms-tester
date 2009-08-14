@@ -40,7 +40,7 @@ public class SimpleBenchmarkIteration extends AbstractBenchmarkIteration {
         return currentRate;
     }
     
-    public long getDuration() {
+    public long getCurrentDuration() {
         return duration;
     }
 
@@ -77,6 +77,18 @@ public class SimpleBenchmarkIteration extends AbstractBenchmarkIteration {
     	return increment;
     }
 
+    public long getRunsNeeded() {
+    	long result = (getMaxRate() - getInitialRate()) / getIncrement();
+    	if ((getMaxRate() - getInitialRate()) % getIncrement() == 0) {
+    		result++;
+    	}
+    	return result;
+    }
+    
+    public long getTotalDuration() {
+    	return getRunsNeeded() * getCurrentDuration();
+    }
+    
     public void setIncrement(long incrementalRate) {
         this.increment = incrementalRate;
     }

@@ -3,29 +3,40 @@ package com.fusesource.forge.jmstest.rrd;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDef;
 import org.rrd4j.core.Sample;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
-public class RRDController implements ApplicationContextAware, InitializingBean, DisposableBean {
+import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
+import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
+import com.fusesource.forge.jmstest.executor.Releaseable;
+
+public class RRDController implements Releaseable {
 	
 	private String fileName = "jmstest.rrd"; 
 	private long   step = 300L;
-	private List<RRDRecorder> rrdRecorder;
-	private ApplicationContext ac;
+	private int archiveLength = 100;
+	private Map<String, RRDRecorder> rrdRecorder;
 
+	private boolean initialized = false;
 	private RrdDb database;
 	
-	public RRDController() {}
+	private ScheduledThreadPoolExecutor executor = null;
+	private TreeMap<Long, Sample> valueCache;
+	
+	public RRDController() {
+		valueCache = new TreeMap<Long, Sample>();
+	}
 
 	public String getFileName() {
 		return fileName;
@@ -43,54 +54,144 @@ public class RRDController implements ApplicationContextAware, InitializingBean,
 		this.step = step;
 	}
 	
-	public List<RRDRecorder> getRrdRecorder() {
-		if (rrdRecorder != null) {
-			return rrdRecorder;
+	public int getArchiveLength() {
+		return archiveLength;
+	}
+
+	public void setArchiveLength(int archiveLength) {
+		this.archiveLength = archiveLength;
+	}
+	
+	public ReleaseManager getReleaseManager() {
+		return BenchmarkContext.getInstance().getReleaseManager();
+	}
+
+	public RrdDb getDatabase() {
+		if (database.isClosed()) {
+			try {
+				database = new RrdDb(getFileName());
+			} catch (IOException e) {
+			}
 		}
-		return new ArrayList<RRDRecorder>();
+		return database;
+	}
+	
+	synchronized public Map<String, RRDRecorder> getRrdRecorder() {
+		if (rrdRecorder == null) {
+			rrdRecorder = new HashMap<String, RRDRecorder>();
+		}
+		return rrdRecorder;
+	}
+	
+	synchronized public void addRrdRecorder(RRDRecorder recorder) {
+		if (!getRrdRecorder().containsKey(recorder.getName())) {
+			getRrdRecorder().put(recorder.getName(), recorder);
+		}
 	}
 
 	public void record(RRDRecorder recorder, long timestamp, Number value) {
-		try {
-			Sample sample = database.createSample();
-			sample.setTime(timestamp);
-			sample.setValue(recorder.getName(), value.doubleValue());
-			sample.update();
-		} catch (IOException ioe) {
-		    //TODO: handle this
+		synchronized (valueCache) {
+			if (getRrdRecorder().containsKey(recorder.getName())) {
+				try {
+					Sample sample = valueCache.get(timestamp);
+					if (sample == null) {
+						sample = database.createSample();
+						sample.setTime(timestamp);
+						valueCache.put(new Long(timestamp), sample);
+					}
+					sample.setValue(recorder.getName(), value.doubleValue());
+				} catch (IOException ioe) {
+					ioe.printStackTrace();
+				}
+			} else {
+				log().warn("Ignoring recording for unregistered recorder: " + recorder.toString());
+			}
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	public void afterPropertiesSet() throws Exception {
+	synchronized public void start() throws Exception {
+		
+		if (initialized) {
+			return;
+		}
+		
+		getReleaseManager().register(this);
+		
+		log().debug("Initializing RRDController ...");
 		File dbFile = new File(getFileName());
 		
+		long startTime = System.currentTimeMillis() / 1000 - 1;
+		log().debug("Setting Start time to : " + startTime);
+
 		if (!dbFile.getAbsoluteFile().getParentFile().exists()) {
 			dbFile.getCanonicalFile().mkdirs();
 		}
+		log().debug("RRDController uses : " + dbFile.getAbsolutePath() + " Step: " + getStep());
 		
-		RrdDef rrdDef = new RrdDef(getFileName(), System.currentTimeMillis() / 1000, getStep());
-		
-		Map<String, Object> recorders = ac.getBeansOfType(RRDRecorder.class);
+		RrdDef rrdDef = new RrdDef(getFileName(), startTime, getStep());
 
-		rrdRecorder = new ArrayList<RRDRecorder>();
+		Collection<RRDRecorder> recorders = new ArrayList<RRDRecorder>();
+		recorders.addAll(getRrdRecorder().values());
+		getRrdRecorder().clear();
 		
-		for(Object obj: recorders.values()) {
-			RRDRecorder recorder = (RRDRecorder)obj;
-			rrdRecorder.add(recorder);
-			recorder.setController(this);
+		for(RRDRecorder recorder: recorders) {
+			log().debug("Adding Data Source to RRD: " + recorder);
 			rrdDef.addDatasource(recorder.getName(), recorder.getDsType(), getStep(), Double.NaN, Double.NaN);
+			getRrdRecorder().put(recorder.getName(), recorder);
 		}
-
-		rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 1, 1000);
+		
+		rrdDef.setStartTime(startTime);
+		rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 1, getArchiveLength());
 		database = new RrdDb(rrdDef);
+		
+		executor = new ScheduledThreadPoolExecutor(1);
+		executor.scheduleAtFixedRate(new Runnable() {
+			public void run() {
+				flushToRrd(false);
+			}
+		}, 5, 5, TimeUnit.SECONDS);
+		initialized = true;
+		log().debug("RRDController initialization complete.");
 	}
 	
-	public void destroy() throws Exception {
-		database.close();
+	public void release() {
+		if (executor != null) {
+			executor.shutdown();
+		}
+		flushToRrd(true);
+		try {
+			if (database != null) {
+				database.close();
+			}
+		} catch (IOException e) {}
+		getReleaseManager().deregister(this);
 	}
 	
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		this.ac = applicationContext;
+	private void flushToRrd(boolean complete) {
+		log().debug("Pushing collected metrics to RRD database ...");
+		synchronized (valueCache) {
+			if (valueCache == null || valueCache.isEmpty()) {
+				return;
+			}
+
+			log().debug(valueCache.size() + " values in cache.");
+			long currentTime = System.currentTimeMillis() / 1000;
+
+			while((!valueCache.isEmpty()) && (complete || valueCache.firstKey() < currentTime)) {
+				Sample s = valueCache.remove(valueCache.firstKey());
+				try {
+					log().debug("Writing Sample : " + s.dump());
+					s.update();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			log().debug("Pushed Metrics to RRD backend; " + valueCache.size() + " values remaining in cache.");
+		}
+	}
+	
+	private Log log() {
+		return LogFactory.getLog(this.getClass());
 	}
 }

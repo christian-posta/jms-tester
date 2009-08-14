@@ -1,46 +1,46 @@
 package com.fusesource.forge.jmstest.probe;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ProbeRunner implements Runnable {
+import com.fusesource.forge.jmstest.executor.LimitedTimeScheduledExecutor;
 
-	private List<ProbeDataConsumer> probes;
-	private long duration = 300;
-	private long interval = 5;
+public class ProbeRunner extends LimitedTimeScheduledExecutor {
+
+	private List<Probe> probes;
 	
-	public List<ProbeDataConsumer> getProbes() {
+	public void setProbes(List<Probe> probes) {
+		this.probes = probes;
+	}
+	
+	public List<Probe> getProbes() {
+		if (probes == null) {
+			probes = new ArrayList<Probe>();
+		}
 		return probes;
 	}
 
-	public void setProbes(List<ProbeDataConsumer> probes) {
-		this.probes = probes;
-	}
-
-	public long getDuration() {
-		return duration;
-	}
-
-	public void setDuration(long duration) {
-		this.duration = duration;
-	}
-
-	public long getInterval() {
-		return interval;
-	}
-
-	public void setInterval(long interval) {
-		this.interval = interval;
-	}
-
-	public void run() {
-	  	getLog().info("Prober starting");
-	  	getLog().info("Probe finished");
+	public void addProbe(Probe probe) {
+		getProbes().add(probe);
 	}
 	
-	private Log getLog() {
+	public void run() {
+		setTask(new Runnable() {
+			public void run() {
+				log().debug("Gathering probes ...");
+				for(Probe probe: probes) {
+					probe.probe();
+				}
+				log().debug("Gathering complete ...");
+			}
+		});
+		super.run();
+	}
+	
+	private Log log() {
 		return LogFactory.getLog(this.getClass());
 	}
 }

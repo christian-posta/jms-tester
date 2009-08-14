@@ -15,7 +15,9 @@ import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 		"classpath:com/fusesource/forge/jmstest/tests/MB526/broker-services.xml",
 		"classpath:com/fusesource/forge/jmstest/tests/MB526/config-beans.xml",
 		"classpath:com/fusesource/forge/jmstest/tests/MB526/messaging-beans.xml",
-		"classpath:com/fusesource/forge/jmstest/tests/MB526/profiles.xml"})
+		"classpath:com/fusesource/forge/jmstest/tests/MB526/profiles.xml",
+		"classpath:com/fusesource/forge/jmstest/tests/MB526/stats.xml"
+})
 		
 public class MB526SimpleTest extends JMSTest {
 

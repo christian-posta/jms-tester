@@ -69,12 +69,30 @@ public class CompositeBenchmarkIteration extends AbstractBenchmarkIteration {
 		}
 	}
 	
-	public long getDuration() {
+	public long getCurrentDuration() {
 		if (currentSequence != null) {
-			return currentSequence.getDuration();
+			return currentSequence.getCurrentDuration();
 		} else {
 			return 1;
 		}
+	}
+	
+	public long getRunsNeeded() {
+		long result = 0;
+		
+		for(BenchmarkIteration iteration: getIterations()) {
+			result += iteration.getRunsNeeded();
+		}
+		return result;
+	}
+
+	public long getTotalDuration() {
+		long result = 0;
+		
+		for(BenchmarkIteration iteration: getIterations()) {
+			result += iteration.getTotalDuration();
+		}
+		return result;
 	}
 	
 	private void adjustCurrentSequence() {

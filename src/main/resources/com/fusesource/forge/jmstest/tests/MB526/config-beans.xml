@@ -25,16 +25,12 @@
   <!-- This will try to locate a BrokerServiceFactory and initialize all brokers there -->
   <bean id="brokerServicesFactory" class="com.fusesource.forge.jmstest.config.impl.SpringBrokerServicesFactory" />
   
-  <!-- We need to have a Release Manger around that keeps track of beans that have resources allocated and can release them if required. -->    
-  <bean id="releaseManager" class="com.fusesource.forge.jmstest.benchmark.ReleaseManager" init-method="initialise" />
-
   <!--  ============================================================================================================================ -->
   <!--  How we will create Producers -->
   <!-- The configuration of a Producer prototype bean-->
   <bean id="messageProducer" class="com.fusesource.forge.jmstest.executor.BenchmarkProducer" scope="prototype" >
     <property name="connectionProvider" ref="connectionProvider" />
     <property name="destinationProvider" ref="destinationProvider" />
-    <property name="releaseManager" ref="releaseManager" />
     <property name="messageFactory" ref="messageFactory" />
   </bean>
   
@@ -49,10 +45,10 @@
   
   <!-- A benchmark iteration runner is used to run enough producers in order to sustain a given message load -->
   <bean id="benchmarkIterationRunner" class="com.fusesource.forge.jmstest.executor.IterationRunner" scope="prototype">
-    <property name="releaseManager" ref="releaseManager" />
     <property name="producerFactory" ref="messageProducerFactory"/>
     <property name="testRunConfig" ref="TestConfig" />
     <property name="iteration" ref="testProfile" />
+    <property name="probe" ref="ProducerMsgCounter" />
   </bean>
 
   <!-- The factory used to create the runner -->
@@ -66,14 +62,12 @@
 
   <!-- The Benchmark client Notifier sends out the Notification from the Producer to the consumers that the benchmark is about to start -->
   <bean id="clientNotifier" class="com.fusesource.forge.jmstest.executor.BenchmarkClientNotifier">
-    <property name="releaseManager" ref="releaseManager" />
     <property name="connectionProvider" ref="connectionProvider" />
     <property name="destinationProvider" ref="destinationProvider" />
   </bean>  
 
   <!-- The consumer listener listens for the consumer responses (that they are ready to go) -->  
   <bean id="consumerListener" class="com.fusesource.forge.jmstest.executor.ConsumerToProducerListener">
-    <property name="releaseManager" ref="releaseManager" />
     <property name="connectionProvider" ref="connectionProvider" />
     <property name="destinationProvider" ref="destinationProvider" />
   </bean> 
@@ -94,7 +88,6 @@
   <!-- The Benchmark Consumer is a simple JMS consumer consuming messages from the test destination. -->
   
   <bean id="messageConsumer" class="com.fusesource.forge.jmstest.executor.BenchmarkConsumer" scope="prototype" >
-    <property name="releaseManager" ref="releaseManager" />
     <property name="connectionProvider" ref="connectionProvider" />
     <property name="destinationProvider" ref="destinationProvider" />
   </bean>
@@ -111,7 +104,6 @@
 
   <!-- Finally consumer side is started by a Notification from the producer that the benchmark s about to start -->
   <bean id="producerListener" class="com.fusesource.forge.jmstest.executor.ProducerToConsumerListener" >
-    <property name="releaseManager" ref="releaseManager" />
     <property name="connectionProvider" ref="connectionProvider" />
     <property name="destinationProvider" ref="destinationProvider" />
     <property name="consumerWrapper" ref="messageConsumerWrapper" />

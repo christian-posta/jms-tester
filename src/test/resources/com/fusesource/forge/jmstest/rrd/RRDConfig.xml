@@ -10,5 +10,6 @@
   <bean id="RRDRecorder1" class="com.fusesource.forge.jmstest.rrd.RRDRecorder">
     <property name="name" value="Recorder1" />
     <property name="dsType" value="COUNTER" />
+    <property name="controller" ref="RRDDatabase" />
   </bean>
 </beans>

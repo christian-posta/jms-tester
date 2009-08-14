@@ -10,13 +10,14 @@ import javax.jms.Session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.benchmark.BenchmarkExecutionException;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
-import com.fusesource.forge.jmstest.benchmark.results.ProducerMetricCollector;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
 import com.fusesource.forge.jmstest.config.TestRunConfig;
 import com.fusesource.forge.jmstest.message.MessageFactory;
+import com.fusesource.forge.jmstest.probe.CountingProbe;
 
 public class BenchmarkProducer extends ExecutableBenchmarkComponent {
     private transient Log log;
@@ -24,13 +25,12 @@ public class BenchmarkProducer extends ExecutableBenchmarkComponent {
     private JMSConnectionProvider connectionProvider;
     private JMSDestinationProvider destinationProvider;
     private MessageFactory messageFactory;
-    private ReleaseManager releaseManager;
     
     private Connection conn;
     private Session session;
     private MessageProducer messageProducer;
 
-    private ProducerMetricCollector messageCounter;
+    private CountingProbe messageCounter;
 
     public BenchmarkProducer() {
     }
@@ -52,11 +52,7 @@ public class BenchmarkProducer extends ExecutableBenchmarkComponent {
 	}
 
 	public ReleaseManager getReleaseManager() {
-		return releaseManager;
-	}
-
-	public void setReleaseManager(ReleaseManager releaseManager) {
-		this.releaseManager = releaseManager;
+		return BenchmarkContext.getInstance().getReleaseManager();
 	}
 
 	public MessageFactory getMessageFactory() {
@@ -67,7 +63,7 @@ public class BenchmarkProducer extends ExecutableBenchmarkComponent {
 		this.messageFactory = messageFactory;
 	}
 
-    public void setMessageCounter(ProducerMetricCollector messageCounter) {
+    public void setMessageCounter(CountingProbe messageCounter) {
         this.messageCounter = messageCounter;
     }
 

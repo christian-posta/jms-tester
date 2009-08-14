@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
+import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
@@ -25,10 +26,6 @@ import com.fusesource.forge.jmstest.config.TestRunConfig;
  */
 public class ConsumerToProducerListener implements MessageListener, Releaseable {
 
-	/**
-	 * @uml.property  name="testRunConfig"
-	 * @uml.associationEnd  
-	 */
 	private TestRunConfig testRunConfig;
 	private JMSConnectionProvider connectionProvider;
 	private JMSDestinationProvider destinationProvider;
@@ -36,14 +33,8 @@ public class ConsumerToProducerListener implements MessageListener, Releaseable 
     private Connection conn;
     private Session session;
     private MessageConsumer consumer;
-    /**
-	 * @uml.property  name="waiter"
-	 * @uml.associationEnd  
-	 */
+
     private BenchmarkNotificationPayload waiter;
-    /**
-	 * @uml.property  name="isWaiting"
-	 */
     private boolean isWaiting = false;
 
     private transient Log log;
@@ -65,11 +56,7 @@ public class ConsumerToProducerListener implements MessageListener, Releaseable 
 	}
 
 	public ReleaseManager getReleaseManager() {
-		return releaseManager;
-	}
-
-	public void setReleaseManager(ReleaseManager releaseManager) {
-		this.releaseManager = releaseManager;
+		return BenchmarkContext.getInstance().getReleaseManager();
 	}
 
 	public void registerWaiter(BenchmarkNotificationPayload payload) {
@@ -167,10 +154,6 @@ public class ConsumerToProducerListener implements MessageListener, Releaseable 
         log().trace("<<< ProducerToConsumerListener#release");
     }
 
-    /**
-	 * @return
-	 * @uml.property  name="isWaiting"
-	 */
     public boolean isWaiting() {
         return isWaiting;
     }

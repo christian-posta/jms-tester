@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
+import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 import com.fusesource.forge.jmstest.benchmark.results.RawMetric;
 import com.fusesource.forge.jmstest.benchmark.results.RawMetricCollector;
@@ -21,20 +22,15 @@ import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
 import com.fusesource.forge.jmstest.config.TestRunConfig;
 
-/**
- * @author  andreasgies
- */
 public class BenchmarkConsumer implements MessageListener, Releaseable  {
     private transient Log log;
 
     private JMSConnectionProvider connectionProvider;
     private JMSDestinationProvider destinationProvider;
-    private ReleaseManager releaseManager;
     
     private Connection conn;
     private Session session;
     private MessageConsumer messageConsumer;
-    private TestRunConfig testRunConfig;
     private String clientId;
     private RawMetricCollector metricCollector;
 
@@ -59,16 +55,11 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
 	}
 
 	public ReleaseManager getReleaseManager() {
-		return releaseManager;
-	}
-
-	public void setReleaseManager(ReleaseManager releaseManager) {
-		this.releaseManager = releaseManager;
+		return BenchmarkContext.getInstance().getReleaseManager();
 	}
 
 	//TODO: simulate slow subscriber
     public void initialise(TestRunConfig testRunConfig, int clientId, RawMetricCollector collector) {
-        this.testRunConfig = testRunConfig;
         this.metricCollector = collector;
         this.setClientId(clientId);
         getReleaseManager().register(this);
