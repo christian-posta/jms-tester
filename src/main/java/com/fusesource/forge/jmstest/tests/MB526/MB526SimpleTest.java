@@ -3,13 +3,11 @@ package com.fusesource.forge.jmstest.tests.MB526;
 import org.springframework.test.context.ContextConfiguration;
 import org.testng.annotations.Test;
 
-import com.fusesource.forge.jmstest.config.TestRunConfig;
+import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.executor.BenchmarkProducerWrapper;
 import com.fusesource.forge.jmstest.executor.ConsumerToProducerListener;
-import com.fusesource.forge.jmstest.executor.JMSTest;
+import com.fusesource.forge.jmstest.executor.AbstractTestNGSpringJMSTest;
 import com.fusesource.forge.jmstest.executor.ProducerToConsumerListener;
-import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
-
 
 @ContextConfiguration(locations={
 		"classpath:com/fusesource/forge/jmstest/tests/MB526/broker-services.xml",
@@ -19,22 +17,18 @@ import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 		"classpath:com/fusesource/forge/jmstest/tests/MB526/stats.xml"
 })
 		
-public class MB526SimpleTest extends JMSTest {
+public class MB526SimpleTest extends AbstractTestNGSpringJMSTest {
 
 	@Test
     public void benchmark() {
-		TestRunConfig testRunConfig = (TestRunConfig)getBeanByClass(TestRunConfig.class);
-		
 		ConsumerToProducerListener cpl = (ConsumerToProducerListener)getBeanByClass(ConsumerToProducerListener.class);
-		cpl.initialise(testRunConfig);
+		cpl.initialise(BenchmarkContext.getInstance().getTestrunConfig());
 		
 		ProducerToConsumerListener listener = (ProducerToConsumerListener)getBeanByClass(ProducerToConsumerListener.class);
-		listener.initialize(testRunConfig);
+		listener.initialize(BenchmarkContext.getInstance().getTestrunConfig());
 
-		
 		BenchmarkProducerWrapper bpw = (BenchmarkProducerWrapper)getBeanByClass(BenchmarkProducerWrapper.class);
-		BenchmarkIteration profile = (BenchmarkIteration)applicationContext.getBean("testProfile");
-		bpw.initialise(testRunConfig, profile);
+		bpw.initialise(BenchmarkContext.getInstance().getTestrunConfig(), BenchmarkContext.getInstance().getProfile());
 		
 		bpw.benchmark();
     }

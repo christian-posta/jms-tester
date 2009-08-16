@@ -21,12 +21,12 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
-import com.fusesource.forge.jmstest.executor.JMSTest;
+import com.fusesource.forge.jmstest.executor.AbstractTestNGSpringJMSTest;
 import com.fusesource.forge.jmstest.tests.AsyncClient;
 import com.fusesource.forge.jmstest.tests.AsyncConsumer;
 import com.fusesource.forge.jmstest.tests.AsyncProducer;
 
-public abstract class AbstractNetworkOfBrokersTest extends JMSTest {
+public abstract class AbstractNetworkOfBrokersTest extends AbstractTestNGSpringJMSTest {
 
 
 	protected static final Log LOG = LogFactory.getLog(SystemaTestExternalBrokers.class);

@@ -4,21 +4,26 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
 
   <bean id="RRDDatabase" class="com.fusesource.forge.jmstest.rrd.RRDController">
-    <property name="fileName" value="target/Simple.rrd" />
-  </bean>
-
-  <bean id="ProducerMsgCounterRec" class="com.fusesource.forge.jmstest.rrd.RRDRecorder">
-    <property name="name" value="ProducerCountRecorder" />
-    <property name="dsType" value="GAUGE" />
+    <property name="fileName" value="target/MB526.rrd" />
+    <property name="step" value="1" />
   </bean>
 
   <bean id="ProducerMsgCounter" class="com.fusesource.forge.jmstest.probe.CountingProbe" >
     <property name="name" value="ProducerMsgCounter" />
-    <property name="dataConsumer" ref="ProducerMsgCounterRec" />
+    <property name="dataConsumer" >
+      <bean class="com.fusesource.forge.jmstest.rrd.RRDRecorder">
+        <property name="dsType" value="COUNTER" />
+        <property name="controller" ref="RRDDatabase" />
+      </bean>
+    </property>
   </bean>
   
   <bean id="ProbeRunner" class="com.fusesource.forge.jmstest.probe.ProbeRunner"> 
-    <property name="duration" value="30" />
-    <property name="interval" value="3" />
+	<property name="interval" value="1" />
+    <property name="probes">
+      <list>
+        <ref bean="ProducerMsgCounter" />
+      </list>
+    </property>
   </bean>
 </beans>

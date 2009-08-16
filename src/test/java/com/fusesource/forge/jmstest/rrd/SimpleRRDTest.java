@@ -11,14 +11,12 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
-
 @ContextConfiguration(locations={
 	"classpath:com/fusesource/forge/jmstest/rrd/RRDConfig.xml"})
 
 public class SimpleRRDTest extends AbstractTestNGSpringContextTests {
 
-	private final static int NUM_VALUES = 10;
+	private final static int NUM_VALUES = 120;
 	
 	@Test
 	public void rrdTest() {
@@ -27,6 +25,7 @@ public class SimpleRRDTest extends AbstractTestNGSpringContextTests {
 		long startTime = System.currentTimeMillis() / 1000;
 
 		RRDController controller = (RRDController)applicationContext.getBean("RRDDatabase");
+		controller.setArchiveLength((int) (NUM_VALUES / controller.getStep()));
 		RRDRecorder recorder = (RRDRecorder)applicationContext.getBean("RRDRecorder1");
 
 		try {

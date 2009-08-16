@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 import com.fusesource.forge.jmstest.config.TestRunConfig;
 import com.fusesource.forge.jmstest.executor.BenchmarkProducerWrapper;
 import com.fusesource.forge.jmstest.executor.ConsumerToProducerListener;
-import com.fusesource.forge.jmstest.executor.JMSTest;
+import com.fusesource.forge.jmstest.executor.AbstractTestNGSpringJMSTest;
 import com.fusesource.forge.jmstest.executor.ProducerToConsumerListener;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
@@ -16,7 +16,7 @@ import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 		"classpath:com/fusesource/forge/jmstest/tests/simple/test-beans.xml",
 		"classpath:com/fusesource/forge/jmstest/tests/simple/profiles.xml"})
 		
-public class SimpleTest extends JMSTest {
+public class SimpleTest extends AbstractTestNGSpringJMSTest {
 
 	@Test
     public void benchmark() {

@@ -8,7 +8,7 @@
     <property name="iterations">
       <list>
         <bean class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration">
-          <property name="duration"    value="20"/>
+          <property name="duration"    value="10"/>
           <property name="initialRate" value="500"/>
           <property name="maxRate"     value="1000" />
           <property name="increment"   value="100" />

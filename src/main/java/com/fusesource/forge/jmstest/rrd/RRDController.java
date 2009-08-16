@@ -67,7 +67,7 @@ public class RRDController implements Releaseable {
 	}
 
 	public RrdDb getDatabase() {
-		if (database.isClosed()) {
+		if (database == null || database.isClosed()) {
 			try {
 				database = new RrdDb(getFileName());
 			} catch (IOException e) {
@@ -126,6 +126,11 @@ public class RRDController implements Releaseable {
 		if (!dbFile.getAbsoluteFile().getParentFile().exists()) {
 			dbFile.getCanonicalFile().mkdirs();
 		}
+		
+		if(dbFile.exists()) {
+			dbFile.delete();
+		}
+		
 		log().debug("RRDController uses : " + dbFile.getAbsolutePath() + " Step: " + getStep());
 		
 		RrdDef rrdDef = new RrdDef(getFileName(), startTime, getStep());
@@ -143,6 +148,7 @@ public class RRDController implements Releaseable {
 		rrdDef.setStartTime(startTime);
 		rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 1, getArchiveLength());
 		database = new RrdDb(rrdDef);
+		database.close();
 		
 		executor = new ScheduledThreadPoolExecutor(1);
 		executor.scheduleAtFixedRate(new Runnable() {
@@ -177,15 +183,27 @@ public class RRDController implements Releaseable {
 			log().debug(valueCache.size() + " values in cache.");
 			long currentTime = System.currentTimeMillis() / 1000;
 
+			RrdDb db = getDatabase();
+			Sample writeSample;
+			
 			while((!valueCache.isEmpty()) && (complete || valueCache.firstKey() < currentTime)) {
 				Sample s = valueCache.remove(valueCache.firstKey());
 				try {
-					log().debug("Writing Sample : " + s.dump());
-					s.update();
+					writeSample = db.createSample();
+					writeSample.setTime(s.getTime());
+					writeSample.setValues(s.getValues());
+					log().debug("Writing Sample : " + writeSample.dump());
+					writeSample.update();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+			}
+			
+			try {
+				db.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 			log().debug("Pushed Metrics to RRD backend; " + valueCache.size() + " values remaining in cache.");
 		}
