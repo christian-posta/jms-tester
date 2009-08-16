@@ -31,6 +31,8 @@ public class RRDController implements Releaseable {
 	private boolean initialized = false;
 	private RrdDb database;
 	
+	private boolean autoStart = true;
+	
 	private ScheduledThreadPoolExecutor executor = null;
 	private TreeMap<Long, Sample> valueCache;
 	
@@ -62,6 +64,14 @@ public class RRDController implements Releaseable {
 		this.archiveLength = archiveLength;
 	}
 	
+	public boolean isAutoStart() {
+		return autoStart;
+	}
+
+	public void setAutoStart(boolean autoStart) {
+		this.autoStart = autoStart;
+	}
+
 	public ReleaseManager getReleaseManager() {
 		return BenchmarkContext.getInstance().getReleaseManager();
 	}

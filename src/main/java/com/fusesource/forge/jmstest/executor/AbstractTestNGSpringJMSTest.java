@@ -42,11 +42,21 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 	private void startRRDBackends() {
 		String [] beanNames = applicationContext.getBeanNamesForType(RRDController.class);
 		
-		for(String name: beanNames) {
-			RRDController controller = (RRDController)applicationContext.getBean(name);
-			controller.setArchiveLength((int)((BenchmarkContext.getInstance().getProfile().getTotalDuration() + 5) / controller.getStep() + 1));
+		if (beanNames.length > 0) {
+			for(String name: beanNames) {
+				RRDController controller = (RRDController)applicationContext.getBean(name);
+				controller.setArchiveLength((int)((BenchmarkContext.getInstance().getProfile().getTotalDuration() + 5) / controller.getStep() + 1));
+				try {
+					if (controller.isAutoStart()) {
+						controller.start();
+					}
+				} catch (Exception e) {
+					Assert.fail("Could not start RRD Backend", e);
+				}
+			}
+		} else {
 			try {
-				controller.start();
+				BenchmarkContext.getInstance().getRRDController().start();
 			} catch (Exception e) {
 				Assert.fail("Could not start RRD Backend", e);
 			}
@@ -55,9 +65,15 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 	
 	private void startProbeRunner() {
 		String [] beanNames = applicationContext.getBeanNamesForType(ProbeRunner.class);
-		
-		for(String name: beanNames) {
-			ProbeRunner runner = (ProbeRunner)applicationContext.getBean(name);
+
+		if (beanNames.length > 0) { 
+			for(String name: beanNames) {
+				ProbeRunner runner = (ProbeRunner)applicationContext.getBean(name);
+				runner.setDuration(BenchmarkContext.getInstance().getProfile().getTotalDuration());
+				runner.start();
+			}
+		} else {
+			ProbeRunner runner = BenchmarkContext.getInstance().getProbeRunner();
 			runner.setDuration(BenchmarkContext.getInstance().getProfile().getTotalDuration());
 			runner.start();
 		}
@@ -67,6 +83,7 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 	public void setUp() {
 		try {
 			log().info("Initializing Test ...");
+			BenchmarkContext.getInstance().setApplicationContext(applicationContext);
 			BrokerServicesFactory bsf = getBrokerServicesFactory();
 			if (bsf == null) {
 				log().warn("No BrokerServicesFactory configured in Test ...");

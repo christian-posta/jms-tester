@@ -90,6 +90,7 @@
   <bean id="messageConsumer" class="com.fusesource.forge.jmstest.executor.BenchmarkConsumer" scope="prototype" >
     <property name="connectionProvider" ref="connectionProvider" />
     <property name="destinationProvider" ref="destinationProvider" />
+    <property name="probeRunner" ref="ConsumerProbeRunner" />
   </bean>
 
   <!--  The consumer factory is responsible for creating the consumers upon request -->
@@ -110,5 +111,6 @@
        ProducerToConsumerNotifier --> 
   <bean id="messageConsumerWrapper" class="com.fusesource.forge.jmstest.executor.BenchmarkConsumerWrapper" >
     <property name="consumerFactory" ref="messageConsumerFactory" />
+    <property name="RRDController" ref="ConsumerRRD" />
   </bean>  
 </beans>

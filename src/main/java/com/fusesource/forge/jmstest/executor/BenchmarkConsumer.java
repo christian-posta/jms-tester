@@ -12,6 +12,7 @@ import javax.jms.TextMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.rrd4j.DsType;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
 import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
@@ -21,6 +22,9 @@ import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
 import com.fusesource.forge.jmstest.config.TestRunConfig;
 import com.fusesource.forge.jmstest.probe.AveragingProbe;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
+import com.fusesource.forge.jmstest.probe.ProbeRunner;
+import com.fusesource.forge.jmstest.rrd.RRDController;
+import com.fusesource.forge.jmstest.rrd.RRDRecorder;
 
 public class BenchmarkConsumer implements MessageListener, Releaseable  {
     private transient Log log;
@@ -33,12 +37,14 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
     private MessageConsumer messageConsumer;
     private String clientId;
     
+    private ProbeRunner probeRunner;
     private CountingProbe msgCounterProbe;
     private AveragingProbe latencyProbe;
     private AveragingProbe msgSizeProbe;
+    private RRDController rrdController;
 
     public void setClientId(int clientId) {
-        this.clientId = "benchmarkClient-" + clientId;
+        this.clientId = "bmClient-" + clientId;
     }
     
     public String getClientId() {
@@ -66,6 +72,15 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
 	}
 
 	public CountingProbe getMsgCounterProbe() {
+		if (msgCounterProbe == null) {
+			msgCounterProbe = new CountingProbe();
+			msgCounterProbe.setName(getClientId() + "-Counter");
+			RRDRecorder recorder = new RRDRecorder();
+			recorder.setProbe(msgCounterProbe);
+			recorder.setDsType(DsType.COUNTER);
+			recorder.setController(rrdController);
+			msgCounterProbe.setDataConsumer(recorder);
+		}
 		return msgCounterProbe;
 	}
 
@@ -74,6 +89,15 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
 	}
 
 	public AveragingProbe getLatencyProbe() {
+		if (latencyProbe == null) {
+			latencyProbe = new AveragingProbe();
+			latencyProbe.setName(getClientId() + "-Latency");
+			RRDRecorder recorder = new RRDRecorder();
+			recorder.setProbe(latencyProbe);
+			recorder.setDsType(DsType.GAUGE);
+			recorder.setController(rrdController);
+			latencyProbe.setDataConsumer(recorder);
+		}
 		return latencyProbe;
 	}
 
@@ -82,6 +106,15 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
 	}
 
 	public AveragingProbe getMsgSizeProbe() {
+		if (msgSizeProbe == null) {
+			msgSizeProbe = new AveragingProbe();
+			msgSizeProbe.setName(getClientId() + "-MsgSize");
+			RRDRecorder recorder = new RRDRecorder();
+			recorder.setProbe(msgSizeProbe);
+			recorder.setDsType(DsType.GAUGE);
+			recorder.setController(rrdController);
+			msgSizeProbe.setDataConsumer(recorder);
+		}
 		return msgSizeProbe;
 	}
 
@@ -89,10 +122,29 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
 		this.msgSizeProbe = msgSizeProbe;
 	}
 
+	public ProbeRunner getProbeRunner() {
+		if (probeRunner == null) {
+			probeRunner = BenchmarkContext.getInstance().getProbeRunner();
+		}
+		return probeRunner;
+	}
+
+	public void setProbeRunner(ProbeRunner probeRunner) {
+		this.probeRunner = probeRunner;
+	}
+
 	//TODO: simulate slow subscriber
-    public void initialise(TestRunConfig testRunConfig, int clientId) {
+    public void initialise(TestRunConfig testRunConfig, int clientId, RRDController rrdController) {
         this.setClientId(clientId);
+        this.rrdController = rrdController;
         getReleaseManager().register(this);
+        
+        if (getProbeRunner() != null) {
+        	getProbeRunner().addProbe(getMsgCounterProbe());
+        	getProbeRunner().addProbe(getLatencyProbe());
+        	getProbeRunner().addProbe(getMsgSizeProbe());
+        }
+        
         try {
             conn = getConnectionProvider().getConnection();
             session = conn.createSession(false, testRunConfig.getAcknowledgeMode().getCode());

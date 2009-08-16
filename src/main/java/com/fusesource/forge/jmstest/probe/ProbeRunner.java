@@ -12,27 +12,34 @@ public class ProbeRunner extends LimitedTimeScheduledExecutor {
 
 	private List<Probe> probes;
 	
-	public void setProbes(List<Probe> probes) {
-		this.probes = probes;
+	public ProbeRunner() {
+		probes = new ArrayList<Probe>();
 	}
 	
-	public List<Probe> getProbes() {
-		if (probes == null) {
-			probes = new ArrayList<Probe>();
+	synchronized public void setProbes(List<Probe> probes) {
+		if (probes != null) {
+			this.probes = probes;
 		}
+	}
+	
+    public List<Probe> getProbes() {
 		return probes;
 	}
 
 	public void addProbe(Probe probe) {
-		getProbes().add(probe);
+	    synchronized (probes) {
+			getProbes().add(probe);
+		}	
 	}
 	
 	public void run() {
 		setTask(new Runnable() {
 			public void run() {
 				log().debug("Gathering probes ...");
-				for(Probe probe: probes) {
-					probe.probe();
+				synchronized (probes) {
+					for(Probe probe: getProbes()) {
+						probe.probe();
+					}
 				}
 				log().debug("Gathering complete ...");
 			}

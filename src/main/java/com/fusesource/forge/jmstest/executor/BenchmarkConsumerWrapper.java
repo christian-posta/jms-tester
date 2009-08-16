@@ -3,14 +3,13 @@ package com.fusesource.forge.jmstest.executor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.ObjectFactory;
 
-import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.config.TestRunConfig;
+import com.fusesource.forge.jmstest.rrd.RRDController;
 
 public class BenchmarkConsumerWrapper {
 
@@ -21,19 +20,29 @@ public class BenchmarkConsumerWrapper {
     
     private ObjectFactory clientFactory;
     private List<BenchmarkConsumer> consumers;
+    
+    private RRDController controller;
 
     public void setConsumerFactory(ObjectFactory clientFactory) {
         this.clientFactory = clientFactory;
     }
 
-    public boolean initialise(TestRunConfig testRunConfig)  {
+    public RRDController getRRDController() {
+		return controller;
+	}
+
+	public void setRRDController(RRDController controller) {
+		this.controller = controller;
+	}
+
+	public boolean initialise(TestRunConfig testRunConfig)  {
         consumers = new ArrayList<BenchmarkConsumer>(testRunConfig.getNumConsumers());
         boolean configFailed = false;
         for (int i = 0; !configFailed && i < testRunConfig.getNumConsumers(); i++) {
             BenchmarkConsumer client = null;
             try {
                 client = (BenchmarkConsumer) clientFactory.getObject();
-                client.initialise(testRunConfig, i);
+                client.initialise(testRunConfig, i, controller);
                 consumers.add(client);
             } catch (Exception e) {
                 log().warn("Exception during client initialisation", e);
@@ -41,6 +50,12 @@ public class BenchmarkConsumerWrapper {
                 closedown();
             }
         }
+        try {
+			getRRDController().start();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return !configFailed;
     }
     
@@ -78,6 +93,7 @@ public class BenchmarkConsumerWrapper {
         if (scheduler != null) {
         	scheduler.shutdown();
         }
+        getRRDController().release();
         return false;
     }
 
