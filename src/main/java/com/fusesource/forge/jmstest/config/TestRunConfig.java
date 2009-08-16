@@ -20,6 +20,7 @@ public class TestRunConfig implements Serializable {
     private int numConsumers = 1;
 	private String adminFromProducer;
 	private String adminFromConsumer;
+	private String testDestinationName;
 
     public void setRunId(String runId) {
 		this.runId = runId;
@@ -152,8 +153,6 @@ public class TestRunConfig implements Serializable {
 			return false;
 		return true;
 	}
-
-	private String testDestinationName;
 
 	public String getTestDestinationName() {
 		return testDestinationName;

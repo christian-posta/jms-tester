@@ -1,6 +1,9 @@
 package com.fusesource.forge.jmstest.benchmark;
 
+import org.springframework.context.ApplicationContext;
+
 import com.fusesource.forge.jmstest.config.TestRunConfig;
+import com.fusesource.forge.jmstest.rrd.RRDController;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
 public class BenchmarkContext {
@@ -10,6 +13,8 @@ public class BenchmarkContext {
 	private ReleaseManager releaseManager = null;
 	private BenchmarkIteration profile = null;
 	private TestRunConfig testrunConfig = null;
+	private RRDController rrdController = null;
+	private ApplicationContext appContext = null;
 	
 	private BenchmarkContext() {
 		getReleaseManager();
@@ -28,6 +33,21 @@ public class BenchmarkContext {
 			Runtime.getRuntime().addShutdownHook(releaseManager);
 		}
 		return releaseManager;
+	}
+	
+	public RRDController getRRDController() {
+		if (rrdController == null) {
+			if (appContext != null) {
+				String[] rrdNames = appContext.getBeanNamesForType(RRDController.class);
+				if (rrdNames.length > 0) {
+					rrdController = (RRDController)appContext.getBean(rrdNames[0]);
+				} else {
+					rrdController = new RRDController();
+					rrdController.setFileName("PerformanceTest.rrd");
+				}
+			}
+		}
+		return rrdController;
 	}
 	
 	public BenchmarkIteration getProfile() {

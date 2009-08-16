@@ -3,10 +3,12 @@ package com.fusesource.forge.jmstest.rrd;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.rrd4j.DsType;
+import org.springframework.beans.factory.InitializingBean;
 
+import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.probe.AbstractProbeDataConsumer;
 
-public class RRDRecorder extends AbstractProbeDataConsumer {
+public class RRDRecorder extends AbstractProbeDataConsumer implements InitializingBean {
 	
 	private RRDController controller;
 	private DsType dsType = DsType.COUNTER;
@@ -14,6 +16,10 @@ public class RRDRecorder extends AbstractProbeDataConsumer {
 	public RRDRecorder() {}
 
 	public RRDController getController() {
+		if (controller == null) {
+			log().debug("No RRD Controller configured; using default...");
+			setController(BenchmarkContext.getInstance().getRRDController());
+		}
 		return controller;
 	}
 
@@ -37,6 +43,10 @@ public class RRDRecorder extends AbstractProbeDataConsumer {
 	public void record(long timestamp, Number value) {
 		log().debug(toString() + " recording : " + timestamp + ":" + value);
 		controller.record(this, timestamp, value);
+	}
+	
+	public void afterPropertiesSet() throws Exception {
+		getController();
 	}
 	
 	@Override

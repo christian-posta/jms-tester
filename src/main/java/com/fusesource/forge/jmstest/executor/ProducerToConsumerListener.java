@@ -28,7 +28,6 @@ public class ProducerToConsumerListener implements MessageListener, Releaseable 
 	private BenchmarkConsumerWrapper consumerWrapper;
 	private JMSConnectionProvider connectionProvider;
 	private JMSDestinationProvider destinationProvider;
-	private ReleaseManager releaseManager;
     private Connection conn;
     private Session consumerSession;
     private Session producerSession;
@@ -65,18 +64,18 @@ public class ProducerToConsumerListener implements MessageListener, Releaseable 
 		this.consumerWrapper = consumerWrapper;
 	}
 
-	public void initialize(TestRunConfig testRunConfig) {
+	public void initialize() {
     	release();
-        log().debug(">>> Initialising ProducerToConsumerListener");
+        log().debug("Initialising ProducerToConsumerListener");
         try {
         	conn = getConnectionProvider().getConnection();
             consumerSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            String receiveDestName = testRunConfig.getAdminFromProducer();
+            String receiveDestName = BenchmarkContext.getInstance().getTestrunConfig().getAdminFromProducer();
             Destination receiveDest = getDestinationProvider().getDestination(consumerSession, receiveDestName);
             consumer = consumerSession.createConsumer(receiveDest);
             consumer.setMessageListener(this);
             producerSession = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            String producerDestName = testRunConfig.getAdminFromConsumer();
+            String producerDestName = BenchmarkContext.getInstance().getTestrunConfig().getAdminFromConsumer();
             Destination producerDest = getDestinationProvider().getDestination(producerSession, producerDestName);
             producer = producerSession.createProducer(producerDest);
             conn.start();

@@ -21,15 +21,10 @@ import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
 import com.fusesource.forge.jmstest.config.TestRunConfig;
 
-/**
- * @author  andreasgies
- */
 public class ConsumerToProducerListener implements MessageListener, Releaseable {
 
-	private TestRunConfig testRunConfig;
 	private JMSConnectionProvider connectionProvider;
 	private JMSDestinationProvider destinationProvider;
-	private ReleaseManager releaseManager;
     private Connection conn;
     private Session session;
     private MessageConsumer consumer;
@@ -64,15 +59,14 @@ public class ConsumerToProducerListener implements MessageListener, Releaseable 
         this.isWaiting = true;
     }
 
-    public void initialise(TestRunConfig trc) {
+    public void initialise() {
     	release();
-    	testRunConfig = trc;
-        log().debug(">>> Initialising");
+        log().debug("ConsumerToProducerListener Initialising");
         getReleaseManager().register(this);
         try {
             conn = getConnectionProvider().getConnection();
             session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            String fromConsumerDestName = testRunConfig.getAdminFromConsumer();
+            String fromConsumerDestName = BenchmarkContext.getInstance().getTestrunConfig().getAdminFromConsumer();
             Destination fromConsumerDest = getDestinationProvider().getDestination(session, fromConsumerDestName);      
             consumer = session.createConsumer(fromConsumerDest);
             consumer.setMessageListener(this);

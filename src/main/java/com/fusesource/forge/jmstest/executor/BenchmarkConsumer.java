@@ -16,11 +16,11 @@ import org.apache.commons.logging.LogFactory;
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
 import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
-import com.fusesource.forge.jmstest.benchmark.results.RawMetric;
-import com.fusesource.forge.jmstest.benchmark.results.RawMetricCollector;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
 import com.fusesource.forge.jmstest.config.TestRunConfig;
+import com.fusesource.forge.jmstest.probe.AveragingProbe;
+import com.fusesource.forge.jmstest.probe.CountingProbe;
 
 public class BenchmarkConsumer implements MessageListener, Releaseable  {
     private transient Log log;
@@ -32,10 +32,17 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
     private Session session;
     private MessageConsumer messageConsumer;
     private String clientId;
-    private RawMetricCollector metricCollector;
+    
+    private CountingProbe msgCounterProbe;
+    private AveragingProbe latencyProbe;
+    private AveragingProbe msgSizeProbe;
 
     public void setClientId(int clientId) {
         this.clientId = "benchmarkClient-" + clientId;
+    }
+    
+    public String getClientId() {
+    	return this.clientId;
     }
 
     public JMSConnectionProvider getConnectionProvider() {
@@ -58,9 +65,32 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
 		return BenchmarkContext.getInstance().getReleaseManager();
 	}
 
+	public CountingProbe getMsgCounterProbe() {
+		return msgCounterProbe;
+	}
+
+	public void setMsgCounterProbe(CountingProbe msgCounterProbe) {
+		this.msgCounterProbe = msgCounterProbe;
+	}
+
+	public AveragingProbe getLatencyProbe() {
+		return latencyProbe;
+	}
+
+	public void setLatencyProbe(AveragingProbe latencyProbe) {
+		this.latencyProbe = latencyProbe;
+	}
+
+	public AveragingProbe getMsgSizeProbe() {
+		return msgSizeProbe;
+	}
+
+	public void setMsgSizeProbe(AveragingProbe msgSizeProbe) {
+		this.msgSizeProbe = msgSizeProbe;
+	}
+
 	//TODO: simulate slow subscriber
-    public void initialise(TestRunConfig testRunConfig, int clientId, RawMetricCollector collector) {
-        this.metricCollector = collector;
+    public void initialise(TestRunConfig testRunConfig, int clientId) {
         this.setClientId(clientId);
         getReleaseManager().register(this);
         try {
@@ -82,7 +112,15 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
         try {
             long now = System.currentTimeMillis();
             long latency = now - message.getLongProperty("SendTime");
-            metricCollector.collect(new RawMetric(this.clientId, now, latency, getMessageSize(message)));
+            if (getMsgCounterProbe() != null) {
+            	getMsgCounterProbe().increment();
+            }
+            if (getLatencyProbe() != null) {
+            	getLatencyProbe().addValue(new Double(latency));
+            }
+            if (getMsgSizeProbe() != null) {
+            	getMsgSizeProbe().addValue(new Double(getMessageSize(message)));
+            }
         } catch (JMSException e) {
             log().warn("SendTime not available in message properties", e);
         }

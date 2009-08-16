@@ -99,9 +99,6 @@
     </property>
   </bean>
  
-  <!-- The Raw MetricsCollector is used to capture raw metrics as quickly as possible. These will be summarized asynchronously --> 
-  <bean id="metricCollector" class="com.fusesource.forge.jmstest.benchmark.results.RawMetricCollector" />
-
   <!-- Finally consumer side is started by a Notification from the producer that the benchmark s about to start -->
   <bean id="producerListener" class="com.fusesource.forge.jmstest.executor.ProducerToConsumerListener" >
     <property name="connectionProvider" ref="connectionProvider" />
@@ -109,27 +106,9 @@
     <property name="consumerWrapper" ref="messageConsumerWrapper" />
   </bean>
   
-  <!-- A metrics summariser is used to digest to raw metrics and produce a mor meaningful output -->  
-  <bean id="metricSummariser" class="com.fusesource.forge.jmstest.benchmark.results.PerUnitMetricSummariser" />
-
-  <!-- The metrics flusher triggers the summarizer periodically to dump the summarized metrics. -->
-  <bean id="metricFlusher" class="com.fusesource.forge.jmstest.benchmark.results.CSVMetricFlusher" scope="prototype">
-    <property name="resultsDir" value="~/tmp"/>
-    <property name="summariser" ref="metricSummariser"/>
-    <property name="collector" ref="metricCollector" />
-  </bean>
-
-  <bean id="metricFlusherFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
-    <property name="targetBeanName">
-      <idref local="metricFlusher"/>
-    </property>
-  </bean>
-
   <!-- The BenchmarkConsumerWrapper encapsulates the creation of the desired number of consumers. Usually it is triggered by a 
        ProducerToConsumerNotifier --> 
   <bean id="messageConsumerWrapper" class="com.fusesource.forge.jmstest.executor.BenchmarkConsumerWrapper" >
-    <property name="metricsFlusherFactory" ref="metricFlusherFactory" />
     <property name="consumerFactory" ref="messageConsumerFactory" />
-    <property name="metricCollector" ref="metricCollector" />
   </bean>  
 </beans>

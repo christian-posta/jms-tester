@@ -55,12 +55,12 @@ public class BenchmarkClientNotifier implements Releaseable {
 		return BenchmarkContext.getInstance().getReleaseManager();
 	}
 
-	public void initialise(TestRunConfig testRunConfig) {
+	public void initialise() {
         try {
             getReleaseManager().register(this);
             conn = getConnectionProvider().getConnection();
             session = conn.createSession(false, AcknowledgeMode.AUTO_ACKNOWLEDGE.getCode());
-            String destName = testRunConfig.getAdminFromProducer();
+            String destName = BenchmarkContext.getInstance().getTestrunConfig().getAdminFromProducer();
             Destination dest = getDestinationProvider().getDestination(session, destName);
             messageProducer = session.createProducer(dest);
         } catch (Exception e) {

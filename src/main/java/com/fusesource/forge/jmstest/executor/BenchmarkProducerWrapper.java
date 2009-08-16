@@ -7,24 +7,17 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.ObjectFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
+import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.config.TestRunConfig;
-import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
 public class BenchmarkProducerWrapper {
 
 	private transient Log log;
 	
-	private TestRunConfig testRunConfig;
 	private ObjectFactory profileRunnerFactory;
-	private BenchmarkIteration profile;
 	private BenchmarkClientNotifier clientNotifier;
 	private ConsumerToProducerListener consumerListener;
 	private long maxWaitTime = 5L;
-	
-	public void initialise(TestRunConfig testRunConfig, BenchmarkIteration profile) {
-		this.testRunConfig = testRunConfig;
-		this.profile = profile;
-	}
 	
 	public void setProfileRunnerFactory(ObjectFactory profileRunnerFactory) {
 		this.profileRunnerFactory = profileRunnerFactory;
@@ -57,8 +50,8 @@ public class BenchmarkProducerWrapper {
 	public void benchmark() {
 		log().info("Benchmark");
 		
-		clientNotifier.initialise(testRunConfig);
-		consumerListener.initialise(testRunConfig);
+		clientNotifier.initialise();
+		consumerListener.initialise();
 		
         BenchmarkRunStatus runStatus = null;
 
@@ -75,10 +68,10 @@ public class BenchmarkProducerWrapper {
         }
         
         log().debug("Notifying consumers ...");
-        notifyClientAndWaitForResponse(true, testRunConfig);
-        log().info("Benchmark starting [" + testRunConfig.toString() + "]");
-        runner.setIteration(profile);
-        runner.setTestRunConfig(testRunConfig);
+        notifyClientAndWaitForResponse(true, BenchmarkContext.getInstance().getTestrunConfig());
+        log().info("Benchmark starting [" + BenchmarkContext.getInstance().getTestrunConfig().toString() + "]");
+        runner.setIteration(BenchmarkContext.getInstance().getProfile());
+        runner.setTestRunConfig(BenchmarkContext.getInstance().getTestrunConfig());
         runner.observeStatus(runStatus);
         CountDownLatch barrier = new CountDownLatch(1);
         runner.setBenchmarkIterationLatch(barrier);
@@ -86,13 +79,13 @@ public class BenchmarkProducerWrapper {
 
         try {
             barrier.await();
-            log().info("Benchmark completed [" + testRunConfig.toString() + "]");
+            log().info("Benchmark completed [" + BenchmarkContext.getInstance().getTestrunConfig().toString() + "]");
         } catch (InterruptedException e) {
             runStatus.setState(BenchmarkRunStatus.State.FAILED);
             log().warn("Benchmark broken", e);
         } finally {
         	log.debug("Notifying consumer of benchmark end");
-        	notifyClientAndWaitForResponse(false, testRunConfig);
+        	notifyClientAndWaitForResponse(false, BenchmarkContext.getInstance().getTestrunConfig());
         }
     }
     

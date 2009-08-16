@@ -9,13 +9,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.ObjectFactory;
 
-import com.fusesource.forge.jmstest.benchmark.results.MetricsFlusher;
-import com.fusesource.forge.jmstest.benchmark.results.RawMetricCollector;
+import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.config.TestRunConfig;
 
-/**
- * @author  andreasgies
- */
 public class BenchmarkConsumerWrapper {
 
     private transient Log log;
@@ -23,37 +19,11 @@ public class BenchmarkConsumerWrapper {
     private ScheduledThreadPoolExecutor scheduler;
     private boolean running = false;
     
-    private ObjectFactory flusherFactory;
-    
     private ObjectFactory clientFactory;
     private List<BenchmarkConsumer> consumers;
 
-    private RawMetricCollector metricCollector;
-
-    public BenchmarkConsumerWrapper() {
-    }
-
-    public void setMetricsFlusherFactory(ObjectFactory factory) {
-    	this.flusherFactory = factory;
-    }
-    
-    public MetricsFlusher getMetricsFlusher() {
-    	if (flusherFactory != null) {
-    	  return (MetricsFlusher)flusherFactory.getObject();
-    	}
-    	return null;
-    }
-    
     public void setConsumerFactory(ObjectFactory clientFactory) {
         this.clientFactory = clientFactory;
-    }
-
-    public void setMetricCollector(RawMetricCollector metricCollector) {
-        this.metricCollector = metricCollector;
-    }
-
-    public RawMetricCollector getMetricCollector() {
-        return metricCollector;
     }
 
     public boolean initialise(TestRunConfig testRunConfig)  {
@@ -63,7 +33,7 @@ public class BenchmarkConsumerWrapper {
             BenchmarkConsumer client = null;
             try {
                 client = (BenchmarkConsumer) clientFactory.getObject();
-                client.initialise(testRunConfig, i, metricCollector);
+                client.initialise(testRunConfig, i);
                 consumers.add(client);
             } catch (Exception e) {
                 log().warn("Exception during client initialisation", e);
@@ -79,21 +49,6 @@ public class BenchmarkConsumerWrapper {
             try {
             	log().info("Starting BenchmarkConsumerWrapper [" + testRunConfig + "]");
             	initialise(testRunConfig);
-            	MetricsFlusher flusher = getMetricsFlusher();
-            	if (flusher != null) {
-            		flusher.setRunId(testRunConfig.getRunId());
-                    flusher.setCollector(getMetricCollector());
-                    if (flusher.initialiseFlusher()) {
-                        scheduler = new ScheduledThreadPoolExecutor(2);
-                        scheduler.scheduleWithFixedDelay(flusher, 30, 30, TimeUnit.SECONDS);
-                        if (initialise(testRunConfig)) {
-                            log().info("Benchmark consumers initialised and ready to benchmark [" + testRunConfig + "]");
-                            running = true;
-                        } else {
-                            log().warn("Failed to initialise benchmark consumers [" + testRunConfig + "]");
-                        }
-                    }
-            	}
             	running = true;
             } catch (Exception e) {
                 log().error("Unable to get BenchmarkClient from factory", e);
@@ -123,7 +78,6 @@ public class BenchmarkConsumerWrapper {
         if (scheduler != null) {
         	scheduler.shutdown();
         }
-        metricCollector.stop();
         return false;
     }
 

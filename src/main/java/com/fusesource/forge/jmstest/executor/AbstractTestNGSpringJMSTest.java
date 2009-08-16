@@ -17,7 +17,7 @@ import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTests {
 
 	private transient Log log = null; 
-
+	
 	protected Object getBeanByClass(Class clazz) {
 		Object result = null;
 		String [] beanNames = applicationContext.getBeanNamesForType(clazz);
@@ -33,6 +33,10 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 	
 	public BrokerServicesFactory getBrokerServicesFactory() {
 		return (BrokerServicesFactory)getBeanByClass(BrokerServicesFactory.class);
+	}
+	
+	public BenchmarkProducerWrapper getProducerWrapper() {
+		return (BenchmarkProducerWrapper)getBeanByClass(BenchmarkProducerWrapper.class);
 	}
 
 	private void startRRDBackends() {
@@ -86,10 +90,21 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 				BenchmarkContext.getInstance().setTestrunConfig(testrunConfig);
 			}
 			
+			ProducerToConsumerListener listener = (ProducerToConsumerListener)getBeanByClass(ProducerToConsumerListener.class);
+			if (listener != null) {
+				listener.initialize();
+			}
+
 			startRRDBackends();
 			startProbeRunner();
 		} catch (Exception e) {
 			Assert.fail("Unexpected exception setting up test", e);
+		}
+	}
+	
+	public void benchmark() {
+		if (getProducerWrapper() != null) {
+			getProducerWrapper().benchmark();
 		}
 	}
 	
