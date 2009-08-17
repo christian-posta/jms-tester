@@ -11,7 +11,9 @@ import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.config.BrokerServicesFactory;
 import com.fusesource.forge.jmstest.config.TestRunConfig;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
+import com.fusesource.forge.jmstest.rrd.GraphGenerator;
 import com.fusesource.forge.jmstest.rrd.RRDController;
+import com.fusesource.forge.jmstest.rrd.RRDGraphGenerator;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
 public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTests {
@@ -42,21 +44,13 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 	private void startRRDBackends() {
 		String [] beanNames = applicationContext.getBeanNamesForType(RRDController.class);
 		
-		if (beanNames.length > 0) {
-			for(String name: beanNames) {
-				RRDController controller = (RRDController)applicationContext.getBean(name);
-				controller.setArchiveLength((int)((BenchmarkContext.getInstance().getProfile().getTotalDuration() + 5) / controller.getStep() + 1));
-				try {
-					if (controller.isAutoStart()) {
-						controller.start();
-					}
-				} catch (Exception e) {
-					Assert.fail("Could not start RRD Backend", e);
-				}
-			}
-		} else {
+		for(String name: beanNames) {
+			RRDController controller = (RRDController)applicationContext.getBean(name);
+			controller.setArchiveLength((int)((BenchmarkContext.getInstance().getProfile().getTotalDuration() + 5) / controller.getStep() + 1));
 			try {
-				BenchmarkContext.getInstance().getRRDController().start();
+				if (controller.isAutoStart()) {
+					controller.start();
+				}
 			} catch (Exception e) {
 				Assert.fail("Could not start RRD Backend", e);
 			}
@@ -66,14 +60,8 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 	private void startProbeRunner() {
 		String [] beanNames = applicationContext.getBeanNamesForType(ProbeRunner.class);
 
-		if (beanNames.length > 0) { 
-			for(String name: beanNames) {
-				ProbeRunner runner = (ProbeRunner)applicationContext.getBean(name);
-				runner.setDuration(BenchmarkContext.getInstance().getProfile().getTotalDuration());
-				runner.start();
-			}
-		} else {
-			ProbeRunner runner = BenchmarkContext.getInstance().getProbeRunner();
+		for(String name: beanNames) {
+			ProbeRunner runner = (ProbeRunner)applicationContext.getBean(name);
 			runner.setDuration(BenchmarkContext.getInstance().getProfile().getTotalDuration());
 			runner.start();
 		}
@@ -125,6 +113,16 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 		}
 	}
 	
+	public void createGraphs() {
+		// Make sure to flush all stats
+		BenchmarkContext.getInstance().getReleaseManager().run();
+		String[] beanNames = applicationContext.getBeanNamesForType(GraphGenerator.class);
+		for(String name: beanNames) {
+			GraphGenerator gg = (GraphGenerator)applicationContext.getBean(name);
+			gg.createGraphs();
+		}
+	}
+
 	@AfterClass
 	public void tearDown() {
 		try {

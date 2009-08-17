@@ -123,9 +123,6 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
 	}
 
 	public ProbeRunner getProbeRunner() {
-		if (probeRunner == null) {
-			probeRunner = BenchmarkContext.getInstance().getProbeRunner();
-		}
 		return probeRunner;
 	}
 

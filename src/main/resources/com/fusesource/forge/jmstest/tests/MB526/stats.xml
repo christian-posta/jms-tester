@@ -38,4 +38,8 @@
     <property name="name" value="ConsumerProbeRunner" />
 	<property name="interval" value="1" />
   </bean>
+  
+  <bean id="GraphGenerator" class="com.fusesource.forge.jmstest.rrd.RRDGraphGenerator">
+  	<property name="baseDir" value="target" />
+  </bean>
 </beans>

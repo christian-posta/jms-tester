@@ -18,5 +18,6 @@ public class MB526SimpleTest extends AbstractTestNGSpringJMSTest {
 	@Test
     public void benchmark() {
 		super.benchmark();
+		createGraphs();
     }
 }
