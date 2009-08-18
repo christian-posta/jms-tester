@@ -2,7 +2,7 @@ package com.fusesource.forge.jmstest.benchmark;
 
 import org.springframework.context.ApplicationContext;
 
-import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
 public class BenchmarkContext {
@@ -10,7 +10,7 @@ public class BenchmarkContext {
 	private static BenchmarkContext instance = null;
 
 	private BenchmarkIteration profile = null;
-	private TestRunConfig testrunConfig = null;
+	private BenchmarkPartConfig testrunConfig = null;
 	private ApplicationContext appContext = null;
 	
 	synchronized public static BenchmarkContext getInstance() {
@@ -24,11 +24,11 @@ public class BenchmarkContext {
 		return profile;
 	}
 	
-	public void setTestrunConfig(TestRunConfig testrunConfig) {
+	public void setTestrunConfig(BenchmarkPartConfig testrunConfig) {
 		this.testrunConfig = testrunConfig;
 	}
 	
-	public TestRunConfig getTestrunConfig() {
+	public BenchmarkPartConfig getTestrunConfig() {
 		return testrunConfig;
 	}
 	

@@ -16,7 +16,7 @@ import org.rrd4j.DsType;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
-import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
 import com.fusesource.forge.jmstest.probe.AveragingProbe;
@@ -130,7 +130,7 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
 	}
 
 	//TODO: simulate slow subscriber
-    public void initialise(TestRunConfig testRunConfig, int clientId, RRDController rrdController) {
+    public void initialise(BenchmarkPartConfig testRunConfig, int clientId, RRDController rrdController) {
         this.setClientId(clientId);
         this.rrdController = rrdController;
         getReleaseManager().register(this);

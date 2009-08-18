@@ -1,0 +1,14 @@
+#!/bin/sh
+
+APP_HOME=`dirname $0`
+
+APPCP=$APP_HOME/../conf
+for jar in $APP_HOME/../lib/*.jar 
+do
+  APPCP=$APPCP:${jar}
+done
+
+export PATH=$PATH:$APP_HOME/../lib
+
+java -classpath $APPCP com.fusesource.forge.jmstest.executor.BenchmarkClient $@
+

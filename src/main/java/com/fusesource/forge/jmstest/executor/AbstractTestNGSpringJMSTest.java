@@ -9,7 +9,7 @@ import org.testng.annotations.BeforeClass;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
-import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.config.BrokerServicesFactory;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
 import com.fusesource.forge.jmstest.rrd.GraphGenerator;
@@ -87,7 +87,7 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 				BenchmarkContext.getInstance().setProfile(profile);
 			}
 			
-			TestRunConfig testrunConfig = (TestRunConfig)getBeanByClass(TestRunConfig.class);
+			BenchmarkPartConfig testrunConfig = (BenchmarkPartConfig)getBeanByClass(BenchmarkPartConfig.class);
 			if (profile == null) {
 				log().error("No testrun config set for Testrun.");
 				Assert.fail();
@@ -95,10 +95,10 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 				BenchmarkContext.getInstance().setTestrunConfig(testrunConfig);
 			}
 			
-			ProducerToConsumerListener listener = (ProducerToConsumerListener)getBeanByClass(ProducerToConsumerListener.class);
-			if (listener != null) {
-				listener.initialize();
-			}
+//			ProducerToConsumerListener listener = (ProducerToConsumerListener)getBeanByClass(ProducerToConsumerListener.class);
+//			if (listener != null) {
+//				listener.initialize();
+//			}
 
 			startRRDBackends();
 			startProbeRunner();

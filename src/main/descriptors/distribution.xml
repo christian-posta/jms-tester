@@ -15,7 +15,7 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>src/main/resources</directory>
+      <directory>src/main/testScripts</directory>
       <outputDirectory>conf</outputDirectory>
       <includes>
         <include>**/*</include>

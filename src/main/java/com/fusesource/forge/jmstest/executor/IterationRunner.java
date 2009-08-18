@@ -13,7 +13,7 @@ import org.springframework.beans.factory.ObjectFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
-import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
@@ -29,14 +29,14 @@ public class IterationRunner extends ExecutableBenchmarkComponent implements Run
     private long sendingDelay;
     private CountDownLatch benchmarkIterationLatch;
     private long maxRatePerProducerThread = 5000; //default
-    private TestRunConfig testRunConfig;
+    private BenchmarkPartConfig testRunConfig;
     private CountingProbe probe;
     
-    public TestRunConfig getTestRunConfig() {
+    public BenchmarkPartConfig getTestRunConfig() {
 		return testRunConfig;
 	}
 
-	public void setTestRunConfig(TestRunConfig testRunConfig) {
+	public void setTestRunConfig(BenchmarkPartConfig testRunConfig) {
 		this.testRunConfig = testRunConfig;
 	}
 

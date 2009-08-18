@@ -2,7 +2,7 @@ package com.fusesource.forge.jmstest.executor;
 
 import java.io.Serializable;
 
-import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 
 /**
  * @author  andreasgies
@@ -15,7 +15,7 @@ public class BenchmarkNotificationPayload implements Serializable {
 	 * @uml.property  name="config"
 	 * @uml.associationEnd  
 	 */
-	private TestRunConfig config;
+	private BenchmarkPartConfig config;
     /**
 	 * @uml.property  name="endOfTest"
 	 */
@@ -25,7 +25,7 @@ public class BenchmarkNotificationPayload implements Serializable {
 	 */
     private boolean clientConfigured;
 
-    public BenchmarkNotificationPayload(TestRunConfig config, boolean endOfTest) {
+    public BenchmarkNotificationPayload(BenchmarkPartConfig config, boolean endOfTest) {
         this.config = config;
         this.endOfTest = endOfTest;
     }
@@ -34,7 +34,7 @@ public class BenchmarkNotificationPayload implements Serializable {
 	 * @return
 	 * @uml.property  name="config"
 	 */
-    public TestRunConfig getConfig() {
+    public BenchmarkPartConfig getConfig() {
         return config;
     }
 

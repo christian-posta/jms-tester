@@ -15,6 +15,7 @@
 		<xbean-version>3.1.0.3-fuse</xbean-version>
 		<testng.version>5.8</testng.version>
 		<logging.version>1.1.1</logging.version>
+		<io.version>1.4</io.version>
 		<log4j.version>1.2.14</log4j.version>
 	</properties>
 	
@@ -86,6 +87,11 @@
 	    	<groupId>commons-logging</groupId>
 	    	<artifactId>commons-logging</artifactId>
 	    	<version>${logging.version}</version>
+	    </dependency>
+	    <dependency>
+	    	<groupId>commons-io</groupId>
+	    	<artifactId>commons-io</artifactId>
+	    	<version>${io.version}</version>
 	    </dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>

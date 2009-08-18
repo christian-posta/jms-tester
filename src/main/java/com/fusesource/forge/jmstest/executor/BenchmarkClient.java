@@ -1,4 +1,9 @@
-package com.fusesource.forge.jmstest.benchmark.command;
+package com.fusesource.forge.jmstest.executor;
+
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkClientInfo;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCommand;
+import com.fusesource.forge.jmstest.benchmark.command.CommandTypes;
+import com.fusesource.forge.jmstest.benchmark.command.DefaultCommandHandler;
 
 public class BenchmarkClient extends AbstractBenchmarkExecutor {
 
@@ -27,6 +32,10 @@ public class BenchmarkClient extends AbstractBenchmarkExecutor {
 				}
 			}
 		});
+	}
+	
+	@Override
+	protected void execute() {
 	}
 	
 	public static void main(String[] args) {

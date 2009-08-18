@@ -3,25 +3,6 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
 
-  <!--  The Test config bean encapsulates the overall settings for our test -->
-  <bean id="TestConfig" class="com.fusesource.forge.jmstest.benchmark.command.TestRunConfig">
-    <property name="runId" value="1" />
-    <!--  The test subject destination -->
-    <property name="testDestinationName" value="queue:test" />
-    <!--  The admin destination from producers to consumers -->
-    <property name="adminFromProducer" value="queue:test.admin.producer" />
-    <!--  The admin destination from consumers to producers -->
-    <property name="adminFromConsumer" value="queue:test.admin.consumer" />
-    <!-- PERSRISTENT | NON_PERSISTENT -->
-    <property name="deliveryMode" value="NON_PERSISTENT" />
-    <!-- How do we acknowledge messages -->
-    <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
-    <!-- Run with JMS transactions ? -->
-    <property name="transacted" value="false" />
-    <!-- How many consumers do we want to run ? -->
-    <property name="numConsumers" value="1" />
-  </bean>
-
   <!-- This will try to locate a BrokerServiceFactory and initialize all brokers there -->
   <bean id="brokerServicesFactory" class="com.fusesource.forge.jmstest.config.impl.SpringBrokerServicesFactory" />
   
@@ -60,25 +41,9 @@
 
   <!--  ============================================================================================================================ -->
 
-  <!-- The Benchmark client Notifier sends out the Notification from the Producer to the consumers that the benchmark is about to start -->
-  <bean id="clientNotifier" class="com.fusesource.forge.jmstest.executor.BenchmarkClientNotifier">
-    <property name="connectionProvider" ref="connectionProvider" />
-    <property name="destinationProvider" ref="destinationProvider" />
-  </bean>  
-
-  <!-- The consumer listener listens for the consumer responses (that they are ready to go) -->  
-  <bean id="consumerListener" class="com.fusesource.forge.jmstest.executor.ConsumerToProducerListener">
-    <property name="connectionProvider" ref="connectionProvider" />
-    <property name="destinationProvider" ref="destinationProvider" />
-  </bean> 
-
-  <!--  ============================================================================================================================ -->
-
   <!-- The Benchmarkproducer wraps up creating and initializing the profile runner to execute the benchmark 
        from the producer side -->
   <bean id="benchmarkProducer" class="com.fusesource.forge.jmstest.executor.BenchmarkProducerWrapper">
-    <property name="consumerListener" ref="consumerListener" />
-    <property name="clientNotifier" ref="clientNotifier" />
     <property name="profileRunnerFactory" ref="benchmarkProfileRunnerFactory" /> 
     <property name="maxWaitTime" value="10" />
   </bean>
@@ -100,15 +65,7 @@
     </property>
   </bean>
  
-  <!-- Finally consumer side is started by a Notification from the producer that the benchmark s about to start -->
-  <bean id="producerListener" class="com.fusesource.forge.jmstest.executor.ProducerToConsumerListener" >
-    <property name="connectionProvider" ref="connectionProvider" />
-    <property name="destinationProvider" ref="destinationProvider" />
-    <property name="consumerWrapper" ref="messageConsumerWrapper" />
-  </bean>
-  
-  <!-- The BenchmarkConsumerWrapper encapsulates the creation of the desired number of consumers. Usually it is triggered by a 
-       ProducerToConsumerNotifier --> 
+  <!-- The BenchmarkConsumerWrapper encapsulates the creation of the desired number of consumers.  --> 
   <bean id="messageConsumerWrapper" class="com.fusesource.forge.jmstest.executor.BenchmarkConsumerWrapper" >
     <property name="consumerFactory" ref="messageConsumerFactory" />
     <property name="RRDController" ref="ConsumerRRD" />

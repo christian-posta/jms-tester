@@ -8,7 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.ObjectFactory;
 
-import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.rrd.RRDController;
 
 public class BenchmarkConsumerWrapper {
@@ -35,7 +35,7 @@ public class BenchmarkConsumerWrapper {
 		this.controller = controller;
 	}
 
-	public boolean initialise(TestRunConfig testRunConfig)  {
+	public boolean initialise(BenchmarkPartConfig testRunConfig)  {
         consumers = new ArrayList<BenchmarkConsumer>(testRunConfig.getNumConsumers());
         boolean configFailed = false;
         for (int i = 0; !configFailed && i < testRunConfig.getNumConsumers(); i++) {
@@ -59,7 +59,7 @@ public class BenchmarkConsumerWrapper {
         return !configFailed;
     }
     
-    synchronized public boolean start(TestRunConfig testRunConfig) {
+    synchronized public boolean start(BenchmarkPartConfig testRunConfig) {
         if (!isRunning()) {
             try {
             	log().info("Starting BenchmarkConsumerWrapper [" + testRunConfig + "]");

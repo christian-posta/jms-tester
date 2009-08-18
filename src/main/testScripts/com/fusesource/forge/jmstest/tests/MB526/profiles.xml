@@ -1,0 +1,47 @@
+<beans
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
+
+  <bean id="benchmark1" class="com.fusesource.forge.jmstest.benchmark.command.BenchmarkConfig">
+    <property name="benchmarkId" value="benchmark-1" />
+    <property name="configLocations">
+    	<list>
+    		<bean class="java.lang.String">
+    		  <constructor-arg value="src/main/testScripts/com/fusesource/forge/jmstest/tests/MB526" />
+    		</bean>
+    	</list>
+    </property>
+    
+    <property name="benchmarkParts">
+	  <list>
+	    <bean class="com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig">
+	      <property name="testDestinationName" value="queue:test1" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="1" />
+	      <property name="profileName" value="testProfile" />
+	    </bean>
+	    <bean class="com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig">
+	      <property name="testDestinationName" value="queue:test2" />
+	      <property name="deliveryMode" value="PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="1" />
+	      <property name="profileName" value="testProfile" />
+	    </bean>
+	  </list> 
+    </property>
+  </bean>    
+  
+  <bean id="testProfile" class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration">
+    <property name="name" value="testProfile" />
+    <property name="duration"    value="10"/>
+    <property name="initialRate" value="500"/>
+    <property name="maxRate"     value="1000" />
+    <property name="increment"   value="100" />
+    <property name="measured"    value="true"/>
+  </bean>
+
+</beans>

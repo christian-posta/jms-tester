@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
+import com.fusesource.forge.jmstest.executor.AbstractBenchmarkExecutor;
 import com.fusesource.forge.jmstest.executor.Releaseable;
 
 public class JMSCommandTransport implements MessageListener, Releaseable, ExceptionListener {

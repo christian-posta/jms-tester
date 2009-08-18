@@ -1,4 +1,4 @@
-package com.fusesource.forge.jmstest.benchmark.command;
+package com.fusesource.forge.jmstest.executor;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -12,14 +12,19 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCommand;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCommandChainHandler;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCommandHandler;
+import com.fusesource.forge.jmstest.benchmark.command.CommandTypes;
+import com.fusesource.forge.jmstest.benchmark.command.DefaultCommandHandler;
+import com.fusesource.forge.jmstest.benchmark.command.JMSCommandTransport;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
-import com.fusesource.forge.jmstest.executor.Releaseable;
-import com.fusesource.forge.jmstest.executor.TerminatingThreadPoolExecutor;
 
 public abstract class AbstractBenchmarkExecutor implements Runnable, Releaseable {
 
@@ -96,10 +101,15 @@ public abstract class AbstractBenchmarkExecutor implements Runnable, Releaseable
 		getCmdTransport().start();
 	}
 	
+	protected abstract void execute();
+	
 	public void run() {
 		init();
 		log().info("Running Benchmarking framework ...");
 		latch = new CountDownLatch(1);
+		
+		execute();
+		
 		try {
 			latch.await();
 		} catch (InterruptedException e) {
@@ -184,7 +194,7 @@ public abstract class AbstractBenchmarkExecutor implements Runnable, Releaseable
 		this.destinationProviderName = destinationProviderName;
 	}
 
-	private ApplicationContext getApplicationContext() {
+	protected ApplicationContext getApplicationContext() {
 		if (applicationContext == null) {
 			List<String> cfgLocations = new ArrayList<String>();
 			StringTokenizer sTok = new StringTokenizer(getSpringConfigDirs(), ":");
@@ -219,7 +229,16 @@ public abstract class AbstractBenchmarkExecutor implements Runnable, Releaseable
 				}
 			}
 			String[] configLocations = cfgLocations.toArray(new String[0]);
-			applicationContext = new FileSystemXmlApplicationContext(configLocations);
+			try {
+				applicationContext = new FileSystemXmlApplicationContext(configLocations);
+			} catch (BeansException be) {
+				log.error("Could not create Application Context.", be);
+			}
+			if (log().isDebugEnabled()) {
+				for(String beanName: applicationContext.getBeanDefinitionNames()) {
+					log().debug("Found bean: " + beanName);
+				}
+			}
 		}
 		return applicationContext;
 	}

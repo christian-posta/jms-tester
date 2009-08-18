@@ -3,7 +3,7 @@ package com.fusesource.forge.jmstest.executor;
 import java.util.Observable;
 import java.util.Observer;
 
-import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 
 /**
  * @author  andreasgies
@@ -11,16 +11,16 @@ import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
 public abstract class ExecutableBenchmarkComponent implements Observer, Releaseable {
 
 	private BenchmarkRunStatus benchmarkStatus;
-    private TestRunConfig testRunConfig;
+    private BenchmarkPartConfig testRunConfig;
 
     protected ExecutableBenchmarkComponent() {
     }
 
-    public void setTestRunConfig(TestRunConfig testRunConfig) {
+    public void setTestRunConfig(BenchmarkPartConfig testRunConfig) {
     	this.testRunConfig = testRunConfig;
     }
     
-    public TestRunConfig getTestRunConfig() {
+    public BenchmarkPartConfig getTestRunConfig() {
     	return testRunConfig;
     }
     

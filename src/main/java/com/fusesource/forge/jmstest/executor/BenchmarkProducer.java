@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkExecutionException;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
-import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
 import com.fusesource.forge.jmstest.message.MessageFactory;
@@ -66,13 +66,13 @@ public class BenchmarkProducer extends ExecutableBenchmarkComponent {
         this.messageCounter = messageCounter;
     }
 
-    public void configure(TestRunConfig testRunConfig, boolean reinitialiseSession) {
+    public void configure(BenchmarkPartConfig testRunConfig, boolean reinitialiseSession) {
         if (reinitialiseSession) {
             initialise(testRunConfig);
         }
     }
 
-    public void initialise(TestRunConfig testRunConfig) throws BenchmarkExecutionException {
+    public void initialise(BenchmarkPartConfig testRunConfig) throws BenchmarkExecutionException {
     	setTestRunConfig(testRunConfig);
         getReleaseManager().register(this);
         try {

@@ -12,28 +12,37 @@ import java.io.Serializable;
 import com.fusesource.forge.jmstest.config.AcknowledgeMode;
 import com.fusesource.forge.jmstest.config.DeliveryMode;
 
-public class TestRunConfig implements Serializable {
+public class BenchmarkPartConfig implements Serializable {
 
 	private static final long serialVersionUID = -6606481736821036885L;
 	
-	private String runId;
     private AcknowledgeMode acknowledgeMode;
     private DeliveryMode deliveryMode;
     private boolean transacted;
     private int numConsumers = 1;
-	private String adminFromProducer;
-	private String adminFromConsumer;
 	private String testDestinationName;
+	private int transactionBatchSize = 1;
+	private String profileName;
+	private String consumerClients = "ALL";
+	private String producerClients = "ALL";
 
-    public void setRunId(String runId) {
-		this.runId = runId;
-	}
-    
-    public String getRunId() {
-		return runId;
+	public String getProducerClients() {
+		return producerClients;
 	}
 
-    public void setAcknowledgeMode(AcknowledgeMode acknowledgeMode) {
+	public void setProducerClients(String producerClients) {
+		this.producerClients = producerClients;
+	}
+
+	public String getConsumerClients() {
+		return consumerClients;
+	}
+
+	public void setConsumerClients(String consumerClients) {
+		this.consumerClients = consumerClients;
+	}
+
+   public void setAcknowledgeMode(AcknowledgeMode acknowledgeMode) {
 		this.acknowledgeMode = acknowledgeMode;
 	}
     
@@ -65,37 +74,53 @@ public class TestRunConfig implements Serializable {
 		this.numConsumers = numConsumers;
 	}
 
+	public String getTestDestinationName() {
+		return testDestinationName;
+	}
+
+	public void setTestDestinationName(String testDestinationName) {
+		this.testDestinationName = testDestinationName;
+	}
+
+	public int getTransactionBatchSize() {
+		return transactionBatchSize;
+	}
+
+	public void setTransactionBatchSize(int transactionBatchSize) {
+		this.transactionBatchSize = transactionBatchSize;
+	}
+
+	public String getProfileName() {
+		return profileName;
+	}
+
+	public void setProfileName(String profileName) {
+		this.profileName = profileName;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
 				+ ((acknowledgeMode == null) ? 0 : acknowledgeMode.hashCode());
-		result = prime
-				* result
-				+ ((adminFromConsumer == null) ? 0 : adminFromConsumer
-						.hashCode());
-		result = prime
-				* result
-				+ ((adminFromProducer == null) ? 0 : adminFromProducer
-						.hashCode());
 		result = prime * result
 				+ ((deliveryMode == null) ? 0 : deliveryMode.hashCode());
 		result = prime * result + numConsumers;
-		result = prime * result + ((runId == null) ? 0 : runId.hashCode());
+		result = prime * result
+				+ ((profileName == null) ? 0 : profileName.hashCode());
 		result = prime
 				* result
 				+ ((testDestinationName == null) ? 0 : testDestinationName
 						.hashCode());
 		result = prime * result + (transacted ? 1231 : 1237);
+		result = prime * result + transactionBatchSize;
 		return result;
 	}
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder("TestRunConfig{");
-        builder.append(runId);
-        builder.append(",");
+        StringBuilder builder = new StringBuilder(getClass().getSimpleName() + "{");
         builder.append(acknowledgeMode.name());
         builder.append(",");
         builder.append(deliveryMode.name());
@@ -104,9 +129,9 @@ public class TestRunConfig implements Serializable {
         builder.append(",");
         builder.append(testDestinationName);
         builder.append(",");
-        builder.append(adminFromProducer);
+        builder.append(profileName);
         builder.append(",");
-        builder.append(adminFromConsumer);
+        builder.append(transactionBatchSize);
         builder.append("}");
         return builder.toString();
     }
@@ -119,21 +144,11 @@ public class TestRunConfig implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		TestRunConfig other = (TestRunConfig) obj;
+		BenchmarkPartConfig other = (BenchmarkPartConfig) obj;
 		if (acknowledgeMode == null) {
 			if (other.acknowledgeMode != null)
 				return false;
 		} else if (!acknowledgeMode.equals(other.acknowledgeMode))
-			return false;
-		if (adminFromConsumer == null) {
-			if (other.adminFromConsumer != null)
-				return false;
-		} else if (!adminFromConsumer.equals(other.adminFromConsumer))
-			return false;
-		if (adminFromProducer == null) {
-			if (other.adminFromProducer != null)
-				return false;
-		} else if (!adminFromProducer.equals(other.adminFromProducer))
 			return false;
 		if (deliveryMode == null) {
 			if (other.deliveryMode != null)
@@ -142,10 +157,10 @@ public class TestRunConfig implements Serializable {
 			return false;
 		if (numConsumers != other.numConsumers)
 			return false;
-		if (runId == null) {
-			if (other.runId != null)
+		if (profileName == null) {
+			if (other.profileName != null)
 				return false;
-		} else if (!runId.equals(other.runId))
+		} else if (!profileName.equals(other.profileName))
 			return false;
 		if (testDestinationName == null) {
 			if (other.testDestinationName != null)
@@ -154,31 +169,8 @@ public class TestRunConfig implements Serializable {
 			return false;
 		if (transacted != other.transacted)
 			return false;
+		if (transactionBatchSize != other.transactionBatchSize)
+			return false;
 		return true;
-	}
-
-	public String getTestDestinationName() {
-		return testDestinationName;
-	}
-
-	public void setTestDestinationName(String testDestinationName) {
-		this.testDestinationName = testDestinationName;
-	}
-
-
-	public String getAdminFromProducer() {
-		return adminFromProducer;
-	}
-
-	public void setAdminFromProducer(String adminFromProducer) {
-		this.adminFromProducer = adminFromProducer;
-	}
-
-	public String getAdminFromConsumer() {
-		return adminFromConsumer;
-	}
-
-	public void setAdminFromConsumer(String adminFromConsumer) {
-		this.adminFromConsumer = adminFromConsumer;
 	}
 }
