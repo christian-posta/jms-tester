@@ -1,24 +1,43 @@
 package com.fusesource.forge.jmstest.benchmark.command;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.fusesource.forge.jmstest.executor.TerminatingThreadPoolExecutor;
-
 public class BenchmarkController extends AbstractBenchmarkExecutor {
 
+	private Map<String, BenchmarkClientInfo> clients = new TreeMap<String, BenchmarkClientInfo>();
+	
+	@Override
+	protected void createHandlerChain() {
+		super.createHandlerChain();
+		getHandler().addHandler(new DefaultCommandHandler() {
+			public boolean handleCommand(BenchmarkCommand command) {
+				if (command.getCommandType() == CommandTypes.CLIENT_INFO) {
+					BenchmarkClientInfo info = (BenchmarkClientInfo)command;
+					synchronized (clients) {
+						clients.put(info.getClientName(), info);
+					}
+					return true;
+				}
+				return false;
+			}
+		});
+	}
+	
+	public void refreshClientInfos() {
+		synchronized (clients) {
+			clients.clear();
+		}
+		sendCommand(new BenchmarkGetClientInfo());
+	}
+	
 	public static void main(String[] args) {
-		ExecutorService service = new TerminatingThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 		
 		final BenchmarkController controller = new BenchmarkController();
-		controller.setSpringConfigLocations(args);
-		service.submit(controller);
-		
-		
-		// for now terminate the controller at some point 
-		
+		start(controller, args);
+
 		final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 		
 		executor.schedule(
@@ -27,8 +46,7 @@ public class BenchmarkController extends AbstractBenchmarkExecutor {
 					controller.sendCommand(new ShutdownCommand());
 					executor.shutdown();
 				}
-			}, 10, TimeUnit.SECONDS
+			}, 5, TimeUnit.SECONDS
 		);
 	}
 }
- 

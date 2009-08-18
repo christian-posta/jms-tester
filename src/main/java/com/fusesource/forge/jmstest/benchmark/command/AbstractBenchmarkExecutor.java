@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,6 +19,7 @@ import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
 import com.fusesource.forge.jmstest.executor.Releaseable;
+import com.fusesource.forge.jmstest.executor.TerminatingThreadPoolExecutor;
 
 public abstract class AbstractBenchmarkExecutor implements Runnable, Releaseable {
 
@@ -25,8 +29,8 @@ public abstract class AbstractBenchmarkExecutor implements Runnable, Releaseable
 	private String destinationName = "topic:benchmark.command";
 	private String springConfigDirs; 
 	
-	private JMSCommandTransport cmdTransport = null;
-	private BenchmarkCommandHandler handler = new BenchmarkCommandChainHandler();
+	private JMSCommandTransport cmdTransport = new JMSCommandTransport(this);
+	private BenchmarkCommandChainHandler handler = new BenchmarkCommandChainHandler();
 	
 	private CountDownLatch latch;
 	private Log log = null;
@@ -49,8 +53,12 @@ public abstract class AbstractBenchmarkExecutor implements Runnable, Releaseable
 		}
 	}
 	
+	protected BenchmarkCommandChainHandler getHandler() {
+		return handler;
+	}
+	
 	protected  void createHandlerChain() {
-		((BenchmarkCommandChainHandler)handler).addHandler(new DefaultCommandHandler() {
+		getHandler().addHandler(new DefaultCommandHandler() {
 			public boolean handleCommand(BenchmarkCommand command) {
 				if (command.getCommandType() == CommandTypes.SHUTDOWN) {
 					latch.countDown();
@@ -66,9 +74,7 @@ public abstract class AbstractBenchmarkExecutor implements Runnable, Releaseable
 	}
 	
 	public final void sendCommand(BenchmarkCommand command) {
-		if (getCmdTransport() != null) {
-			getCmdTransport().sendMessage(command);
-		}
+		getCmdTransport().sendMessage(command);
 	}
 	
 	public final boolean handleCommand(BenchmarkCommand command) {
@@ -80,16 +86,19 @@ public abstract class AbstractBenchmarkExecutor implements Runnable, Releaseable
 		return result;
 	}
 	
-	public void run() {
-		log().info("Running BenchmarkController");
+	protected void init() {
+		log().info("Initializing Benchmarking framework ...");
+		
 		ReleaseManager.getInstance().register(this); 
 		
 		log().debug("Initializing the Spring Context");
 		getApplicationContext();
-
-		if (getCmdTransport() != null) {
-			getCmdTransport().start();
-		}
+		getCmdTransport().start();
+	}
+	
+	public void run() {
+		init();
+		log().info("Running Benchmarking framework ...");
 		latch = new CountDownLatch(1);
 		try {
 			latch.await();
@@ -99,7 +108,7 @@ public abstract class AbstractBenchmarkExecutor implements Runnable, Releaseable
 		}
 		release();
 		ReleaseManager.getInstance().deregister(this);
-		log().info("Done BenchmarkController");
+		log().info("Done Benchmarking framework");
 	}
 
 	public void stop() {
@@ -142,9 +151,6 @@ public abstract class AbstractBenchmarkExecutor implements Runnable, Releaseable
 	}
 	
 	public JMSCommandTransport getCmdTransport() {
-		if (cmdTransport == null) {
-			cmdTransport = new JMSCommandTransport(this);
-		}
 		return cmdTransport;
 	}
 
@@ -216,5 +222,11 @@ public abstract class AbstractBenchmarkExecutor implements Runnable, Releaseable
 			applicationContext = new FileSystemXmlApplicationContext(configLocations);
 		}
 		return applicationContext;
+	}
+	
+	protected static void start(AbstractBenchmarkExecutor instance, String[] args) {
+		ExecutorService service = new TerminatingThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+		instance.setSpringConfigLocations(args);
+		service.submit(instance);
 	}
 }

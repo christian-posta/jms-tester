@@ -33,6 +33,7 @@ public class ReleaseManager extends Thread {
     synchronized static public ReleaseManager getInstance() {
     	if (instance == null) {
     		instance = new ReleaseManager();
+    		Runtime.getRuntime().addShutdownHook(instance);
     	}
     	return instance;
     }

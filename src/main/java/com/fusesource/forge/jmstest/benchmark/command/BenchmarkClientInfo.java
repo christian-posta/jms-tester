@@ -1,6 +1,5 @@
 package com.fusesource.forge.jmstest.benchmark.command;
 
-import java.io.Serializable;
 
 public class BenchmarkClientInfo extends BaseBenchmarkCommand {
 	
