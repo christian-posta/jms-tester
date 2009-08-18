@@ -73,7 +73,7 @@ public class RRDController implements Releaseable {
 	}
 
 	public ReleaseManager getReleaseManager() {
-		return BenchmarkContext.getInstance().getReleaseManager();
+		return ReleaseManager.getInstance();
 	}
 
 	public RrdDb getDatabase() {

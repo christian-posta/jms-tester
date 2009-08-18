@@ -8,7 +8,7 @@ import org.springframework.beans.factory.ObjectFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
 import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
-import com.fusesource.forge.jmstest.config.TestRunConfig;
+import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
 
 public class BenchmarkProducerWrapper {
 

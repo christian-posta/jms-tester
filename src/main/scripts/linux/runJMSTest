@@ -8,5 +8,7 @@ do
   APPCP=$APPCP:${jar}
 done
 
+export PATH=$PATH:$APP_HOME/../lib
+
 java -classpath $APPCP org.testng.TestNG $@
 

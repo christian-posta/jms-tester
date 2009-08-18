@@ -28,8 +28,16 @@ public class ReleaseManager extends Thread {
 
     private transient Log log;
     private Vector<Releaseable> releaseables;
-
-    public ReleaseManager() {
+    static private ReleaseManager instance = null;
+ 
+    synchronized static public ReleaseManager getInstance() {
+    	if (instance == null) {
+    		instance = new ReleaseManager();
+    	}
+    	return instance;
+    }
+    
+    private ReleaseManager() {
         releaseables = new Vector<Releaseable>();
     }
 
@@ -62,5 +70,9 @@ public class ReleaseManager extends Thread {
             log = LogFactory.getLog(getClass());
         }
         return log;
+    }
+    
+    static {
+    	ReleaseManager.getInstance();
     }
 }

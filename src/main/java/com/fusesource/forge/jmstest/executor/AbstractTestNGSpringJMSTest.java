@@ -8,12 +8,12 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
+import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
+import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
 import com.fusesource.forge.jmstest.config.BrokerServicesFactory;
-import com.fusesource.forge.jmstest.config.TestRunConfig;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
 import com.fusesource.forge.jmstest.rrd.GraphGenerator;
 import com.fusesource.forge.jmstest.rrd.RRDController;
-import com.fusesource.forge.jmstest.rrd.RRDGraphGenerator;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
 public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTests {
@@ -115,7 +115,7 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 	
 	public void createGraphs() {
 		// Make sure to flush all stats
-		BenchmarkContext.getInstance().getReleaseManager().run();
+		ReleaseManager.getInstance().run();
 		String[] beanNames = applicationContext.getBeanNamesForType(GraphGenerator.class);
 		for(String name: beanNames) {
 			GraphGenerator gg = (GraphGenerator)applicationContext.getBean(name);

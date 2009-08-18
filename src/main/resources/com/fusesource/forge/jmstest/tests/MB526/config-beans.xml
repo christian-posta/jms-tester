@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
 
   <!--  The Test config bean encapsulates the overall settings for our test -->
-  <bean id="TestConfig" class="com.fusesource.forge.jmstest.config.TestRunConfig">
+  <bean id="TestConfig" class="com.fusesource.forge.jmstest.benchmark.command.TestRunConfig">
     <property name="runId" value="1" />
     <!--  The test subject destination -->
     <property name="testDestinationName" value="queue:test" />

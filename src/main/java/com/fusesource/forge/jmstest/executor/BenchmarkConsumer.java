@@ -15,11 +15,10 @@ import org.apache.commons.logging.LogFactory;
 import org.rrd4j.DsType;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
-import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
+import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
-import com.fusesource.forge.jmstest.config.TestRunConfig;
 import com.fusesource.forge.jmstest.probe.AveragingProbe;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
@@ -68,7 +67,7 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
 	}
 
 	public ReleaseManager getReleaseManager() {
-		return BenchmarkContext.getInstance().getReleaseManager();
+		return ReleaseManager.getInstance();
 	}
 
 	public CountingProbe getMsgCounterProbe() {

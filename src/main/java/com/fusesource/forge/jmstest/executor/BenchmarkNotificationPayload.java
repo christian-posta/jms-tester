@@ -2,7 +2,7 @@ package com.fusesource.forge.jmstest.executor;
 
 import java.io.Serializable;
 
-import com.fusesource.forge.jmstest.config.TestRunConfig;
+import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
 
 /**
  * @author  andreasgies

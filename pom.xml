@@ -172,6 +172,11 @@
 		  <artifactId>xbean-spring</artifactId>
 		  <version>3.4</version>
 		</dependency>
+		<dependency>
+		  <groupId>org.hyperic</groupId>
+		  <artifactId>sigar</artifactId>
+		  <version>1.6.2.7</version>
+		</dependency>
 	</dependencies>
 
 

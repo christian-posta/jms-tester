@@ -8,7 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.ObjectFactory;
 
-import com.fusesource.forge.jmstest.config.TestRunConfig;
+import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
 import com.fusesource.forge.jmstest.rrd.RRDController;
 
 public class BenchmarkConsumerWrapper {

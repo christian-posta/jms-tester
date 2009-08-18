@@ -12,9 +12,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.ObjectFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
-import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
-import com.fusesource.forge.jmstest.config.TestRunConfig;
+import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
@@ -42,7 +41,7 @@ public class IterationRunner extends ExecutableBenchmarkComponent implements Run
 	}
 
 	public ReleaseManager getReleaseManager() {
-		return BenchmarkContext.getInstance().getReleaseManager();
+		return ReleaseManager.getInstance();
 	}
 
     public void setProducerFactory(ObjectFactory producerFactory) {

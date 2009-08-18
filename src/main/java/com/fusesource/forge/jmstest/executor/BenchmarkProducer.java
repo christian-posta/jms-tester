@@ -10,12 +10,11 @@ import javax.jms.Session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.benchmark.BenchmarkExecutionException;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
+import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
-import com.fusesource.forge.jmstest.config.TestRunConfig;
 import com.fusesource.forge.jmstest.message.MessageFactory;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
 
@@ -52,7 +51,7 @@ public class BenchmarkProducer extends ExecutableBenchmarkComponent {
 	}
 
 	public ReleaseManager getReleaseManager() {
-		return BenchmarkContext.getInstance().getReleaseManager();
+		return ReleaseManager.getInstance();
 	}
 
 	public MessageFactory getMessageFactory() {

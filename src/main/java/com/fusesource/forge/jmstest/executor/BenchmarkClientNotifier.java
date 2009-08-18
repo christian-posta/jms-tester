@@ -14,11 +14,11 @@ import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
 import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.benchmark.BenchmarkExecutionException;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
+import com.fusesource.forge.jmstest.benchmark.command.TestRunConfig;
 import com.fusesource.forge.jmstest.config.AcknowledgeMode;
 import com.fusesource.forge.jmstest.config.DeliveryMode;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
-import com.fusesource.forge.jmstest.config.TestRunConfig;
 
 /**
  * @author  andreasgies
@@ -52,7 +52,7 @@ public class BenchmarkClientNotifier implements Releaseable {
 	}
 
 	public ReleaseManager getReleaseManager() {
-		return BenchmarkContext.getInstance().getReleaseManager();
+		return ReleaseManager.getInstance();
 	}
 
 	public void initialise() {

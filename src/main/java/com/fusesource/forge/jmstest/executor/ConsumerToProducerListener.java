@@ -19,7 +19,6 @@ import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
-import com.fusesource.forge.jmstest.config.TestRunConfig;
 
 public class ConsumerToProducerListener implements MessageListener, Releaseable {
 
@@ -51,7 +50,7 @@ public class ConsumerToProducerListener implements MessageListener, Releaseable 
 	}
 
 	public ReleaseManager getReleaseManager() {
-		return BenchmarkContext.getInstance().getReleaseManager();
+		return ReleaseManager.getInstance();
 	}
 
 	public void registerWaiter(BenchmarkNotificationPayload payload) {

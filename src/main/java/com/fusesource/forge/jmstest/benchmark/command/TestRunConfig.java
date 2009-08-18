@@ -5,9 +5,12 @@
  *  The software in this package is published under the terms of the AGPL license
  *  a copy of which has been included with this distribution in the license.txt file.
  */
-package com.fusesource.forge.jmstest.config;
+package com.fusesource.forge.jmstest.benchmark.command;
 
 import java.io.Serializable;
+
+import com.fusesource.forge.jmstest.config.AcknowledgeMode;
+import com.fusesource.forge.jmstest.config.DeliveryMode;
 
 public class TestRunConfig implements Serializable {
 

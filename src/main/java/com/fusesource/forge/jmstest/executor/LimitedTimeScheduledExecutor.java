@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 
 public class LimitedTimeScheduledExecutor implements Runnable, Releaseable {
@@ -70,7 +69,7 @@ public class LimitedTimeScheduledExecutor implements Runnable, Releaseable {
 	}
 	
 	public ReleaseManager getReleaseManager() {
-		return BenchmarkContext.getInstance().getReleaseManager();
+		return ReleaseManager.getInstance();
 	}
 	
 	public void start() {
