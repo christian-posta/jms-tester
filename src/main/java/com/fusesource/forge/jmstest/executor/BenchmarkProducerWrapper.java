@@ -8,7 +8,6 @@ import org.springframework.beans.factory.ObjectFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
 import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
-import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 
 public class BenchmarkProducerWrapper {
 
@@ -32,13 +31,6 @@ public class BenchmarkProducerWrapper {
 	public void benchmark() {
 		log().info("Benchmark");
 		
-        BenchmarkRunStatus runStatus = null;
-
-		if (runStatus != null) {
-            runStatus.reinitialise();
-        } else {
-            runStatus = new BenchmarkRunStatus();
-        }
         IterationRunner runner;
         try {
             runner = (IterationRunner)profileRunnerFactory.getObject();
@@ -51,7 +43,6 @@ public class BenchmarkProducerWrapper {
         log().info("Benchmark starting [" + BenchmarkContext.getInstance().getTestrunConfig().toString() + "]");
         runner.setIteration(BenchmarkContext.getInstance().getProfile());
         runner.setTestRunConfig(BenchmarkContext.getInstance().getTestrunConfig());
-        runner.observeStatus(runStatus);
         CountDownLatch barrier = new CountDownLatch(1);
         runner.setBenchmarkIterationLatch(barrier);
         new Thread(runner, "Benchmark").start();
@@ -60,7 +51,6 @@ public class BenchmarkProducerWrapper {
             barrier.await();
             log().info("Benchmark completed [" + BenchmarkContext.getInstance().getTestrunConfig().toString() + "]");
         } catch (InterruptedException e) {
-            runStatus.setState(BenchmarkRunStatus.State.FAILED);
             log().warn("Benchmark broken", e);
         } finally {
         	log.debug("Notifying consumer of benchmark end");

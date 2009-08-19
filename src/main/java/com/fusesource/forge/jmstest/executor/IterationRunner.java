@@ -99,7 +99,6 @@ public class IterationRunner extends ExecutableBenchmarkComponent implements Run
                 producer.observeStatus(this.getBenchmarkStatus());
                 producers.add(producer);
             } catch (Exception e) {
-                getBenchmarkStatus().setState(BenchmarkRunStatus.State.FAILED);
                 throw new BenchmarkConfigurationException("Unable to create BenchmarkProducer instance", e);
             }
         }

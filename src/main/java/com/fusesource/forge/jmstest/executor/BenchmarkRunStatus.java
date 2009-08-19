@@ -1,33 +1,23 @@
 package com.fusesource.forge.jmstest.executor;
 
-import java.util.Observable;
+public class BenchmarkRunStatus {
 
-public class BenchmarkRunStatus extends Observable {
-
-    private State currentState = State.OK;
-
-    public BenchmarkRunStatus() {
-    }
+    private State currentState = State.CREATED;
 
     public void setState(State state) {
-        if (!this.currentState.equals(state)) {
-            this.currentState = state;
-            setChanged();
-            notifyObservers(this.currentState);
-        }
+    	this.currentState = state;
     }
 
     public State getCurrentState() {
         return currentState;
     }
 
-    public void reinitialise() {
-        this.currentState = State.OK;
-    }
-
     public static enum State {
-        OK,
-        FAILED,
-        COMPLETED
+    	CREATED,
+        SUBMITTED,
+        PREPARED,
+        STARTED,
+        FINISHED,
+        FAILED
     }
 }

@@ -8,6 +8,7 @@
 package com.fusesource.forge.jmstest.benchmark.command;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import com.fusesource.forge.jmstest.config.AcknowledgeMode;
 import com.fusesource.forge.jmstest.config.DeliveryMode;
@@ -16,6 +17,7 @@ public class BenchmarkPartConfig implements Serializable {
 
 	private static final long serialVersionUID = -6606481736821036885L;
 	
+	private String partID = null;
     private AcknowledgeMode acknowledgeMode;
     private DeliveryMode deliveryMode;
     private boolean transacted;
@@ -26,6 +28,21 @@ public class BenchmarkPartConfig implements Serializable {
 	private String consumerClients = "ALL";
 	private String producerClients = "ALL";
 
+	public String getPartID() {
+		if (partID == null) {
+			partID = UUID.randomUUID().toString();
+		}
+		return partID;
+	}
+
+	public void setPartID(String partID) {
+		this.partID = partID;
+	}
+
+	public boolean isAcceptAllProducers() {
+		return getProducerClients().equalsIgnoreCase("all");
+	}
+
 	public String getProducerClients() {
 		return producerClients;
 	}
@@ -34,6 +51,10 @@ public class BenchmarkPartConfig implements Serializable {
 		this.producerClients = producerClients;
 	}
 
+	public boolean isAcceptAllConsumers() {
+		return getConsumerClients().equalsIgnoreCase("all");
+	}
+	
 	public String getConsumerClients() {
 		return consumerClients;
 	}

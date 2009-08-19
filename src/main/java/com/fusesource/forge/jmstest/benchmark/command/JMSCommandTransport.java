@@ -16,14 +16,16 @@ import javax.jms.Session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
-import com.fusesource.forge.jmstest.executor.AbstractBenchmarkExecutor;
 import com.fusesource.forge.jmstest.executor.Releaseable;
 
-public class JMSCommandTransport implements MessageListener, Releaseable, ExceptionListener {
+public class JMSCommandTransport extends AbstractCommandTransport implements MessageListener, Releaseable, ExceptionListener {
 	
-	private AbstractBenchmarkExecutor benchmarkController;
+	private JMSConnectionProvider jmsConnectionProvider;
+	private JMSDestinationProvider jmsDestinationProvider;
+	private String destinationName = "topic:benchmark.command";
 	
 	private Connection connection = null;
 	private Session session = null;
@@ -31,15 +33,12 @@ public class JMSCommandTransport implements MessageListener, Releaseable, Except
 
 	private Log log = null;
 
-	public JMSCommandTransport(AbstractBenchmarkExecutor benchmarkController) {
-		this.benchmarkController = benchmarkController;
-	}
-	
 	public void start() {
 		synchronized (started) {
 			if (started) {
 				return;
 			}
+			ReleaseManager.getInstance().register(this);
 			log().info("JMSCommandTransport (re)starting.");
 			while (!started) {
 				if (getConnection() != null) {
@@ -66,7 +65,11 @@ public class JMSCommandTransport implements MessageListener, Releaseable, Except
 		}
 	}
 	
-	public void sendMessage(BenchmarkCommand command) {
+	public void stop() {
+		release();
+	}
+	
+	public void sendCommand(BenchmarkCommand command) {
 		log.debug("Sending command message: " + command.toString());
 		if (getConnection() != null) {
 			try {
@@ -92,7 +95,7 @@ public class JMSCommandTransport implements MessageListener, Releaseable, Except
 			if (!(obj instanceof BenchmarkCommand)) {
 				log().warn("Ignoring msg object of type: " + obj.getClass());
 			}
-			getBenchmarkController().handleCommand((BenchmarkCommand)obj);
+			getHandler().handleCommand((BenchmarkCommand)obj);
 		} catch (JMSException je) {
 			log().error("Unexpected error processing command message", je);
 		}
@@ -104,26 +107,32 @@ public class JMSCommandTransport implements MessageListener, Releaseable, Except
 	
 	public void release() {
 		closeConnection();
+		ReleaseManager.getInstance().deregister(this);
 	}
 	
-	public AbstractBenchmarkExecutor getBenchmarkController() {
-		return benchmarkController;
+	public void setJmsConnectionProvider(JMSConnectionProvider jmsConnectionProvider) {
+		this.jmsConnectionProvider = jmsConnectionProvider;
 	}
 
-	public void setBenchmarkController(AbstractBenchmarkExecutor benchmarkController) {
-		this.benchmarkController = benchmarkController;
+	public void setJmsDestinationProvider(
+			JMSDestinationProvider jmsDestinationProvider) {
+		this.jmsDestinationProvider = jmsDestinationProvider;
+	}
+
+	public void setDestinationName(String destinationName) {
+		this.destinationName = destinationName;
 	}
 
 	public JMSConnectionProvider getJmsConnectionProvider() {
-		return getBenchmarkController().getJmsConnectionProvider();
+		return jmsConnectionProvider;
 	}
 
 	public JMSDestinationProvider getJmsDestinationProvider() {
-		return getBenchmarkController().getJmsDestinationProvider();
+		return jmsDestinationProvider;
 	}
 
 	public String getDestinationName() {
-		return getBenchmarkController().getDestinationName();
+		return destinationName;
 	}
 
 	private void closeConnection() {

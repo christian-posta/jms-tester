@@ -2,24 +2,26 @@ package com.fusesource.forge.jmstest.executor;
 
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkClientInfo;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCommand;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkConfig;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCoordinator;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkGetClientInfo;
 import com.fusesource.forge.jmstest.benchmark.command.CommandTypes;
 import com.fusesource.forge.jmstest.benchmark.command.DefaultCommandHandler;
 import com.fusesource.forge.jmstest.benchmark.command.ShutdownCommand;
+import com.fusesource.forge.jmstest.benchmark.command.SubmitBenchmarkCommand;
 
 public class BenchmarkController extends AbstractBenchmarkExecutor {
 
 	private Map<String, BenchmarkClientInfo> clients = new TreeMap<String, BenchmarkClientInfo>();
+	BenchmarkCoordinator coordinator = null;
 	
 	@Override
 	protected void createHandlerChain() {
 		super.createHandlerChain();
+		
 		getHandler().addHandler(new DefaultCommandHandler() {
 			public boolean handleCommand(BenchmarkCommand command) {
 				if (command.getCommandType() == CommandTypes.CLIENT_INFO) {
@@ -32,6 +34,11 @@ public class BenchmarkController extends AbstractBenchmarkExecutor {
 				return false;
 			}
 		});
+		
+		coordinator = new BenchmarkCoordinator();
+		coordinator.setCommandTransport(getCmdTransport());
+		coordinator.start();
+		getHandler().addHandler(coordinator);
 	}
 	
 	public void refreshClientInfos() {
@@ -46,25 +53,14 @@ public class BenchmarkController extends AbstractBenchmarkExecutor {
 		// Read in all BenchmarkConfigs
 		for(String beanName: getApplicationContext().getBeanNamesForType(BenchmarkConfig.class)) {
 			BenchmarkConfig cfg = (BenchmarkConfig)getApplicationContext().getBean(beanName);
-			cfg.getApplicationContext();
+			sendCommand(new SubmitBenchmarkCommand(cfg));
 		}
-		
-		// Eexcute then sequentially
-		
-		log().info("All Benchmarking tasks are done. Shutting down the framework in 5 seconds");
-		final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-		executor.schedule(
-		    new Runnable() {
-				public void run() {
-					sendCommand(new ShutdownCommand());
-					executor.shutdown();
-				}
-			}, 5, TimeUnit.SECONDS
-		);
+		coordinator.waitUntilFinished();
+		sendCommand(new ShutdownCommand());
 	}
 	
 	public static void main(String[] args) {
 		final BenchmarkController controller = new BenchmarkController();
-		start(controller, args);
+		controller.start(args);
 	}
 }

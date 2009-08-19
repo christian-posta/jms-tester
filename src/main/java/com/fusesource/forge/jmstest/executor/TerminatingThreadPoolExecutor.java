@@ -14,38 +14,48 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class TerminatingThreadPoolExecutor extends ThreadPoolExecutor {
-	
 	private AtomicLong lastSubmit = new AtomicLong(System.currentTimeMillis());
 	private ScheduledThreadPoolExecutor scheduledChecker = null;
+	
+	private String name;
 	
 	private Log log = null;
 	
 	public TerminatingThreadPoolExecutor(
+		String name,
 		int corePoolSize, int maximumPoolSize, long keepAliveTime, 
 		TimeUnit unit, BlockingQueue<Runnable> workQueue) {
 		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
-		startChecker();
+		init(name);
 	}
 
-	public TerminatingThreadPoolExecutor(int corePoolSize, int maximumPoolSize,
+	public TerminatingThreadPoolExecutor(String name, int corePoolSize, int maximumPoolSize,
 			long keepAliveTime, TimeUnit unit,
 			BlockingQueue<Runnable> workQueue, RejectedExecutionHandler handler) {
 		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, handler);
+		init(name);
 	}
 
-	public TerminatingThreadPoolExecutor(int corePoolSize, int maximumPoolSize,
+	public TerminatingThreadPoolExecutor(String name, int corePoolSize, int maximumPoolSize,
 			long keepAliveTime, TimeUnit unit,
 			BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory,
 			RejectedExecutionHandler handler) {
 		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,
 				threadFactory, handler);
+		init(name);
 	}
 
-	public TerminatingThreadPoolExecutor(int corePoolSize, int maximumPoolSize,
+	public TerminatingThreadPoolExecutor(String name, int corePoolSize, int maximumPoolSize,
 			long keepAliveTime, TimeUnit unit,
 			BlockingQueue<Runnable> workQueue, ThreadFactory threadFactory) {
 		super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,
 				threadFactory);
+		init(name);
+	}
+	
+	private void init(String name) {
+		setName(name); 
+		startChecker();
 	}
 	
 	@Override
@@ -71,7 +81,7 @@ public class TerminatingThreadPoolExecutor extends ThreadPoolExecutor {
 		scheduledChecker.scheduleAtFixedRate(new Runnable() {
 			
 			public void run() {
-				log().debug("Checking Terminate condition for " + this.getClass().getName());
+				log().debug("Checking Terminate condition for " + getName());
 				long currentTime = System.currentTimeMillis();
 				if (getActiveCount() == 0) {
 					if (currentTime - lastSubmit.get() >= getKeepAliveTime(TimeUnit.MILLISECONDS)) {
@@ -82,6 +92,17 @@ public class TerminatingThreadPoolExecutor extends ThreadPoolExecutor {
 			}
 		}, getKeepAliveTime(TimeUnit.NANOSECONDS), getKeepAliveTime(TimeUnit.NANOSECONDS), TimeUnit.NANOSECONDS);
 		
+	}
+
+	public String getName() {
+		if (name == null) {
+			name = this.getClass().getName();
+		}
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	@Override
