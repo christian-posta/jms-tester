@@ -6,20 +6,20 @@ import org.rrd4j.DsType;
 
 import com.fusesource.forge.jmstest.probe.AbstractProbeDataConsumer;
 
-public class RRDRecorderImpl extends AbstractProbeDataConsumer {
+public class RRDRecorderImpl extends AbstractProbeDataConsumer implements RRDRecorder {
 	
-	private FileSystemRRDController controller;
+	private RRDController controller;
 	private DsType dsType = DsType.COUNTER;
 	
 	public RRDRecorderImpl() {}
 
-	public FileSystemRRDController getController() {
+	public RRDController getController() {
 		return controller;
 	}
 
-	public void setController(FileSystemRRDController controller) {
+	public void setController(RRDController controller) {
 		this.controller = controller;
-		controller.addRrdRecorder(this);
+		controller.addRRDRecorder(this);
 	}
 
 	public DsType getDsType() {
@@ -43,7 +43,7 @@ public class RRDRecorderImpl extends AbstractProbeDataConsumer {
 	
 	@Override
 	public String toString() {
-		StringBuffer buf = new StringBuffer("RRDRecorder[");
+		StringBuffer buf = new StringBuffer("RRDRecorderImpl[");
 		buf.append(getName());
 		buf.append(",");
 		switch (getDsType()) {

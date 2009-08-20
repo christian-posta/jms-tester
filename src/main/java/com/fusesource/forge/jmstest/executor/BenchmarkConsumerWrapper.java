@@ -2,27 +2,22 @@ package com.fusesource.forge.jmstest.executor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.ObjectFactory;
 
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.benchmark.command.ClientType;
-import com.fusesource.forge.jmstest.rrd.FileSystemRRDController;
+import com.fusesource.forge.jmstest.rrd.RRDController;
 
 public class BenchmarkConsumerWrapper extends BenchmarkClientWrapper {
 
     private Log log;
 
-    private ScheduledThreadPoolExecutor scheduler;
     private boolean running = false;
 
-    private ObjectFactory clientFactory;
     private List<BenchmarkConsumer> consumers;
-    
-    private FileSystemRRDController controller;
+    private RRDController controller;
 
     public BenchmarkConsumerWrapper(BenchmarkClient container, BenchmarkPartConfig partConfig) {
     	super(container, partConfig);
@@ -33,7 +28,7 @@ public class BenchmarkConsumerWrapper extends BenchmarkClientWrapper {
     	return ClientType.CONSUMER;
     }
     
-    public FileSystemRRDController getRRDController() {
+    public RRDController getRRDController() {
     	if (controller == null) {
     		// TODO: fix me
     	}
@@ -51,8 +46,8 @@ public class BenchmarkConsumerWrapper extends BenchmarkClientWrapper {
     	for (int i = 0; !configFailed && i < getConfig().getNumConsumers(); i++) {
             BenchmarkConsumer client = null;
             try {
-                client = (BenchmarkConsumer) clientFactory.getObject();
-                client.initialize(i, getRRDController());
+            	client = new BenchmarkConsumer(this, i, getRRDController(), getProbeRunner());
+                client.prepare();
                 consumers.add(client);
             } catch (Exception e) {
                 log().warn("Exception during client initialisation", e);
@@ -60,21 +55,19 @@ public class BenchmarkConsumerWrapper extends BenchmarkClientWrapper {
                 closedown();
             }
         }
-        try {
-			getRRDController().start();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
         return !configFailed;
     }
     
     synchronized public void start() {
         if (!isRunning()) {
-        	for (BenchmarkConsumer consumer: consumers) {
+        	getProbeRunner().start();
+			getRRDController().start();
+
+			for (BenchmarkConsumer consumer: consumers) {
         		consumer.start();
         	}
-        	running = true;
+        	
+			running = true;
         }
     }
 
@@ -90,10 +83,7 @@ public class BenchmarkConsumerWrapper extends BenchmarkClientWrapper {
             }
             log().info(consumers.size() + " benchmark clients closed down");
         }
-        if (scheduler != null) {
-        	scheduler.shutdown();
-        }
-        getRRDController().release();
+        getRRDController().stop();
         return false;
     }
 

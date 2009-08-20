@@ -3,15 +3,22 @@ package com.fusesource.forge.jmstest.benchmark.command;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class BenchmarkCommandChainHandler implements BenchmarkCommandHandler {
 
-	List<BenchmarkCommandHandler> handlerList = new ArrayList<BenchmarkCommandHandler>();
+	private Log log = null;
+	private List<BenchmarkCommandHandler> handlerList = new ArrayList<BenchmarkCommandHandler>();
 	
 	public BenchmarkCommandChainHandler() {
 		handlerList = new ArrayList<BenchmarkCommandHandler>();
 	}
 	
 	public boolean handleCommand(BenchmarkCommand command) {
+		
+		log().debug("Handling Command: " + command);
+		
 		if (handlerList.size() == 0) {
 			return false;
 		}
@@ -22,6 +29,11 @@ public class BenchmarkCommandChainHandler implements BenchmarkCommandHandler {
 			handled = current.handleCommand(command);
 			current = current.next();
 		}
+
+		if (!handled) {
+			log().warn("Not handle Command: " + command);
+		}
+		
 		return handled;
 	}
 
@@ -39,5 +51,12 @@ public class BenchmarkCommandChainHandler implements BenchmarkCommandHandler {
 			last.setNext(handler);
 		}
 		handlerList.add(handler);
+	}
+	
+	private Log log() {
+		if (log == null) {
+			log = LogFactory.getLog(this.getClass());
+		}
+		return log;
 	}
 }

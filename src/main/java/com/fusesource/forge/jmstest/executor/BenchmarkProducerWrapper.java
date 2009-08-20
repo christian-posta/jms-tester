@@ -21,7 +21,7 @@ public class BenchmarkProducerWrapper extends BenchmarkClientWrapper implements 
     private transient Log log;
 
     private ScheduledThreadPoolExecutor executor;
-    private BenchmarkIteration iteration = null;
+    BenchmarkIteration iteration = null;
     private List<BenchmarkProducer> producers;
     private TimeUnit sendingDelayUnit = TimeUnit.MICROSECONDS;
     private long sendingDelay;
@@ -50,18 +50,7 @@ public class BenchmarkProducerWrapper extends BenchmarkClientWrapper implements 
 		this.probe = probe;
 	}
 
-	public BenchmarkIteration getIteration() {
-		if (iteration == null) {
-			iteration = (BenchmarkIteration)getBean(
-				new String[] { 
-					getConfig().getProfileName()
-				}, BenchmarkIteration.class
-			);
-		}
-		return iteration;
-    }
-
-    public void start() {
+	public void start() {
 		log().info("Benchmark (" + getClientId() + ") starting.");
         benchmarkIterationLatch = new CountDownLatch(1);
         new Thread(this, "Benchmark").start();

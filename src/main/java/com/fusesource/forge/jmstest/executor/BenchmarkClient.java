@@ -18,7 +18,7 @@ import com.fusesource.forge.jmstest.benchmark.command.DefaultCommandHandler;
 import com.fusesource.forge.jmstest.benchmark.command.EndBenchmarkCommand;
 import com.fusesource.forge.jmstest.benchmark.command.StartBenchmarkCommand;
 
-public class BenchmarkClient extends AbstractBenchmarkExecutor {
+public class BenchmarkClient extends AbstractBenchmarkExecutionContainer {
 
 	private BenchmarkClientInfo clientInfo = null;
 	private Map<String, BenchmarkClientWrapper> activeClients;
@@ -91,7 +91,7 @@ public class BenchmarkClient extends AbstractBenchmarkExecutor {
 	protected void createHandlerChain() {
 		super.createHandlerChain();
 		
-		getHandler().addHandler(new DefaultCommandHandler() {
+		getConnector().addHandler(new DefaultCommandHandler() {
 			@Override
 			public boolean handleCommand(BenchmarkCommand command) {
 				if (command.getCommandType() == CommandTypes.GET_CLIENT_INFO) {
@@ -103,7 +103,7 @@ public class BenchmarkClient extends AbstractBenchmarkExecutor {
 			}
 		});
 		
-		getHandler().addHandler(new BenchmarkLifeCycleHandler(
+		getConnector().addHandler(new BenchmarkLifeCycleHandler(
 			getCmdTransport(), this
 		));
 	}

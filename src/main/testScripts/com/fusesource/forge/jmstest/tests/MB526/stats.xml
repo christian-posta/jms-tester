@@ -3,18 +3,18 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
 
-  <bean id="JMXConnector" class="com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory" >
+  <!--bean id="JMXConnector" class="com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory" >
     <property name="url" value="service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi" />
     <property name="username" value="smx" />
     <property name="password" value="smx" />
   </bean>
   
-  <bean id="ProducerRRD" class="com.fusesource.forge.jmstest.rrd.RRDController">
+  <bean id="ProducerRRD" class="com.fusesource.forge.jmstest.rrd.FileSystemRRDController">
     <property name="fileName" value="target/MB526-Producer.rrd" />
     <property name="step" value="1" />
   </bean>
 
-  <bean id="ConsumerRRD" class="com.fusesource.forge.jmstest.rrd.RRDController">
+  <bean id="ConsumerRRD" class="com.fusesource.forge.jmstest.rrd.FileSystemRRDController">
     <property name="fileName" value="target/MB526-Consumer.rrd" />
     <property name="step" value="1" />
     <property name="autoStart" value="false" />
@@ -72,5 +72,5 @@
   
   <bean id="GraphGenerator" class="com.fusesource.forge.jmstest.rrd.RRDGraphGenerator">
   	<property name="baseDir" value="target" />
-  </bean>
+  </bean -->
 </beans>

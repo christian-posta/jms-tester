@@ -12,8 +12,8 @@ import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.config.BrokerServicesFactory;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
-import com.fusesource.forge.jmstest.rrd.GraphGenerator;
 import com.fusesource.forge.jmstest.rrd.FileSystemRRDController;
+import com.fusesource.forge.jmstest.rrd.GraphGenerator;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
 public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTests {
@@ -37,8 +37,8 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 		return (BrokerServicesFactory)getBeanByClass(BrokerServicesFactory.class);
 	}
 	
-	public BenchmarkProducerWrapper getProducerWrapper() {
-		return (BenchmarkProducerWrapper)getBeanByClass(BenchmarkProducerWrapper.class);
+	public BenchmarkClientWrapper getProducerWrapper() {
+		return (BenchmarkClientWrapper)getBeanByClass(BenchmarkProducerWrapper.class);
 	}
 
 	private void startRRDBackends() {

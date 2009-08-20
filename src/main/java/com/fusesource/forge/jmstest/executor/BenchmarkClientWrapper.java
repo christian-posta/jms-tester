@@ -10,6 +10,8 @@ import com.fusesource.forge.jmstest.benchmark.command.ClientId;
 import com.fusesource.forge.jmstest.benchmark.command.ClientType;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
+import com.fusesource.forge.jmstest.probe.ProbeRunner;
+import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
 public abstract class BenchmarkClientWrapper implements Releaseable {
 	
@@ -21,6 +23,9 @@ public abstract class BenchmarkClientWrapper implements Releaseable {
 	
 	private BenchmarkClient container;
 	private ClientId clientId = null;
+	
+	private ProbeRunner probeRunner = null;
+	private BenchmarkIteration iteration = null;
 	
 	private Log log = null;
 	
@@ -44,6 +49,16 @@ public abstract class BenchmarkClientWrapper implements Releaseable {
 		return appContext;
 	}
 
+	ProbeRunner getProbeRunner() {
+		if (probeRunner == null) {
+			probeRunner = new ProbeRunner();
+			probeRunner.setName(getClientId().toString());
+			probeRunner.setInterval(1);
+			probeRunner.setDuration(getIteration().getTotalDuration());
+		}
+		return probeRunner;
+	}
+	
 	public abstract ClientType getClientType();
 	
 	public ClientId getClientId() {
@@ -124,5 +139,16 @@ public abstract class BenchmarkClientWrapper implements Releaseable {
 			log = LogFactory.getLog(this.getClass());
 		}
 		return log;
+	}
+
+	public BenchmarkIteration getIteration() {
+		if (iteration == null) {
+			iteration = (BenchmarkIteration)getBean(
+				new String[] { 
+					getConfig().getProfileName()
+				}, BenchmarkIteration.class
+			);
+		}
+		return iteration;
 	}
 }

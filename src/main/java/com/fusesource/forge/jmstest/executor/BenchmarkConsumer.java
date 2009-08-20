@@ -16,7 +16,7 @@ import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
 import com.fusesource.forge.jmstest.probe.AveragingProbe;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
-import com.fusesource.forge.jmstest.rrd.FileSystemRRDController;
+import com.fusesource.forge.jmstest.rrd.RRDController;
 import com.fusesource.forge.jmstest.rrd.RRDRecorderImpl;
 
 public class BenchmarkConsumer extends AbstractJMSClientComponent implements MessageListener, Releaseable  {
@@ -30,10 +30,20 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
     private AveragingProbe latencyProbe;
     private AveragingProbe msgSizeProbe;
 
-    private FileSystemRRDController rrdController;
+    private RRDController rrdController;
 
-    public BenchmarkConsumer(BenchmarkClientWrapper container) {
+    public BenchmarkConsumer(BenchmarkClientWrapper container, int clientId, RRDController rrdController, ProbeRunner probeRunner) {
     	super(container);
+    	setClientId(clientId);
+    	setProbeRunner(probeRunner);
+    	setRrdController(rrdController);
+
+        if (getProbeRunner() != null) {
+        	getProbeRunner().addProbe(getMsgCounterProbe());
+        	getProbeRunner().addProbe(getLatencyProbe());
+        	getProbeRunner().addProbe(getMsgSizeProbe());
+        }
+
     }
     
     public void setClientId(int clientId) {
@@ -51,7 +61,7 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
 			RRDRecorderImpl recorder = new RRDRecorderImpl();
 			recorder.setProbe(msgCounterProbe);
 			recorder.setDsType(DsType.COUNTER);
-			recorder.setController(rrdController);
+			recorder.setController(getRrdController());
 			msgCounterProbe.setDataConsumer(recorder);
 		}
 		return msgCounterProbe;
@@ -68,7 +78,7 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
 			RRDRecorderImpl recorder = new RRDRecorderImpl();
 			recorder.setProbe(latencyProbe);
 			recorder.setDsType(DsType.GAUGE);
-			recorder.setController(rrdController);
+			recorder.setController(getRrdController());
 			latencyProbe.setDataConsumer(recorder);
 		}
 		return latencyProbe;
@@ -85,7 +95,7 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
 			RRDRecorderImpl recorder = new RRDRecorderImpl();
 			recorder.setProbe(msgSizeProbe);
 			recorder.setDsType(DsType.GAUGE);
-			recorder.setController(rrdController);
+			recorder.setController(getRrdController());
 			msgSizeProbe.setDataConsumer(recorder);
 		}
 		return msgSizeProbe;
@@ -103,18 +113,17 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
 		this.probeRunner = probeRunner;
 	}
 
+	public RRDController getRrdController() {
+		return rrdController;
+	}
+
+	public void setRrdController(RRDController rrdController) {
+		this.rrdController = rrdController;
+	}
+
 	//TODO: simulate slow subscriber
-    public void initialize(int clientId, FileSystemRRDController rrdController) {
+    public void prepare() {
     	super.start();
-        
-    	setClientId(clientId);
-        this.rrdController = rrdController;
-        
-        if (getProbeRunner() != null) {
-        	getProbeRunner().addProbe(getMsgCounterProbe());
-        	getProbeRunner().addProbe(getLatencyProbe());
-        	getProbeRunner().addProbe(getMsgSizeProbe());
-        }
         
         try {
               // TODO: Handle Durable subscribers

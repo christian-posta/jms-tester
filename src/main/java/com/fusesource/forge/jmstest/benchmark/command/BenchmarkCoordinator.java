@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
@@ -13,7 +14,6 @@ import org.apache.commons.logging.LogFactory;
 import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 import com.fusesource.forge.jmstest.executor.BenchmarkRunStatus;
 import com.fusesource.forge.jmstest.executor.Releaseable;
-import com.fusesource.forge.jmstest.executor.TerminatingThreadPoolExecutor;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
@@ -75,7 +75,7 @@ public class BenchmarkCoordinator extends DefaultCommandHandler implements Relea
 				log().debug("Starting Benchmark Coordinator.");
 				ReleaseManager.getInstance().register(this);
 				benchmarks = new HashMap<String, BenchmarkRunner>();
-				executor = new TerminatingThreadPoolExecutor("BenchmarCoordinator", 1, 1, 5, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+				executor = new ThreadPoolExecutor(1, 1, 5, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 				started = true;
 			}
 		}

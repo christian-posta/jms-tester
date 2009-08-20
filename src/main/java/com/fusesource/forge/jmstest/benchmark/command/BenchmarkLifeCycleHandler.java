@@ -4,7 +4,6 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.context.ApplicationContext;
 
 import com.fusesource.forge.jmstest.executor.BenchmarkClient;
 import com.fusesource.forge.jmstest.executor.BenchmarkClientWrapper;
