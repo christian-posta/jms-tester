@@ -6,5 +6,7 @@ import javax.jms.Session;
 
 public interface MessageFactory {
 
+	public final static String DEFAULT_BEAN_NAME = "messageFactory";
+	
 	public Message createMessage(Session session) throws JMSException;
 }

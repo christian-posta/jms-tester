@@ -1,57 +1,28 @@
 package com.fusesource.forge.jmstest.benchmark.command;
 
+import com.fusesource.forge.jmstest.executor.BenchmarkClientWrapper;
+
 public class PrepareBenchmarkResponse extends StartBenchmarkCommand {
 
 	private static final long serialVersionUID = -5586700527088404915L;
-	private String clientId;
-	private String partId;
-	private ClientType clientType;
+
+	private ClientId clientId;
 	
-	public PrepareBenchmarkResponse(ClientType clientType, String clientId, String benchmarkId, String partId) {
-		super(benchmarkId);
-		this.clientType = clientType;
-		this.clientId = clientId;
-		this.partId = partId;
+	public PrepareBenchmarkResponse(BenchmarkClientWrapper client) {
+		super(client.getConfig().getParent().getBenchmarkId());
+		this.clientId = client.getClientId();
 	}
 	
 	public byte getCommandType() {
 		return CommandTypes.PREPARE_RESPONSE;
 	}
 
-	public String getClientId() {
+	public ClientId getClientId() {
 		return clientId;
 	}
 
-	public void setClientId(String clientId) {
+	public void setClientId(ClientId clientId) {
 		this.clientId = clientId;
-	}
-
-	public String getPartId() {
-		return partId;
-	}
-
-	public void setPartId(String partId) {
-		this.partId = partId;
-	}
-
-	public ClientType getClientType() {
-		return clientType;
-	}
-
-	public void setClientType(ClientType clientType) {
-		this.clientType = clientType;
-	}
-
-	public String getCombinedId() {
-		StringBuffer buf = new StringBuffer();
-		buf.append(getClientType());
-		buf.append("-");
-		buf.append(getClientId());
-		buf.append("-");
-		buf.append(getBenchmarkId());
-		buf.append("-");
-		buf.append(getPartId());
-		return buf.toString();
 	}
 }
 

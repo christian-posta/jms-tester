@@ -139,7 +139,8 @@ public abstract class AbstractBenchmarkExecutor implements Runnable, Releaseable
 		getApplicationContext();
 	}
 	
-	protected abstract void execute();
+	protected void execute() {
+	}
 	
 	public void run() {
 		init();

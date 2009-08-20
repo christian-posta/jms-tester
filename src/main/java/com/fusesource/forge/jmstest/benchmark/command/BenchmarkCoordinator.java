@@ -130,7 +130,7 @@ public class BenchmarkCoordinator extends DefaultCommandHandler implements Relea
 
 		public void registerClient(PrepareBenchmarkResponse response) {
 			
-			String clientId = response.getCombinedId();
+			ClientId clientId = response.getClientId();
 			log().debug("Prepare Response received: " + clientId);
 			
 			synchronized (clientStates) {
@@ -142,13 +142,13 @@ public class BenchmarkCoordinator extends DefaultCommandHandler implements Relea
 				} else {
 					BenchmarkRunStatus state = new BenchmarkRunStatus();
 					state.setState(BenchmarkRunStatus.State.PREPARED);
-					clientStates.put(clientId, state);
+					clientStates.put(clientId.toString(), state);
 				}
 			}
 		}
 		
 		public void finishProducer(ProducerFinished finished) {
-			String clientId = finished.getCombinedId();
+			ClientId clientId = finished.getClientId();
 			log().debug("Producer finished: " + clientId);
 			
 			synchronized (clientStates) {
@@ -215,10 +215,10 @@ public class BenchmarkCoordinator extends DefaultCommandHandler implements Relea
 				sTok = new StringTokenizer(partCfg.getProducerClients(), ",");
 			}
 			while(sTok.hasMoreTokens()) {
-				PrepareBenchmarkResponse response = new PrepareBenchmarkResponse(clientType, sTok.nextToken(), config.getBenchmarkId(), partCfg.getPartID());
+				ClientId id = new ClientId(clientType, sTok.nextToken(), config.getBenchmarkId(), partCfg.getPartID());
 				BenchmarkRunStatus state = new BenchmarkRunStatus();
 				state.setState(BenchmarkRunStatus.State.SUBMITTED);
-				clientStates.put(response.getCombinedId(), state);
+				clientStates.put(id.toString(), state);
 			}
 		}
 		

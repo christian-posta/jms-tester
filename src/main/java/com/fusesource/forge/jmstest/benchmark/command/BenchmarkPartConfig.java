@@ -17,9 +17,10 @@ public class BenchmarkPartConfig implements Serializable {
 
 	private static final long serialVersionUID = -6606481736821036885L;
 	
+	private BenchmarkConfig parent;
 	private String partID = null;
     private AcknowledgeMode acknowledgeMode;
-    private DeliveryMode deliveryMode;
+	private DeliveryMode deliveryMode;
     private boolean transacted;
     private int numConsumers = 1;
 	private String testDestinationName;
@@ -27,6 +28,17 @@ public class BenchmarkPartConfig implements Serializable {
 	private String profileName;
 	private String consumerClients = "ALL";
 	private String producerClients = "ALL";
+	private String jmsConnectionProviderName = null;
+	private String jmsDestinationProviderName = null;
+	private String messageFactoryName = null;
+
+    public BenchmarkConfig getParent() {
+		return parent;
+	}
+
+	public void setParent(BenchmarkConfig parent) {
+		this.parent = parent;
+	}
 
 	public String getPartID() {
 		if (partID == null) {
@@ -119,6 +131,22 @@ public class BenchmarkPartConfig implements Serializable {
 		this.profileName = profileName;
 	}
 
+	public String getJmsConnectionProviderName() {
+		return jmsConnectionProviderName;
+	}
+
+	public void setJmsConnectionProviderName(String jmsConnectionProviderName) {
+		this.jmsConnectionProviderName = jmsConnectionProviderName;
+	}
+
+	public String getJmsDestinationProviderName() {
+		return jmsDestinationProviderName;
+	}
+
+	public void setJmsDestinationProviderName(String jmsDestinationProviderName) {
+		this.jmsDestinationProviderName = jmsDestinationProviderName;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -126,8 +154,26 @@ public class BenchmarkPartConfig implements Serializable {
 		result = prime * result
 				+ ((acknowledgeMode == null) ? 0 : acknowledgeMode.hashCode());
 		result = prime * result
+				+ ((consumerClients == null) ? 0 : consumerClients.hashCode());
+		result = prime * result
 				+ ((deliveryMode == null) ? 0 : deliveryMode.hashCode());
+		result = prime
+				* result
+				+ ((jmsConnectionProviderName == null) ? 0
+						: jmsConnectionProviderName.hashCode());
+		result = prime
+				* result
+				+ ((jmsDestinationProviderName == null) ? 0
+						: jmsDestinationProviderName.hashCode());
+		result = prime
+				* result
+				+ ((messageFactoryName == null) ? 0 : messageFactoryName
+						.hashCode());
 		result = prime * result + numConsumers;
+		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
+		result = prime * result + ((partID == null) ? 0 : partID.hashCode());
+		result = prime * result
+				+ ((producerClients == null) ? 0 : producerClients.hashCode());
 		result = prime * result
 				+ ((profileName == null) ? 0 : profileName.hashCode());
 		result = prime
@@ -139,23 +185,28 @@ public class BenchmarkPartConfig implements Serializable {
 		return result;
 	}
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder(getClass().getSimpleName() + "{");
-        builder.append(acknowledgeMode.name());
-        builder.append(",");
-        builder.append(deliveryMode.name());
-        builder.append(",");
-        builder.append(transacted);
-        builder.append(",");
-        builder.append(testDestinationName);
-        builder.append(",");
-        builder.append(profileName);
-        builder.append(",");
-        builder.append(transactionBatchSize);
-        builder.append("}");
-        return builder.toString();
-    }
+    public String getMessageFactoryName() {
+		return messageFactoryName;
+	}
+
+	public void setMessageFactoryName(String messageFactoryName) {
+		this.messageFactoryName = messageFactoryName;
+	}
+
+	@Override
+	public String toString() {
+		return "BenchmarkPartConfig [acknowledgeMode=" + acknowledgeMode
+				+ ", consumerClients=" + consumerClients + ", deliveryMode="
+				+ deliveryMode + ", jmsConnectionProviderName="
+				+ jmsConnectionProviderName + ", jmsDestinationProviderName="
+				+ jmsDestinationProviderName + ", messageFactoryName="
+				+ messageFactoryName + ", numConsumers=" + numConsumers
+				+ ", parent=" + parent + ", partID=" + partID
+				+ ", producerClients=" + producerClients + ", profileName="
+				+ profileName + ", testDestinationName=" + testDestinationName
+				+ ", transacted=" + transacted + ", transactionBatchSize="
+				+ transactionBatchSize + "]";
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -171,12 +222,49 @@ public class BenchmarkPartConfig implements Serializable {
 				return false;
 		} else if (!acknowledgeMode.equals(other.acknowledgeMode))
 			return false;
+		if (consumerClients == null) {
+			if (other.consumerClients != null)
+				return false;
+		} else if (!consumerClients.equals(other.consumerClients))
+			return false;
 		if (deliveryMode == null) {
 			if (other.deliveryMode != null)
 				return false;
 		} else if (!deliveryMode.equals(other.deliveryMode))
 			return false;
+		if (jmsConnectionProviderName == null) {
+			if (other.jmsConnectionProviderName != null)
+				return false;
+		} else if (!jmsConnectionProviderName
+				.equals(other.jmsConnectionProviderName))
+			return false;
+		if (jmsDestinationProviderName == null) {
+			if (other.jmsDestinationProviderName != null)
+				return false;
+		} else if (!jmsDestinationProviderName
+				.equals(other.jmsDestinationProviderName))
+			return false;
+		if (messageFactoryName == null) {
+			if (other.messageFactoryName != null)
+				return false;
+		} else if (!messageFactoryName.equals(other.messageFactoryName))
+			return false;
 		if (numConsumers != other.numConsumers)
+			return false;
+		if (parent == null) {
+			if (other.parent != null)
+				return false;
+		} else if (!parent.equals(other.parent))
+			return false;
+		if (partID == null) {
+			if (other.partID != null)
+				return false;
+		} else if (!partID.equals(other.partID))
+			return false;
+		if (producerClients == null) {
+			if (other.producerClients != null)
+				return false;
+		} else if (!producerClients.equals(other.producerClients))
 			return false;
 		if (profileName == null) {
 			if (other.profileName != null)

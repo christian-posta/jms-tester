@@ -1,86 +1,57 @@
 package com.fusesource.forge.jmstest.executor;
 
-import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageProducer;
-import javax.jms.Session;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkExecutionException;
-import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
-import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
-import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
-import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
+import com.fusesource.forge.jmstest.message.DefaultMessageFactory;
 import com.fusesource.forge.jmstest.message.MessageFactory;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
 
-public class BenchmarkProducer extends ExecutableBenchmarkComponent {
+public class BenchmarkProducer extends AbstractJMSClientComponent {
     private transient Log log;
     
-    private JMSConnectionProvider connectionProvider;
-    private JMSDestinationProvider destinationProvider;
-    private MessageFactory messageFactory;
-    
-    private Connection conn;
-    private Session session;
+    private MessageFactory messageFactory = null;
     private MessageProducer messageProducer;
 
     private CountingProbe messageCounter;
 
-    public BenchmarkProducer() {
+    public BenchmarkProducer(BenchmarkClientWrapper container) {
+    	super(container);
     }
 
-    public JMSConnectionProvider getConnectionProvider() {
-		return connectionProvider;
-	}
-
-	public void setConnectionProvider(JMSConnectionProvider connectionProvider) {
-		this.connectionProvider = connectionProvider;
-	}
-
-	public JMSDestinationProvider getDestinationProvider() {
-		return destinationProvider;
-	}
-
-	public void setDestinationProvider(JMSDestinationProvider destinationProvider) {
-		this.destinationProvider = destinationProvider;
-	}
-
-	public ReleaseManager getReleaseManager() {
-		return ReleaseManager.getInstance();
-	}
-
 	public MessageFactory getMessageFactory() {
+		if (messageFactory == null) {
+			messageFactory = (MessageFactory)getContainer().getBean(
+				new String[] { 
+					getContainer().getConfig().getMessageFactoryName(),
+					MessageFactory.DEFAULT_BEAN_NAME
+				}, MessageFactory.class
+			);
+		}
+		if (messageFactory == null) {
+			log().warn("Could not resolve message factory object. Creating Default ...");
+			messageFactory = new DefaultMessageFactory();
+			((DefaultMessageFactory)messageFactory).setPrefix(getContainer().getClientId().toString());
+		}
 		return messageFactory;
-	}
-
-	public void setMessageFactory(MessageFactory messageFactory) {
-		this.messageFactory = messageFactory;
 	}
 
     public void setMessageCounter(CountingProbe messageCounter) {
         this.messageCounter = messageCounter;
     }
 
-    public void configure(BenchmarkPartConfig testRunConfig, boolean reinitialiseSession) {
-        if (reinitialiseSession) {
-            initialise(testRunConfig);
-        }
-    }
-
-    public void initialise(BenchmarkPartConfig testRunConfig) throws BenchmarkExecutionException {
-    	setTestRunConfig(testRunConfig);
-        getReleaseManager().register(this);
+    public void start() throws BenchmarkExecutionException {
+    	super.start();
         try {
-            conn = getConnectionProvider().getConnection();
-            session = conn.createSession(getTestRunConfig().isTransacted(), getTestRunConfig().getAcknowledgeMode().getCode());
-            String destName = getTestRunConfig().getTestDestinationName();
-            Destination destination = getDestinationProvider().getDestination(session, destName);
-            messageProducer = session.createProducer(destination);
+            String destName = getContainer().getConfig().getTestDestinationName();
+            Destination destination = getDestinationProvider().getDestination(getSession(), destName);
+            messageProducer = getSession().createProducer(destination);
         } catch (Exception e) {
             throw new BenchmarkExecutionException("Unable to connect to JMS Provider", e);
         }
@@ -88,16 +59,15 @@ public class BenchmarkProducer extends ExecutableBenchmarkComponent {
 
     public void sendMessage() {
         try {
-            Message msg = getMessageFactory().createMessage(session);
-            if (BenchmarkRunStatus.State.OK.equals(getBenchmarkStatus().getCurrentState())) {
-                msg.setLongProperty("SendTime", System.currentTimeMillis());
-                msg.setLongProperty("MessageNumber", messageCounter.increment());
-                messageProducer.send(msg, getTestRunConfig().getDeliveryMode().getCode(), 4, 0);
-                if (getTestRunConfig().isTransacted()) {
-                    session.commit();
-                }
-            } else {
-                log().warn("Ignoring send call, benchmark not OK!");
+            Message msg = getMessageFactory().createMessage(getSession());
+            msg.setLongProperty("SendTime", System.currentTimeMillis());
+            msg.setLongProperty("MessageNumber", messageCounter.increment());
+            messageProducer.send(msg, getContainer().getConfig().getDeliveryMode().getCode(), 4, 0);
+            if (messageCounter != null) {
+            	messageCounter.increment();
+            }
+            if (getContainer().getConfig().isTransacted()) {
+                getSession().commit();
             }
         } catch (Exception e) {
             //TODO attempt to reinitialise producer
@@ -107,10 +77,7 @@ public class BenchmarkProducer extends ExecutableBenchmarkComponent {
     }
 
     public void release() {
-        log().trace(">>> BenchmarkProducer#release");
-        //TODO refactor into base class
-        getReleaseManager().deregister(this);
-        getBenchmarkStatus().deleteObserver(this);
+        log().debug("Releasing Producer for client: " + getContainer().getClientId().toString());
         try {
             if (messageProducer != null) {
                 messageProducer.close();
@@ -121,29 +88,9 @@ public class BenchmarkProducer extends ExecutableBenchmarkComponent {
         } finally {
         	messageProducer = null;
         }
-        
-        try {
-            if (session != null) {
-                session.close();
-            }
-        } catch (JMSException e) {
-            // failed to close, just log it
-            log().warn("Error on releasing JMS resources [session]", e);
-        } finally {
-        	session = null;
-        }
-        
-        try {
-            if (conn != null) {
-                conn.close();
-            }
-        } catch (JMSException e) {
-            // failed to close, just log it
-            log().warn("Error on releasing JMS resources [connection]", e);
-        } finally {
-        	conn = null;
-        }
-        log().trace("<<< BenchmarkProducer#release");
+
+        super.release();
+        log().debug("Released Producer for client: " + getContainer().getClientId().toString());
     }
 
     private Log log() {

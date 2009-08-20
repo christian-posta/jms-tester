@@ -3,7 +3,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
 
-  <!--  The message Factory responsible to create the test messages -->  
+    <!--  The message Factory responsible to create the test messages -->  
   <bean id="messageFactory" class="com.fusesource.forge.jmstest.message.DefaultMessageFactory">
     <property name="messageSize" value="100" />
     <property name="prefix" value="Hello" />

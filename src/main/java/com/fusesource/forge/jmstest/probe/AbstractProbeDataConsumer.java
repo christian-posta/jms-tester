@@ -5,7 +5,6 @@ import java.util.UUID;
 public abstract class AbstractProbeDataConsumer implements ProbeDataConsumer {
 
 	private String name;
-	
 	private Probe probe = null;
 	
 	public String getName() {

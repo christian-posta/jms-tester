@@ -9,40 +9,50 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.ObjectFactory;
 
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
-import com.fusesource.forge.jmstest.rrd.RRDController;
+import com.fusesource.forge.jmstest.benchmark.command.ClientType;
+import com.fusesource.forge.jmstest.rrd.FileSystemRRDController;
 
-public class BenchmarkConsumerWrapper {
+public class BenchmarkConsumerWrapper extends BenchmarkClientWrapper {
 
-    private transient Log log;
+    private Log log;
 
     private ScheduledThreadPoolExecutor scheduler;
     private boolean running = false;
-    
+
     private ObjectFactory clientFactory;
     private List<BenchmarkConsumer> consumers;
     
-    private RRDController controller;
+    private FileSystemRRDController controller;
 
-    public void setConsumerFactory(ObjectFactory clientFactory) {
-        this.clientFactory = clientFactory;
+    public BenchmarkConsumerWrapper(BenchmarkClient container, BenchmarkPartConfig partConfig) {
+    	super(container, partConfig);
     }
-
-    public RRDController getRRDController() {
+    
+    @Override
+    public ClientType getClientType() {
+    	return ClientType.CONSUMER;
+    }
+    
+    public FileSystemRRDController getRRDController() {
+    	if (controller == null) {
+    		// TODO: fix me
+    	}
 		return controller;
 	}
 
-	public void setRRDController(RRDController controller) {
-		this.controller = controller;
-	}
+    @Override
+    public boolean prepare() {
+    	super.prepare();
 
-	public boolean initialise(BenchmarkPartConfig testRunConfig)  {
-        consumers = new ArrayList<BenchmarkConsumer>(testRunConfig.getNumConsumers());
-        boolean configFailed = false;
-        for (int i = 0; !configFailed && i < testRunConfig.getNumConsumers(); i++) {
+    	consumers = new ArrayList<BenchmarkConsumer>(getConfig().getNumConsumers());
+
+    	boolean configFailed = false;
+        
+    	for (int i = 0; !configFailed && i < getConfig().getNumConsumers(); i++) {
             BenchmarkConsumer client = null;
             try {
                 client = (BenchmarkConsumer) clientFactory.getObject();
-                client.initialise(testRunConfig, i, controller);
+                client.initialize(i, getRRDController());
                 consumers.add(client);
             } catch (Exception e) {
                 log().warn("Exception during client initialisation", e);
@@ -59,23 +69,13 @@ public class BenchmarkConsumerWrapper {
         return !configFailed;
     }
     
-    synchronized public boolean start(BenchmarkPartConfig testRunConfig) {
+    synchronized public void start() {
         if (!isRunning()) {
-            try {
-            	log().info("Starting BenchmarkConsumerWrapper [" + testRunConfig + "]");
-            	initialise(testRunConfig);
-            	running = true;
-            } catch (Exception e) {
-                log().error("Unable to get BenchmarkClient from factory", e);
-            }
-        } else {
-            log.error("Benchmark execution is in progress, request will be ignored [jmsParameterMix: " + testRunConfig + "]");
+        	for (BenchmarkConsumer consumer: consumers) {
+        		consumer.start();
+        	}
+        	running = true;
         }
-        return isRunning();
-    }
-
-    public void setRunning(boolean running) {
-    	this.running = running;
     }
 
     public boolean isRunning() {
@@ -83,7 +83,7 @@ public class BenchmarkConsumerWrapper {
     }
     
     public boolean closedown() {
-        if (!consumers.isEmpty()) {
+        if (consumers != null && !consumers.isEmpty()) {
             log().info("Closing down " + consumers.size() + " benchmark clients");
             for (BenchmarkConsumer consumer : consumers) {
                 consumer.release();

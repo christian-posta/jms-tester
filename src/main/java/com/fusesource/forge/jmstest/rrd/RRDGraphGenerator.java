@@ -30,9 +30,9 @@ public class RRDGraphGenerator implements ApplicationContextAware, GraphGenerato
 			return;
 		}
 		
-		String[] beanNames = appContext.getBeanNamesForType(RRDController.class);
+		String[] beanNames = appContext.getBeanNamesForType(FileSystemRRDController.class);
 		for (String name: beanNames) {
-			RRDController controller = (RRDController)appContext.getBean(name);
+			FileSystemRRDController controller = (FileSystemRRDController)appContext.getBean(name);
 			RrdDb db = controller.getDatabase();
 			try {
 				for(int i=0; i<db.getArcCount(); i++) {
@@ -85,7 +85,7 @@ public class RRDGraphGenerator implements ApplicationContextAware, GraphGenerato
 		return true;
 	}
 	
-	private void renderGraph(RRDController controller, Archive arch, String dsName) throws Exception {
+	private void renderGraph(FileSystemRRDController controller, Archive arch, String dsName) throws Exception {
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
 

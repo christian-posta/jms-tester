@@ -13,7 +13,10 @@ import javax.jms.Session;
 import javax.jms.Topic;
 
 public interface JMSDestinationProvider {
-	Destination getDestination(final Session _session, final String _destName) throws Exception;
-	Topic getTopic(Session _session, String _topic) throws Exception;
-	Queue getQueue(Session _session, String _queue) throws Exception;
+	
+	public final static String DEFAULT_BEAN_NAME = "destinationProvider";
+	
+	public Destination getDestination(final Session _session, final String _destName) throws Exception;
+	public Topic getTopic(Session _session, String _topic) throws Exception;
+	public Queue getQueue(Session _session, String _queue) throws Exception;
 }

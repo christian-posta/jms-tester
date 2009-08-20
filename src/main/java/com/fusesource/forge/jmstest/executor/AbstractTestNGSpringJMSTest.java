@@ -13,7 +13,7 @@ import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.config.BrokerServicesFactory;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
 import com.fusesource.forge.jmstest.rrd.GraphGenerator;
-import com.fusesource.forge.jmstest.rrd.RRDController;
+import com.fusesource.forge.jmstest.rrd.FileSystemRRDController;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
 public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTests {
@@ -42,10 +42,10 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 	}
 
 	private void startRRDBackends() {
-		String [] beanNames = applicationContext.getBeanNamesForType(RRDController.class);
+		String [] beanNames = applicationContext.getBeanNamesForType(FileSystemRRDController.class);
 		
 		for(String name: beanNames) {
-			RRDController controller = (RRDController)applicationContext.getBean(name);
+			FileSystemRRDController controller = (FileSystemRRDController)applicationContext.getBean(name);
 			controller.setArchiveLength((int)((BenchmarkContext.getInstance().getProfile().getTotalDuration() + 5) / controller.getStep() + 1));
 			try {
 				if (controller.isAutoStart()) {
@@ -109,7 +109,7 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 	
 	public void benchmark() {
 		if (getProducerWrapper() != null) {
-			getProducerWrapper().benchmark();
+			getProducerWrapper().start();
 		}
 	}
 	

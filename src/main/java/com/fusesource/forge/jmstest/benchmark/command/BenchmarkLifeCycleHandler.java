@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 
 import com.fusesource.forge.jmstest.executor.BenchmarkClient;
+import com.fusesource.forge.jmstest.executor.BenchmarkClientWrapper;
 
 public class BenchmarkLifeCycleHandler extends DefaultCommandHandler {
 	
@@ -40,20 +41,15 @@ public class BenchmarkLifeCycleHandler extends DefaultCommandHandler {
 				log().debug("Handling Benchmark prepare command ..." + prepCommand.getBenchmarkConfig().getBenchmarkId());
 				BenchmarkConfig config = prepCommand.getBenchmarkConfig();
 				for(BenchmarkPartConfig partConfig: prepCommand.getBenchmarkConfig().getBenchmarkParts()) {
+					BenchmarkClientWrapper bcw = null;
 					if (partConfig.isAcceptAllConsumers() || matchesConsumer(partConfig.getConsumerClients())) {
-						client.addConsumers(partConfig);
-						PrepareBenchmarkResponse response = new PrepareBenchmarkResponse(
-							ClientType.CONSUMER, client.getClientInfo().getClientName(),
-							config.getBenchmarkId(), partConfig.getPartID()
-						);
-						cmdTransport.sendCommand(response);
+						bcw = client.addClients(ClientType.CONSUMER, partConfig);
 					}
 					if (partConfig.isAcceptAllProducers() || matchesConsumer(partConfig.getProducerClients())) {
-						client.addProducers(partConfig);
-						PrepareBenchmarkResponse response = new PrepareBenchmarkResponse(
-								ClientType.PRODUCER, client.getClientInfo().getClientName(),
-								config.getBenchmarkId(), partConfig.getPartID()
-						);
+						bcw = client.addClients(ClientType.PRODUCER, partConfig);
+					}
+					if (bcw != null) {
+						PrepareBenchmarkResponse response = new PrepareBenchmarkResponse(bcw);
 						cmdTransport.sendCommand(response);
 					}
 				}

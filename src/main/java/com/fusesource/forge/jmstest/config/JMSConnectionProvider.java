@@ -14,8 +14,10 @@ import javax.jms.TopicConnection;
 
 public interface JMSConnectionProvider {
 	
-  ConnectionFactory getConnectionFactory() throws Exception;	
-  Connection getConnection() throws Exception;
-  TopicConnection getTopicConnection() throws Exception;
-  QueueConnection getQueueConnection() throws Exception;
+  public final static String DEFAULT_BEAN_NAME = "connectionProvider";
+	
+  public ConnectionFactory getConnectionFactory() throws Exception;	
+  public Connection getConnection() throws Exception;
+  public TopicConnection getTopicConnection() throws Exception;
+  public QueueConnection getQueueConnection() throws Exception;
 }

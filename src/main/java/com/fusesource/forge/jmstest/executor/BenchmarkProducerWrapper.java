@@ -1,62 +1,170 @@
 package com.fusesource.forge.jmstest.executor;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.ObjectFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
-import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
+import com.fusesource.forge.jmstest.benchmark.command.ClientType;
+import com.fusesource.forge.jmstest.probe.CountingProbe;
+import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
-public class BenchmarkProducerWrapper {
+public class BenchmarkProducerWrapper extends BenchmarkClientWrapper implements Runnable {
 
-	private transient Log log;
-	
-	private ObjectFactory profileRunnerFactory;
-	private long maxWaitTime = 5L;
-	
-	public void setProfileRunnerFactory(ObjectFactory profileRunnerFactory) {
-		this.profileRunnerFactory = profileRunnerFactory;
+    private transient Log log;
+
+    private ScheduledThreadPoolExecutor executor;
+    private BenchmarkIteration iteration = null;
+    private List<BenchmarkProducer> producers;
+    private TimeUnit sendingDelayUnit = TimeUnit.MICROSECONDS;
+    private long sendingDelay;
+    private CountDownLatch benchmarkIterationLatch;
+    private long maxRatePerProducerThread = 5000;
+    private CountingProbe probe;
+
+    public BenchmarkProducerWrapper(BenchmarkClient container, BenchmarkPartConfig partConfig) {
+    	super(container, partConfig);
+    }
+    
+	@Override
+	public ClientType getClientType() {
+		return ClientType.PRODUCER;
 	}
-	
-	public long getMaxWaitTime() {
-		return maxWaitTime;
+    
+    public void setMaxRatePerProducerThread(long maxRatePerProducerThread) {
+        this.maxRatePerProducerThread = maxRatePerProducerThread;
+    }
+
+    public CountingProbe getProbe() {
+		return probe;
 	}
 
-	public void setMaxWaitTime(long maxWaitTime) {
-		this.maxWaitTime = maxWaitTime;
+	public void setProbe(CountingProbe probe) {
+		this.probe = probe;
 	}
 
-	public void benchmark() {
-		log().info("Benchmark");
-		
-        IterationRunner runner;
+	public BenchmarkIteration getIteration() {
+		if (iteration == null) {
+			iteration = (BenchmarkIteration)getBean(
+				new String[] { 
+					getConfig().getProfileName()
+				}, BenchmarkIteration.class
+			);
+		}
+		return iteration;
+    }
+
+    public void start() {
+		log().info("Benchmark (" + getClientId() + ") starting.");
+        benchmarkIterationLatch = new CountDownLatch(1);
+        new Thread(this, "Benchmark").start();
         try {
-            runner = (IterationRunner)profileRunnerFactory.getObject();
-        } catch (Exception e) {
-            throw new BenchmarkConfigurationException("Unable to obtain a ProfileRunner", e);
-        }
-        
-        log().debug("Notifying consumers ...");
-        //notifyClientAndWaitForResponse(true, BenchmarkContext.getInstance().getTestrunConfig());
-        log().info("Benchmark starting [" + BenchmarkContext.getInstance().getTestrunConfig().toString() + "]");
-        runner.setIteration(BenchmarkContext.getInstance().getProfile());
-        runner.setTestRunConfig(BenchmarkContext.getInstance().getTestrunConfig());
-        CountDownLatch barrier = new CountDownLatch(1);
-        runner.setBenchmarkIterationLatch(barrier);
-        new Thread(runner, "Benchmark").start();
-
-        try {
-            barrier.await();
-            log().info("Benchmark completed [" + BenchmarkContext.getInstance().getTestrunConfig().toString() + "]");
+            benchmarkIterationLatch.await();
+    		log().info("Benchmark (" + getClientId() + ") completed.");
         } catch (InterruptedException e) {
-            log().warn("Benchmark broken", e);
-        } finally {
-        	log.debug("Notifying consumer of benchmark end");
-        	//notifyClientAndWaitForResponse(false, BenchmarkContext.getInstance().getTestrunConfig());
+    		log().warn("Benchmark (" + getClientId() + ") interrupted.");
         }
     }
+    
+
+	private void runProducers(long rate, long duration) {
+
+    	BigDecimal bd = new BigDecimal(1000000).divide(new BigDecimal(rate), BigDecimal.ROUND_HALF_DOWN);
+        long delayInMicroSeconds;
+        try {
+             delayInMicroSeconds = bd.longValueExact();
+        } catch (ArithmeticException e) {
+            delayInMicroSeconds = bd.longValue();
+            log().warn("Publish rate cannot be expressed as a precise microsecond value, rounding to nearest value "
+                     + "[actualDelay: " + delayInMicroSeconds + "]");
+        }
+
+        // break it down so that we get at least 200 microseconds to publish each message
+        int producersNeeded = (int)(rate / maxRatePerProducerThread);
+        if (producersNeeded == 0) {
+            producersNeeded++;
+        }
+        
+        log.debug("Running " + producersNeeded + " producers for " + duration + "s");
+        producers = new ArrayList<BenchmarkProducer>(producersNeeded);
+        sendingDelay = delayInMicroSeconds * producersNeeded;
+        executor = new ScheduledThreadPoolExecutor(producersNeeded);
+        
+        for (int i = 0; i < producersNeeded; i++) {
+            try {
+                BenchmarkProducer producer = new BenchmarkProducer(this);
+                producer.start();
+                producer.setMessageCounter(getProbe());
+                producers.add(producer);
+            } catch (Exception e) {
+                throw new BenchmarkConfigurationException("Unable to create BenchmarkProducer instance", e);
+            }
+        }
+        for (BenchmarkProducer producer : producers) {
+            //TODO should really hold onto these and monitor for failures until the executor is shutdown
+            executor.scheduleAtFixedRate(new MessageSender(producer), 0, sendingDelay, sendingDelayUnit);
+        }
+        
+        final CountDownLatch latch = new CountDownLatch(1);
+
+	    new ScheduledThreadPoolExecutor(1).schedule(new Runnable() {
+	    	public void run() {
+	    		try {
+	    			log.info("Shutting down producers.");
+	    			executor.shutdown();
+	    			latch.countDown();
+	    		} catch (Exception e) {}
+	    	}
+	    }, duration, TimeUnit.SECONDS);
+	    
+	    try {
+            latch.await();
+        } catch(InterruptedException ie) {}
+    }
+
+    /**
+     * Iterate through the profile and run the producers
+     */
+    public void run() {
+        log().debug("BenchmarkIteration [" + iteration.getName() + "] starting");
+        getIteration().startIteration();
+    	while(iteration.needsMoreRuns()) {
+    		long rate = iteration.nextEffectiveRate();
+    		long duration = iteration.getCurrentDuration();
+    		
+            log().debug("BenchmarkIteration [" + iteration.getName() + "] stepping to " + rate +  " msg/s for "
+                    + duration + " s] starting");
+            
+            runProducers(rate, duration);
+    	}
+    	release();
+    }
+
+    public void release() {
+        log().trace(">>> IterationRunner#release");
+        benchmarkIterationLatch.countDown();
+    }
+
+    private class MessageSender implements Runnable {
+        private BenchmarkProducer producer;
+
+        private MessageSender(BenchmarkProducer producer) {
+            this.producer = producer;
+        }
+
+        public void run() {
+            producer.sendMessage();
+        }
+    }
+
+
     
     private Log log() {
     	if (log == null) {

@@ -1,13 +1,11 @@
 package com.fusesource.forge.jmstest.executor;
 
 import javax.jms.BytesMessage;
-import javax.jms.Connection;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
-import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import org.apache.commons.logging.Log;
@@ -15,24 +13,15 @@ import org.apache.commons.logging.LogFactory;
 import org.rrd4j.DsType;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
-import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
-import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
-import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
-import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
 import com.fusesource.forge.jmstest.probe.AveragingProbe;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
-import com.fusesource.forge.jmstest.rrd.RRDController;
-import com.fusesource.forge.jmstest.rrd.RRDRecorder;
+import com.fusesource.forge.jmstest.rrd.FileSystemRRDController;
+import com.fusesource.forge.jmstest.rrd.RRDRecorderImpl;
 
-public class BenchmarkConsumer implements MessageListener, Releaseable  {
+public class BenchmarkConsumer extends AbstractJMSClientComponent implements MessageListener, Releaseable  {
     private transient Log log;
 
-    private JMSConnectionProvider connectionProvider;
-    private JMSDestinationProvider destinationProvider;
-    
-    private Connection conn;
-    private Session session;
     private MessageConsumer messageConsumer;
     private String clientId;
     
@@ -40,41 +29,26 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
     private CountingProbe msgCounterProbe;
     private AveragingProbe latencyProbe;
     private AveragingProbe msgSizeProbe;
-    private RRDController rrdController;
 
+    private FileSystemRRDController rrdController;
+
+    public BenchmarkConsumer(BenchmarkClientWrapper container) {
+    	super(container);
+    }
+    
     public void setClientId(int clientId) {
-        this.clientId = "bmClient-" + clientId;
+        this.clientId = getContainer().getClientId() + "-" + clientId;
     }
     
     public String getClientId() {
     	return this.clientId;
     }
 
-    public JMSConnectionProvider getConnectionProvider() {
-		return connectionProvider;
-	}
-
-	public void setConnectionProvider(JMSConnectionProvider connectionProvider) {
-		this.connectionProvider = connectionProvider;
-	}
-
-	public JMSDestinationProvider getDestinationProvider() {
-		return destinationProvider;
-	}
-
-	public void setDestinationProvider(JMSDestinationProvider destinationProvider) {
-		this.destinationProvider = destinationProvider;
-	}
-
-	public ReleaseManager getReleaseManager() {
-		return ReleaseManager.getInstance();
-	}
-
 	public CountingProbe getMsgCounterProbe() {
 		if (msgCounterProbe == null) {
 			msgCounterProbe = new CountingProbe();
 			msgCounterProbe.setName(getClientId() + "-Counter");
-			RRDRecorder recorder = new RRDRecorder();
+			RRDRecorderImpl recorder = new RRDRecorderImpl();
 			recorder.setProbe(msgCounterProbe);
 			recorder.setDsType(DsType.COUNTER);
 			recorder.setController(rrdController);
@@ -91,7 +65,7 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
 		if (latencyProbe == null) {
 			latencyProbe = new AveragingProbe();
 			latencyProbe.setName(getClientId() + "-Latency");
-			RRDRecorder recorder = new RRDRecorder();
+			RRDRecorderImpl recorder = new RRDRecorderImpl();
 			recorder.setProbe(latencyProbe);
 			recorder.setDsType(DsType.GAUGE);
 			recorder.setController(rrdController);
@@ -108,7 +82,7 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
 		if (msgSizeProbe == null) {
 			msgSizeProbe = new AveragingProbe();
 			msgSizeProbe.setName(getClientId() + "-MsgSize");
-			RRDRecorder recorder = new RRDRecorder();
+			RRDRecorderImpl recorder = new RRDRecorderImpl();
 			recorder.setProbe(msgSizeProbe);
 			recorder.setDsType(DsType.GAUGE);
 			recorder.setController(rrdController);
@@ -130,10 +104,11 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
 	}
 
 	//TODO: simulate slow subscriber
-    public void initialise(BenchmarkPartConfig testRunConfig, int clientId, RRDController rrdController) {
-        this.setClientId(clientId);
+    public void initialize(int clientId, FileSystemRRDController rrdController) {
+    	super.start();
+        
+    	setClientId(clientId);
         this.rrdController = rrdController;
-        getReleaseManager().register(this);
         
         if (getProbeRunner() != null) {
         	getProbeRunner().addProbe(getMsgCounterProbe());
@@ -142,17 +117,26 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
         }
         
         try {
-            conn = getConnectionProvider().getConnection();
-            session = conn.createSession(false, testRunConfig.getAcknowledgeMode().getCode());
               // TODO: Handle Durable subscribers
             Destination dest = getDestinationProvider().getDestination(
-            		session, testRunConfig.getTestDestinationName());
-            messageConsumer = session.createConsumer(dest);
+            	getSession(), getContainer().getConfig().getTestDestinationName()
+            );
+            messageConsumer = getSession().createConsumer(dest);
             messageConsumer.setMessageListener(this);
-            conn.start();
         } catch (Exception e) {
             throw new BenchmarkConfigurationException("Unable to initialise JMS connection", e);
         }
+    }
+
+    public void start() {
+    	super.start();
+		try {
+	    	if (getConnection() != null) {
+	    		getConnection().start();
+	    	}
+		} catch(Exception e) {
+			log().error("Connection could not be started.", e);
+		}
     }
 
     public void onMessage(Message message) {
@@ -161,7 +145,7 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
             long now = System.currentTimeMillis();
             long latency = now - message.getLongProperty("SendTime");
             if (getMsgCounterProbe() != null) {
-            	getMsgCounterProbe().increment();
+            		getMsgCounterProbe().increment();
             }
             if (getLatencyProbe() != null) {
             	getLatencyProbe().addValue(new Double(latency));
@@ -189,26 +173,9 @@ public class BenchmarkConsumer implements MessageListener, Releaseable  {
     }
 
     public void release() {
-        log().trace(">>> BenchmarkConsumer#release");
-        getReleaseManager().deregister(this);
-
-        try {
-            if (session != null) {
-                session.close();
-            }
-        } catch (JMSException e) {
-            // failed to close, just log it
-            log().warn("Error on releasing JMS resources [session]", e);
-        }
-        try {
-            if (conn != null) {
-                conn.close();
-            }
-        } catch (JMSException e) {
-            // failed to close, just log it
-            log().warn("Error on releasing JMS resources [connection]", e);
-        }
-        log().trace("<<< BenchmarkConsumer#release");
+        log().debug("Releasing Consumer for: " + getContainer().getClientId());
+        super.release();
+        log().debug("Released Consumer for: " + getContainer().getClientId());
     }
 
     protected Log log() {

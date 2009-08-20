@@ -46,6 +46,11 @@ public class BenchmarkConfig implements Serializable {
 	
 	public void setBenchmarkParts(List<BenchmarkPartConfig> benchmarkParts) {
 		this.benchmarkParts = benchmarkParts;
+		if (benchmarkParts != null) {
+			for (BenchmarkPartConfig partConfig: benchmarkParts) {
+				partConfig.setParent(this);
+			}
+		}
 	}
 	
 	public List<String> getSpringConfigurations() {

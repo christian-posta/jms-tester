@@ -1,12 +1,18 @@
 package com.fusesource.forge.jmstest.executor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkClientInfo;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCommand;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkLifeCycleHandler;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
+import com.fusesource.forge.jmstest.benchmark.command.ClientType;
 import com.fusesource.forge.jmstest.benchmark.command.CommandTypes;
 import com.fusesource.forge.jmstest.benchmark.command.DefaultCommandHandler;
 import com.fusesource.forge.jmstest.benchmark.command.EndBenchmarkCommand;
@@ -16,6 +22,8 @@ public class BenchmarkClient extends AbstractBenchmarkExecutor {
 
 	private BenchmarkClientInfo clientInfo = null;
 	private Map<String, BenchmarkClientWrapper> activeClients;
+
+	private Log log = null;
 	
 	@Override
 	protected void init() {
@@ -31,20 +39,52 @@ public class BenchmarkClient extends AbstractBenchmarkExecutor {
 		this.clientInfo = clientInfo;
 	}
 
-	public void addConsumers(BenchmarkPartConfig partConfig) {
-		//TODO: implement me
+	public BenchmarkClientWrapper addClients(ClientType type, BenchmarkPartConfig partConfig) {
+
+		BenchmarkClientWrapper bcw = null;
+		
+		switch (type) {
+			case CONSUMER:
+				bcw = new BenchmarkConsumerWrapper(this, partConfig);
+				break;
+			case PRODUCER:
+				bcw = new BenchmarkProducerWrapper(this, partConfig);
+				break;
+			default:
+				// can't happen
+				break;
+		}
+		
+		boolean prepared = bcw.prepare();
+		
+		if (prepared) {
+			synchronized (activeClients) {
+				activeClients.put(bcw.getClientId().toString(), bcw);
+			}
+			return bcw;
+		} else {
+			log().warn("Error while setting up clients for clientId: " + bcw.getClientId());
+			return null;
+		}
 	}
 	
-	public void addProducers(BenchmarkPartConfig partConfig) {
-		//TODO: implement me
+	private List<BenchmarkClientWrapper> getClientsByBenchmarkId(String benchmarkId) {
+		
+		ArrayList<BenchmarkClientWrapper> result = new ArrayList<BenchmarkClientWrapper>();
+		return result;
 	}
 	
 	public void startBenchmark(StartBenchmarkCommand startCommand) {
-		//TODO: implement me
+		for (BenchmarkClientWrapper client: getClientsByBenchmarkId(startCommand.getBenchmarkId())) {
+			log().debug("Starting client: " + client.getClientId());
+			client.start();
+		}
 	}
 	
 	public void endBenchmark(EndBenchmarkCommand endCommand) {
-		//TODO: implement me
+		for (BenchmarkClientWrapper client: getClientsByBenchmarkId(endCommand.getBenchmarkId())) {
+			client.start();
+		}
 	}
 
 	@Override
@@ -68,8 +108,11 @@ public class BenchmarkClient extends AbstractBenchmarkExecutor {
 		));
 	}
 	
-	@Override
-	protected void execute() {
+	private Log log() {
+		if (log == null) {
+			log = LogFactory.getLog(this.getClass());
+		}
+		return log;
 	}
 	
 	public static void main(String[] args) {

@@ -24,9 +24,9 @@ public class SimpleRRDTest extends AbstractTestNGSpringContextTests {
 		
 		long startTime = System.currentTimeMillis() / 1000;
 
-		RRDController controller = (RRDController)applicationContext.getBean("RRDDatabase");
+		FileSystemRRDController controller = (FileSystemRRDController)applicationContext.getBean("RRDDatabase");
 		controller.setArchiveLength((int) (NUM_VALUES / controller.getStep()));
-		RRDRecorder recorder = (RRDRecorder)applicationContext.getBean("RRDRecorder1");
+		RRDRecorderImpl recorder = (RRDRecorderImpl)applicationContext.getBean("RRDRecorder1");
 
 		try {
 			controller.start();
