@@ -47,7 +47,6 @@ public class BenchmarkProducer extends AbstractJMSClientComponent {
     }
 
     public void start() throws BenchmarkExecutionException {
-    	super.start();
         try {
             String destName = getContainer().getConfig().getTestDestinationName();
             Destination destination = getDestinationProvider().getDestination(getSession(), destName);

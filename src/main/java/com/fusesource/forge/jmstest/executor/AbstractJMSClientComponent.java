@@ -15,7 +15,6 @@ public abstract class AbstractJMSClientComponent implements Releaseable {
 
 	private BenchmarkClientWrapper container = null;
 	private BenchmarkRunStatus benchmarkStatus;
-	
 
 	private Connection conn;
     private Session session;
@@ -59,7 +58,7 @@ public abstract class AbstractJMSClientComponent implements Releaseable {
 		return session;
 	}
 	
-	public void start() {
+	public void prepare() {
        ReleaseManager.getInstance().register(this);
 	}
 	

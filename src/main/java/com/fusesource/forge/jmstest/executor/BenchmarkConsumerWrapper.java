@@ -60,8 +60,12 @@ public class BenchmarkConsumerWrapper extends BenchmarkClientWrapper {
     
     synchronized public void start() {
         if (!isRunning()) {
-        	getProbeRunner().start();
-			getRRDController().start();
+        	if (getProbeRunner() != null) {
+        		getProbeRunner().start();
+        	}
+        	if (getRRDController() != null) {
+        		getRRDController().start();
+        	}
 
 			for (BenchmarkConsumer consumer: consumers) {
         		consumer.start();

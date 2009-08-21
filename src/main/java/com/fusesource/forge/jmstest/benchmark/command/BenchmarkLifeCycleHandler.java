@@ -38,18 +38,21 @@ public class BenchmarkLifeCycleHandler extends DefaultCommandHandler {
 			case CommandTypes.PREPARE_BENCHMARK:
 				PrepareBenchmarkCommand prepCommand = (PrepareBenchmarkCommand)command;
 				log().debug("Handling Benchmark prepare command ..." + prepCommand.getBenchmarkConfig().getBenchmarkId());
-				BenchmarkConfig config = prepCommand.getBenchmarkConfig();
 				for(BenchmarkPartConfig partConfig: prepCommand.getBenchmarkConfig().getBenchmarkParts()) {
 					BenchmarkClientWrapper bcw = null;
 					if (partConfig.isAcceptAllConsumers() || matchesConsumer(partConfig.getConsumerClients())) {
 						bcw = client.addClients(ClientType.CONSUMER, partConfig);
+						if (bcw != null) {
+							PrepareBenchmarkResponse response = new PrepareBenchmarkResponse(bcw);
+							cmdTransport.sendCommand(response);
+						}
 					}
 					if (partConfig.isAcceptAllProducers() || matchesConsumer(partConfig.getProducerClients())) {
 						bcw = client.addClients(ClientType.PRODUCER, partConfig);
-					}
-					if (bcw != null) {
-						PrepareBenchmarkResponse response = new PrepareBenchmarkResponse(bcw);
-						cmdTransport.sendCommand(response);
+						if (bcw != null) {
+							PrepareBenchmarkResponse response = new PrepareBenchmarkResponse(bcw);
+							cmdTransport.sendCommand(response);
+						}
 					}
 				}
 				return true;

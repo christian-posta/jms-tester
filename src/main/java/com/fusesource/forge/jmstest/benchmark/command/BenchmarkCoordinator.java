@@ -42,6 +42,7 @@ public class BenchmarkCoordinator extends DefaultCommandHandler implements Relea
 				BenchmarkRunner runner = benchmarks.get(response.getBenchmarkId());
 				if (runner != null) {
 					runner.registerClient(response);
+					return true;
 				} else {
 					return false;
 				}
@@ -152,8 +153,8 @@ public class BenchmarkCoordinator extends DefaultCommandHandler implements Relea
 			log().debug("Producer finished: " + clientId);
 			
 			synchronized (clientStates) {
-				if (clientStates.containsKey(clientId)) {
-					BenchmarkRunStatus state = clientStates.get(clientId);
+				if (clientStates.containsKey(clientId.toString())) {
+					BenchmarkRunStatus state = clientStates.get(clientId.toString());
 					if (state.getCurrentState() != BenchmarkRunStatus.State.FINISHED) {
 						state.setState(BenchmarkRunStatus.State.FINISHED);
 						latch.countDown();

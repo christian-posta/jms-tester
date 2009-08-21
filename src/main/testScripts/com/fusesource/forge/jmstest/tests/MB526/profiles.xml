@@ -16,6 +16,7 @@
     <property name="benchmarkParts">
 	  <list>
 	    <bean class="com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig">
+	      <property name="partID" value="part1" />
 	      <property name="testDestinationName" value="queue:test1" />
 	      <property name="deliveryMode" value="NON_PERSISTENT" />
 	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
@@ -24,8 +25,9 @@
 	      <property name="profileName" value="testProfile" />
 	    </bean>
 	    <bean class="com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig">
+	      <property name="partID" value="part2" />
 	      <property name="testDestinationName" value="queue:test2" />
-	      <property name="deliveryMode" value="PERSISTENT" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
 	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
 	      <property name="transacted" value="false" />
 	      <property name="numConsumers" value="1" />
@@ -35,13 +37,12 @@
     </property>
   </bean>    
   
-  <bean id="testProfile" class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration">
+  <bean id="testProfile" class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration" scope="prototype">
     <property name="name" value="testProfile" />
     <property name="duration"    value="10"/>
     <property name="initialRate" value="500"/>
     <property name="maxRate"     value="1000" />
     <property name="increment"   value="100" />
-    <property name="measured"    value="true"/>
   </bean>
-
+  
 </beans>

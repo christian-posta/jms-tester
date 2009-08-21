@@ -13,7 +13,9 @@ import org.apache.commons.logging.LogFactory;
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.benchmark.command.ClientType;
+import com.fusesource.forge.jmstest.benchmark.command.ProducerFinished;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
+import com.fusesource.forge.jmstest.rrd.RRDRecorderImpl;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
 public class BenchmarkProducerWrapper extends BenchmarkClientWrapper implements Runnable {
@@ -52,16 +54,25 @@ public class BenchmarkProducerWrapper extends BenchmarkClientWrapper implements 
 
 	public void start() {
 		log().info("Benchmark (" + getClientId() + ") starting.");
+		CountingProbe cp = new CountingProbe();
+		cp.setName(getClientId() + "-COUNTER");
+		cp.setDataConsumer(new RRDRecorderImpl());
+		setProbe(cp);
+		getProbeRunner().addProbe(cp);
+		getProbeRunner().start();
         benchmarkIterationLatch = new CountDownLatch(1);
         new Thread(this, "Benchmark").start();
-        try {
-            benchmarkIterationLatch.await();
-    		log().info("Benchmark (" + getClientId() + ") completed.");
-        } catch (InterruptedException e) {
-    		log().warn("Benchmark (" + getClientId() + ") interrupted.");
-        }
+        new Thread(new Runnable() {
+			public void run() {
+		        try {
+		            benchmarkIterationLatch.await();
+		    		log().info("Benchmark (" + getClientId() + ") completed.");
+		        } catch (InterruptedException e) {
+		    		log().warn("Benchmark (" + getClientId() + ") interrupted.");
+		        }
+			}
+		}).start();
     }
-    
 
 	private void runProducers(long rate, long duration) {
 
@@ -122,8 +133,9 @@ public class BenchmarkProducerWrapper extends BenchmarkClientWrapper implements 
      * Iterate through the profile and run the producers
      */
     public void run() {
+    	BenchmarkIteration iteration = getIteration();
         log().debug("BenchmarkIteration [" + iteration.getName() + "] starting");
-        getIteration().startIteration();
+        iteration.startIteration();
     	while(iteration.needsMoreRuns()) {
     		long rate = iteration.nextEffectiveRate();
     		long duration = iteration.getCurrentDuration();
@@ -133,12 +145,13 @@ public class BenchmarkProducerWrapper extends BenchmarkClientWrapper implements 
             
             runProducers(rate, duration);
     	}
+        log().debug("BenchmarkIteration [" + iteration.getName() + "] done.");
     	release();
     }
 
     public void release() {
-        log().trace(">>> IterationRunner#release");
         benchmarkIterationLatch.countDown();
+        getContainer().sendCommand(new ProducerFinished(this));
     }
 
     private class MessageSender implements Runnable {

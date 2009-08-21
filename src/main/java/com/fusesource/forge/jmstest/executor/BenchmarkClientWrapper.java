@@ -1,5 +1,7 @@
 package com.fusesource.forge.jmstest.executor;
 
+import javax.jms.ConnectionFactory;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
@@ -10,6 +12,8 @@ import com.fusesource.forge.jmstest.benchmark.command.ClientId;
 import com.fusesource.forge.jmstest.benchmark.command.ClientType;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
+import com.fusesource.forge.jmstest.config.impl.DefaultDestinationProvider;
+import com.fusesource.forge.jmstest.config.impl.DefaultJMSConnectionProvider;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
@@ -25,7 +29,6 @@ public abstract class BenchmarkClientWrapper implements Releaseable {
 	private ClientId clientId = null;
 	
 	private ProbeRunner probeRunner = null;
-	private BenchmarkIteration iteration = null;
 	
 	private Log log = null;
 	
@@ -91,6 +94,16 @@ public abstract class BenchmarkClientWrapper implements Releaseable {
 				}, JMSConnectionProvider.class
 			);
 		}
+		if (jmsConnectionProvider == null) {
+			log().warn("Creating default JMS Connection Provider.");
+			ConnectionFactory cf = (ConnectionFactory)getBean(
+				new String[] { "connectionFactory" }, ConnectionFactory.class
+			);
+			if (cf != null) {
+				jmsConnectionProvider = new DefaultJMSConnectionProvider();
+				((DefaultJMSConnectionProvider)jmsConnectionProvider).setConnectionFactory(cf);
+			}
+		}
 		return jmsConnectionProvider;
 	}
 	
@@ -102,6 +115,10 @@ public abstract class BenchmarkClientWrapper implements Releaseable {
 						JMSDestinationProvider.DEFAULT_BEAN_NAME
 					}, JMSDestinationProvider.class
 				);
+		}
+		if (jmsDestinationProvider == null) {
+			log().warn("Creating Default Destination Provider.");
+			jmsDestinationProvider = new DefaultDestinationProvider();
 		}
 		return jmsDestinationProvider;
 	}
@@ -141,13 +158,14 @@ public abstract class BenchmarkClientWrapper implements Releaseable {
 		return log;
 	}
 
-	public BenchmarkIteration getIteration() {
-		if (iteration == null) {
-			iteration = (BenchmarkIteration)getBean(
-				new String[] { 
-					getConfig().getProfileName()
-				}, BenchmarkIteration.class
-			);
+	synchronized public BenchmarkIteration getIteration() {
+		
+		BenchmarkIteration iteration = null;
+		
+		try {
+			iteration = (BenchmarkIteration)getApplicationContext().getBean(getConfig().getProfileName());
+		} catch (Exception e) {
+			log().error("Error creating Iteration." ,e);
 		}
 		return iteration;
 	}

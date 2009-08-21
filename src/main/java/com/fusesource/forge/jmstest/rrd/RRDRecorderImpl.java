@@ -19,7 +19,9 @@ public class RRDRecorderImpl extends AbstractProbeDataConsumer implements RRDRec
 
 	public void setController(RRDController controller) {
 		this.controller = controller;
-		controller.addRRDRecorder(this);
+		if (controller != null) {
+			controller.addRRDRecorder(this);
+		}
 	}
 
 	public DsType getDsType() {

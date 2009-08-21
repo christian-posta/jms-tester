@@ -71,6 +71,13 @@ public class BenchmarkClient extends AbstractBenchmarkExecutionContainer {
 	private List<BenchmarkClientWrapper> getClientsByBenchmarkId(String benchmarkId) {
 		
 		ArrayList<BenchmarkClientWrapper> result = new ArrayList<BenchmarkClientWrapper>();
+		synchronized (activeClients) {
+			for(BenchmarkClientWrapper client: activeClients.values()) {
+				if (client.getClientId().getBenchmarkId().equals(benchmarkId)) {
+					result.add(client);
+				}
+			}
+		}
 		return result;
 	}
 	
@@ -83,7 +90,10 @@ public class BenchmarkClient extends AbstractBenchmarkExecutionContainer {
 	
 	public void endBenchmark(EndBenchmarkCommand endCommand) {
 		for (BenchmarkClientWrapper client: getClientsByBenchmarkId(endCommand.getBenchmarkId())) {
-			client.start();
+			client.release();
+			synchronized (activeClients) {
+				activeClients.remove(client.getClientId().toString());
+			}
 		}
 	}
 

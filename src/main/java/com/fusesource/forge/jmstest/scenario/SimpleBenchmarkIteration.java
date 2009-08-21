@@ -1,5 +1,8 @@
 package com.fusesource.forge.jmstest.scenario;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class SimpleBenchmarkIteration extends AbstractBenchmarkIteration {
 
 	private int position;
@@ -9,9 +12,8 @@ public class SimpleBenchmarkIteration extends AbstractBenchmarkIteration {
     private long maxRate;
     private long increment = 0;
     private boolean iterated = false;
-
-    public SimpleBenchmarkIteration() {
-    }
+    
+    private Log log = null;
 
     public void startIteration() {
     	position = 0;
@@ -102,5 +104,12 @@ public class SimpleBenchmarkIteration extends AbstractBenchmarkIteration {
     public String toString() {
         return "BenchmarkIterationImpl{" + "duration=" + duration + ", initialRate=" + initialRate +
                 ", maxRate=" + maxRate + ", increment=" + increment + "}";
+    }
+    
+    private Log log() {
+    	if (log == null) {
+    		log = LogFactory.getLog(this.getClass());
+    	}
+    	return log;
     }
 }

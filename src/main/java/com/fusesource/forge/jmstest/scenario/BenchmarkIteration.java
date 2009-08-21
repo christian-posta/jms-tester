@@ -9,6 +9,4 @@ public interface BenchmarkIteration {
 	public long getCurrentDuration();
 	public long getRunsNeeded();
 	public long getTotalDuration();
-    public boolean isMeasured();
-    public void setMeasured(boolean measured);
 }

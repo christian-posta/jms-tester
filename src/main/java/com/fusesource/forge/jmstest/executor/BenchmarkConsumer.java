@@ -123,8 +123,6 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
 
 	//TODO: simulate slow subscriber
     public void prepare() {
-    	super.start();
-        
         try {
               // TODO: Handle Durable subscribers
             Destination dest = getDestinationProvider().getDestination(
@@ -138,8 +136,7 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
     }
 
     public void start() {
-    	super.start();
-		try {
+ 		try {
 	    	if (getConnection() != null) {
 	    		getConnection().start();
 	    	}
