@@ -4,10 +4,10 @@ import org.rrd4j.DsType;
 
 import com.fusesource.forge.jmstest.probe.ProbeDataConsumer;
 
-public interface RRDRecorder extends ProbeDataConsumer {
+public interface BenchmarkSampleRecorder extends ProbeDataConsumer {
 	
-	public RRDController getController();
-	public void setController(RRDController controller);
+	public BenchmarkSamplePersistenceAdapter getAdapter();
+	public void setAdapter(BenchmarkSamplePersistenceAdapter controller);
 
 	public DsType getDsType();
 	public void setDsType(DsType dsType);

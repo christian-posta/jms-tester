@@ -22,7 +22,7 @@ public class JMXProbe extends AbstractProbe {
 	private Log log = null;
 	
 	@Override
-	protected Number getValue() {
+	public Number getValue() {
 		if (!isActive()) {
 			log().warn("JMXProbe is not accessible...value might not make sense.");
 			return Double.MIN_VALUE;

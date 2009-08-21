@@ -12,7 +12,7 @@ import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.config.BrokerServicesFactory;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
-import com.fusesource.forge.jmstest.rrd.FileSystemRRDController;
+import com.fusesource.forge.jmstest.rrd.Rrd4jSamplePersistenceAdapter;
 import com.fusesource.forge.jmstest.rrd.GraphGenerator;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
@@ -42,10 +42,10 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 	}
 
 	private void startRRDBackends() {
-		String [] beanNames = applicationContext.getBeanNamesForType(FileSystemRRDController.class);
+		String [] beanNames = applicationContext.getBeanNamesForType(Rrd4jSamplePersistenceAdapter.class);
 		
 		for(String name: beanNames) {
-			FileSystemRRDController controller = (FileSystemRRDController)applicationContext.getBean(name);
+			Rrd4jSamplePersistenceAdapter controller = (Rrd4jSamplePersistenceAdapter)applicationContext.getBean(name);
 			controller.setArchiveLength((int)((BenchmarkContext.getInstance().getProfile().getTotalDuration() + 5) / controller.getStep() + 1));
 			try {
 				if (controller.isAutoStart()) {

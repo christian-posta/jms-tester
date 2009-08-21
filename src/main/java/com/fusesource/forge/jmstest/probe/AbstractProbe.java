@@ -10,10 +10,7 @@ public abstract class AbstractProbe implements Probe {
 	private String name;
 	private ProbeDataConsumer dataConsumer;
 	
-	protected abstract Number getValue();
-
-	public AbstractProbe() {
-	}
+	public abstract Number getValue();
 
 	public ProbeDataConsumer getDataConsumer() {
 		return dataConsumer;

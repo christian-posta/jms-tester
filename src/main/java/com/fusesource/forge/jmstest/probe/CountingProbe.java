@@ -21,7 +21,7 @@ public class CountingProbe extends AbstractProbe {
 	}
 	
 	@Override
-	protected Number getValue() {
+	public Number getValue() {
 		return counter.longValue();
 	}
 }

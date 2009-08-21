@@ -15,7 +15,8 @@ import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.benchmark.command.ClientType;
 import com.fusesource.forge.jmstest.benchmark.command.ProducerFinished;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
-import com.fusesource.forge.jmstest.rrd.RRDRecorderImpl;
+import com.fusesource.forge.jmstest.rrd.BenchmarkSampleRecorder;
+import com.fusesource.forge.jmstest.rrd.BenchmarkSampleRecorderImpl;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
 public class BenchmarkProducerWrapper extends BenchmarkClientWrapper implements Runnable {
@@ -56,7 +57,9 @@ public class BenchmarkProducerWrapper extends BenchmarkClientWrapper implements 
 		log().info("Benchmark (" + getClientId() + ") starting.");
 		CountingProbe cp = new CountingProbe();
 		cp.setName(getClientId() + "-COUNTER");
-		cp.setDataConsumer(new RRDRecorderImpl());
+		BenchmarkSampleRecorder bmsr = new BenchmarkSampleRecorderImpl();
+		bmsr.setAdapter(getSamplePersistenceAdapter());
+		cp.setDataConsumer(bmsr);
 		setProbe(cp);
 		getProbeRunner().addProbe(cp);
 		getProbeRunner().start();

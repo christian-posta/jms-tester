@@ -13,61 +13,40 @@ import org.rrd4j.core.Archive;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
-public class RRDGraphGenerator implements ApplicationContextAware, GraphGenerator {
+public class RRDGraphGenerator {
 	
-	private ApplicationContext appContext;
-	private String baseDir = "target";
+	private File baseDir = null;
 
 	private Log log = null;
 	
-	public void createGraphs() {
+	public void createGraphs(File baseDir, Rrd4jSamplePersistenceAdapter adapter) {
+		this.baseDir = baseDir;
+		
 		if (!checkGraphDir()) {
 			log().error(getBaseDir() + " is not accessible. No graphs will be generated.");
 			return;
 		}
 		
-		String[] beanNames = appContext.getBeanNamesForType(FileSystemRRDController.class);
-		for (String name: beanNames) {
-			FileSystemRRDController controller = (FileSystemRRDController)appContext.getBean(name);
-			RrdDb db = controller.getDatabase();
-			try {
-				for(int i=0; i<db.getArcCount(); i++) {
-					Archive arch = db.getArchive(i);
-						for(String dsName: db.getDsNames()) {
-							renderGraph(controller, arch, dsName);
-						}
-				}
-			} catch (Exception e) {
-				log().error("Error while generating graphs for : " + controller.getFileName(), e);
+		RrdDb db = adapter.getDatabase();
+		try {
+			for(int i=0; i<db.getArcCount(); i++) {
+				Archive arch = db.getArchive(i);
+					for(String dsName: db.getDsNames()) {
+						renderGraph(adapter, arch, dsName);
+					}
 			}
+		} catch (Exception e) {
+			log().error("Error while generating graphs for : " + adapter.getFileName(), e);
 		}
 	}
 	
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		this.appContext = applicationContext;
-	}
-
-	public String getBaseDir() {
+	public File getBaseDir() {
 		return baseDir;
 	}
 
-	public void setBaseDir(String baseDir) {
-		this.baseDir = baseDir;
-	}
-
-	private Log log() {
-		if (log == null) {
-			log = LogFactory.getLog(this.getClass());
-		}
-		return log;
-	}
-
 	private boolean checkGraphDir() {
-		File dir = new File(getBaseDir());
+		File dir = getBaseDir();
 		
 		if (dir.exists()) {
 			if (!dir.isDirectory()) {
@@ -81,11 +60,10 @@ public class RRDGraphGenerator implements ApplicationContextAware, GraphGenerato
 		} else {
 			return dir.mkdirs();
 		}
-		
 		return true;
 	}
 	
-	private void renderGraph(FileSystemRRDController controller, Archive arch, String dsName) throws Exception {
+	private void renderGraph(Rrd4jSamplePersistenceAdapter controller, Archive arch, String dsName) throws Exception {
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
 
@@ -111,5 +89,12 @@ public class RRDGraphGenerator implements ApplicationContextAware, GraphGenerato
 		RrdGraph graph = new RrdGraph(graphDef);
 		BufferedImage bi = new BufferedImage(100,100,BufferedImage.TYPE_INT_RGB);
 		graph.render(bi.getGraphics());	
+	}
+
+	private Log log() {
+		if (log == null) {
+			log = LogFactory.getLog(this.getClass());
+		}
+		return log;
 	}
 }

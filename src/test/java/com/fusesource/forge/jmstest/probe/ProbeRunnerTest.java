@@ -5,7 +5,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.fusesource.forge.jmstest.rrd.FileSystemRRDController;
+import com.fusesource.forge.jmstest.rrd.Rrd4jSamplePersistenceAdapter;
 
 @ContextConfiguration(locations={
 	"classpath:com/fusesource/forge/jmstest/probe/ProbeConfig.xml"})
@@ -19,7 +19,7 @@ public class ProbeRunnerTest extends AbstractTestNGSpringContextTests{
 	@Test
 	public void runProbes() {
 		try {
-			FileSystemRRDController controller = (FileSystemRRDController)applicationContext.getBean("RRDDatabase");
+			Rrd4jSamplePersistenceAdapter controller = (Rrd4jSamplePersistenceAdapter)applicationContext.getBean("RRDDatabase");
 			controller.start();
 			ProbeRunner runner = (ProbeRunner)applicationContext.getBean("ProbeRunner");
 			runner.start();

@@ -8,7 +8,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.benchmark.command.ClientType;
-import com.fusesource.forge.jmstest.rrd.RRDController;
 
 public class BenchmarkConsumerWrapper extends BenchmarkClientWrapper {
 
@@ -17,7 +16,6 @@ public class BenchmarkConsumerWrapper extends BenchmarkClientWrapper {
     private boolean running = false;
 
     private List<BenchmarkConsumer> consumers;
-    private RRDController controller;
 
     public BenchmarkConsumerWrapper(BenchmarkClient container, BenchmarkPartConfig partConfig) {
     	super(container, partConfig);
@@ -28,13 +26,6 @@ public class BenchmarkConsumerWrapper extends BenchmarkClientWrapper {
     	return ClientType.CONSUMER;
     }
     
-    public RRDController getRRDController() {
-    	if (controller == null) {
-    		// TODO: fix me
-    	}
-		return controller;
-	}
-
     @Override
     public boolean prepare() {
     	super.prepare();
@@ -46,7 +37,7 @@ public class BenchmarkConsumerWrapper extends BenchmarkClientWrapper {
     	for (int i = 0; !configFailed && i < getConfig().getNumConsumers(); i++) {
             BenchmarkConsumer client = null;
             try {
-            	client = new BenchmarkConsumer(this, i, getRRDController(), getProbeRunner());
+            	client = new BenchmarkConsumer(this, i, getSamplePersistenceAdapter(), getProbeRunner());
                 client.prepare();
                 consumers.add(client);
             } catch (Exception e) {
@@ -63,8 +54,8 @@ public class BenchmarkConsumerWrapper extends BenchmarkClientWrapper {
         	if (getProbeRunner() != null) {
         		getProbeRunner().start();
         	}
-        	if (getRRDController() != null) {
-        		getRRDController().start();
+        	if (getSamplePersistenceAdapter() != null) {
+        		getSamplePersistenceAdapter().start();
         	}
 
 			for (BenchmarkConsumer consumer: consumers) {
@@ -87,7 +78,7 @@ public class BenchmarkConsumerWrapper extends BenchmarkClientWrapper {
             }
             log().info(consumers.size() + " benchmark clients closed down");
         }
-        getRRDController().stop();
+        getSamplePersistenceAdapter().stop();
         return false;
     }
 

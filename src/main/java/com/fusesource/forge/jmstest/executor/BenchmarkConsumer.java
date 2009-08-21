@@ -16,8 +16,8 @@ import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
 import com.fusesource.forge.jmstest.probe.AveragingProbe;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
-import com.fusesource.forge.jmstest.rrd.RRDController;
-import com.fusesource.forge.jmstest.rrd.RRDRecorderImpl;
+import com.fusesource.forge.jmstest.rrd.BenchmarkSamplePersistenceAdapter;
+import com.fusesource.forge.jmstest.rrd.BenchmarkSampleRecorderImpl;
 
 public class BenchmarkConsumer extends AbstractJMSClientComponent implements MessageListener, Releaseable  {
     private transient Log log;
@@ -30,20 +30,19 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
     private AveragingProbe latencyProbe;
     private AveragingProbe msgSizeProbe;
 
-    private RRDController rrdController;
+    private BenchmarkSamplePersistenceAdapter adapter;
 
-    public BenchmarkConsumer(BenchmarkClientWrapper container, int clientId, RRDController rrdController, ProbeRunner probeRunner) {
+    public BenchmarkConsumer(BenchmarkClientWrapper container, int clientId, BenchmarkSamplePersistenceAdapter rrdController, ProbeRunner probeRunner) {
     	super(container);
     	setClientId(clientId);
     	setProbeRunner(probeRunner);
-    	setRrdController(rrdController);
+    	setBenchmarkSamplePersistenceAdapter(rrdController);
 
         if (getProbeRunner() != null) {
         	getProbeRunner().addProbe(getMsgCounterProbe());
         	getProbeRunner().addProbe(getLatencyProbe());
         	getProbeRunner().addProbe(getMsgSizeProbe());
         }
-
     }
     
     public void setClientId(int clientId) {
@@ -58,10 +57,10 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
 		if (msgCounterProbe == null) {
 			msgCounterProbe = new CountingProbe();
 			msgCounterProbe.setName(getClientId() + "-Counter");
-			RRDRecorderImpl recorder = new RRDRecorderImpl();
+			BenchmarkSampleRecorderImpl recorder = new BenchmarkSampleRecorderImpl();
 			recorder.setProbe(msgCounterProbe);
 			recorder.setDsType(DsType.COUNTER);
-			recorder.setController(getRrdController());
+			recorder.setAdapter(getBenchmarkSamplePersistenceAdapter());
 			msgCounterProbe.setDataConsumer(recorder);
 		}
 		return msgCounterProbe;
@@ -75,10 +74,10 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
 		if (latencyProbe == null) {
 			latencyProbe = new AveragingProbe();
 			latencyProbe.setName(getClientId() + "-Latency");
-			RRDRecorderImpl recorder = new RRDRecorderImpl();
+			BenchmarkSampleRecorderImpl recorder = new BenchmarkSampleRecorderImpl();
 			recorder.setProbe(latencyProbe);
 			recorder.setDsType(DsType.GAUGE);
-			recorder.setController(getRrdController());
+			recorder.setAdapter(getBenchmarkSamplePersistenceAdapter());
 			latencyProbe.setDataConsumer(recorder);
 		}
 		return latencyProbe;
@@ -92,10 +91,10 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
 		if (msgSizeProbe == null) {
 			msgSizeProbe = new AveragingProbe();
 			msgSizeProbe.setName(getClientId() + "-MsgSize");
-			RRDRecorderImpl recorder = new RRDRecorderImpl();
+			BenchmarkSampleRecorderImpl recorder = new BenchmarkSampleRecorderImpl();
 			recorder.setProbe(msgSizeProbe);
 			recorder.setDsType(DsType.GAUGE);
-			recorder.setController(getRrdController());
+			recorder.setAdapter(getBenchmarkSamplePersistenceAdapter());
 			msgSizeProbe.setDataConsumer(recorder);
 		}
 		return msgSizeProbe;
@@ -113,12 +112,12 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
 		this.probeRunner = probeRunner;
 	}
 
-	public RRDController getRrdController() {
-		return rrdController;
+	public BenchmarkSamplePersistenceAdapter getBenchmarkSamplePersistenceAdapter() {
+		return adapter;
 	}
 
-	public void setRrdController(RRDController rrdController) {
-		this.rrdController = rrdController;
+	public void setBenchmarkSamplePersistenceAdapter(BenchmarkSamplePersistenceAdapter adapter) {
+		this.adapter = adapter;
 	}
 
 	//TODO: simulate slow subscriber

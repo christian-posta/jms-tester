@@ -15,6 +15,8 @@ import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
 import com.fusesource.forge.jmstest.config.impl.DefaultDestinationProvider;
 import com.fusesource.forge.jmstest.config.impl.DefaultJMSConnectionProvider;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
+import com.fusesource.forge.jmstest.rrd.BenchmarkSamplePersistenceAdapter;
+import com.fusesource.forge.jmstest.rrd.CommandSamplePersistenceAdapter;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
 public abstract class BenchmarkClientWrapper implements Releaseable {
@@ -29,6 +31,7 @@ public abstract class BenchmarkClientWrapper implements Releaseable {
 	private ClientId clientId = null;
 	
 	private ProbeRunner probeRunner = null;
+	private BenchmarkSamplePersistenceAdapter adapter = null;
 	
 	private Log log = null;
 	
@@ -50,6 +53,13 @@ public abstract class BenchmarkClientWrapper implements Releaseable {
 			appContext = getConfig().getParent().getApplicationContext();
 		}
 		return appContext;
+	}
+
+    public BenchmarkSamplePersistenceAdapter getSamplePersistenceAdapter() {
+    	if (adapter == null) {
+    		adapter = new CommandSamplePersistenceAdapter(getClientId(), getContainer().getCmdTransport());
+    	}
+		return adapter;
 	}
 
 	ProbeRunner getProbeRunner() {
@@ -83,6 +93,9 @@ public abstract class BenchmarkClientWrapper implements Releaseable {
 
 	public void release() {
 		ReleaseManager.getInstance().deregister(this);
+		if (adapter != null) {
+			adapter.stop();
+		}
 	}
 	
 	protected JMSConnectionProvider getJmsConnectionProvider() {

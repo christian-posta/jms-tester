@@ -6,7 +6,7 @@ import org.hyperic.sigar.SigarException;
 public class CpuStat extends AbstractSigarProbe {
 	
 	@Override
-	protected Number getValue() {
+	public Number getValue() {
 		
 		try {
 			CpuPerc cpu = getSigar().getCpuPerc();

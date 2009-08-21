@@ -6,21 +6,19 @@ import org.rrd4j.DsType;
 
 import com.fusesource.forge.jmstest.probe.AbstractProbeDataConsumer;
 
-public class RRDRecorderImpl extends AbstractProbeDataConsumer implements RRDRecorder {
+public class BenchmarkSampleRecorderImpl extends AbstractProbeDataConsumer implements BenchmarkSampleRecorder {
 	
-	private RRDController controller;
+	private BenchmarkSamplePersistenceAdapter adapter;
 	private DsType dsType = DsType.COUNTER;
 	
-	public RRDRecorderImpl() {}
-
-	public RRDController getController() {
-		return controller;
+	public BenchmarkSamplePersistenceAdapter getAdapter() {
+		return adapter;
 	}
 
-	public void setController(RRDController controller) {
-		this.controller = controller;
-		if (controller != null) {
-			controller.addRRDRecorder(this);
+	public void setAdapter(BenchmarkSamplePersistenceAdapter adapter) {
+		this.adapter = adapter;
+		if (adapter != null) {
+			adapter.addRecorder(this);
 		}
 	}
 
@@ -38,8 +36,8 @@ public class RRDRecorderImpl extends AbstractProbeDataConsumer implements RRDRec
 	
 	public void record(long timestamp, Number value) {
 		log().debug(toString() + " recording : " + timestamp + ":" + value);
-		if (getController() != null) {
-			getController().record(this, timestamp, value);
+		if (getAdapter() != null) {
+			getAdapter().record(this, timestamp, value);
 		}
 	}
 	

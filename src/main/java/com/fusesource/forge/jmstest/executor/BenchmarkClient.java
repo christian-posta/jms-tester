@@ -1,5 +1,7 @@
 package com.fusesource.forge.jmstest.executor;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +34,14 @@ public class BenchmarkClient extends AbstractBenchmarkExecutionContainer {
 	}
 	
 	public BenchmarkClientInfo getClientInfo() {
+		if (clientInfo == null) {
+			clientInfo = new BenchmarkClientInfo();
+			try {
+				clientInfo.setClientName("bmClient-" + InetAddress.getLocalHost().getHostName() + "-" + System.currentTimeMillis());
+			} catch (UnknownHostException e) {
+				clientInfo.setClientName("bmClient-UnknownHost-" + System.currentTimeMillis());
+			}
+		}
 		return clientInfo;
 	}
 
@@ -66,6 +76,10 @@ public class BenchmarkClient extends AbstractBenchmarkExecutionContainer {
 			log().warn("Error while setting up clients for clientId: " + bcw.getClientId());
 			return null;
 		}
+	}
+	
+	public void setName(String name) {
+		getClientInfo().setClientName(name);
 	}
 	
 	private List<BenchmarkClientWrapper> getClientsByBenchmarkId(String benchmarkId) {
@@ -127,12 +141,7 @@ public class BenchmarkClient extends AbstractBenchmarkExecutionContainer {
 	
 	public static void main(String[] args) {
 		BenchmarkClient client = new BenchmarkClient();
-
-		BenchmarkClientInfo info = new BenchmarkClientInfo();
-		info.setClientName("TestClient");
-		client.setClientInfo(info);
 		client.setAutoTerminate(false);
-		
 		client.start(args);
 	}
 }

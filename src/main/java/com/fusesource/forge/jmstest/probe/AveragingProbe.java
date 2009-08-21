@@ -19,7 +19,7 @@ public class AveragingProbe extends AbstractProbe {
 	}
 	
 	@Override
-	protected Number getValue() {
+	public Number getValue() {
 		return currentAverage;
 	}
 	
