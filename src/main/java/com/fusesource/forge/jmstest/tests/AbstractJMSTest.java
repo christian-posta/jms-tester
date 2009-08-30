@@ -25,7 +25,7 @@ public abstract class AbstractJMSTest {
         return appCtxt;
 	}
 	
-	protected Object getBeanByClass(Class clazz) {
+	protected Object getBeanByClass(Class<?> clazz) {
 		Object result = null;
 		String [] beanNames = getApplicationContext().getBeanNamesForType(clazz);
 		if (beanNames != null && beanNames.length > 0) {

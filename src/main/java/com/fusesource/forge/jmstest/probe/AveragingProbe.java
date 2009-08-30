@@ -7,6 +7,14 @@ public class AveragingProbe extends AbstractProbe {
 	private AtomicLong counter = new AtomicLong(0l);
 	private double currentAverage = 0.0;
 
+	public AveragingProbe() {
+		super();
+	}
+
+	public AveragingProbe(String name) {
+		super(name);
+	}
+
 	synchronized public void reset() {
 		counter = new AtomicLong(0l);
 		currentAverage = 0.0;
@@ -19,7 +27,7 @@ public class AveragingProbe extends AbstractProbe {
 	}
 	
 	@Override
-	public Number getValue() {
+	protected Number getValue() {
 		return currentAverage;
 	}
 	

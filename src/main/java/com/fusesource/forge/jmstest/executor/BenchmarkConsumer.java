@@ -10,14 +10,12 @@ import javax.jms.TextMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.rrd4j.DsType;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
 import com.fusesource.forge.jmstest.probe.AveragingProbe;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
 import com.fusesource.forge.jmstest.rrd.BenchmarkSamplePersistenceAdapter;
-import com.fusesource.forge.jmstest.rrd.BenchmarkSampleRecorderImpl;
 
 public class BenchmarkConsumer extends AbstractJMSClientComponent implements MessageListener, Releaseable  {
     private transient Log log;
@@ -32,11 +30,11 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
 
     private BenchmarkSamplePersistenceAdapter adapter;
 
-    public BenchmarkConsumer(BenchmarkClientWrapper container, int clientId, BenchmarkSamplePersistenceAdapter rrdController, ProbeRunner probeRunner) {
+    public BenchmarkConsumer(AbstractBenchmarkJMSClient container, int clientId, BenchmarkSamplePersistenceAdapter adapter, ProbeRunner probeRunner) {
     	super(container);
     	setClientId(clientId);
     	setProbeRunner(probeRunner);
-    	setBenchmarkSamplePersistenceAdapter(rrdController);
+    	setBenchmarkSamplePersistenceAdapter(adapter);
 
         if (getProbeRunner() != null) {
         	getProbeRunner().addProbe(getMsgCounterProbe());
@@ -55,13 +53,8 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
 
 	public CountingProbe getMsgCounterProbe() {
 		if (msgCounterProbe == null) {
-			msgCounterProbe = new CountingProbe();
-			msgCounterProbe.setName(getClientId() + "-Counter");
-			BenchmarkSampleRecorderImpl recorder = new BenchmarkSampleRecorderImpl();
-			recorder.setProbe(msgCounterProbe);
-			recorder.setDsType(DsType.COUNTER);
-			recorder.setAdapter(getBenchmarkSamplePersistenceAdapter());
-			msgCounterProbe.setDataConsumer(recorder);
+			msgCounterProbe = new CountingProbe(getClientId() + "-Counter");
+			msgCounterProbe.addObserver(getBenchmarkSamplePersistenceAdapter());
 		}
 		return msgCounterProbe;
 	}
@@ -72,13 +65,9 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
 
 	public AveragingProbe getLatencyProbe() {
 		if (latencyProbe == null) {
-			latencyProbe = new AveragingProbe();
-			latencyProbe.setName(getClientId() + "-Latency");
-			BenchmarkSampleRecorderImpl recorder = new BenchmarkSampleRecorderImpl();
-			recorder.setProbe(latencyProbe);
-			recorder.setDsType(DsType.GAUGE);
-			recorder.setAdapter(getBenchmarkSamplePersistenceAdapter());
-			latencyProbe.setDataConsumer(recorder);
+			latencyProbe = new AveragingProbe(getClientId() + "-Latency");
+			latencyProbe.setResetOnRead(true);
+			latencyProbe.addObserver(getBenchmarkSamplePersistenceAdapter());
 		}
 		return latencyProbe;
 	}
@@ -89,13 +78,9 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
 
 	public AveragingProbe getMsgSizeProbe() {
 		if (msgSizeProbe == null) {
-			msgSizeProbe = new AveragingProbe();
-			msgSizeProbe.setName(getClientId() + "-MsgSize");
-			BenchmarkSampleRecorderImpl recorder = new BenchmarkSampleRecorderImpl();
-			recorder.setProbe(msgSizeProbe);
-			recorder.setDsType(DsType.GAUGE);
-			recorder.setAdapter(getBenchmarkSamplePersistenceAdapter());
-			msgSizeProbe.setDataConsumer(recorder);
+			msgSizeProbe = new AveragingProbe(getClientId() + "-MsgSize");
+			msgSizeProbe.setResetOnRead(true);
+			msgSizeProbe.addObserver(getBenchmarkSamplePersistenceAdapter());
 		}
 		return msgSizeProbe;
 	}
@@ -125,7 +110,7 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements Mes
         try {
               // TODO: Handle Durable subscribers
             Destination dest = getDestinationProvider().getDestination(
-            	getSession(), getContainer().getConfig().getTestDestinationName()
+            	getSession(), getContainer().getPartConfig().getTestDestinationName()
             );
             messageConsumer = getSession().createConsumer(dest);
             messageConsumer.setMessageListener(this);

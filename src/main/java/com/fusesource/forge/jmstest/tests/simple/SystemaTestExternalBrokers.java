@@ -49,7 +49,7 @@ public class SystemaTestExternalBrokers extends AbstractNetworkOfBrokersTest {
 		
 		ObjectFactory cfCreator = (ObjectFactory)(applicationContext.getBean("connectionFactoryFactory"));
 		
-		for(Enumeration en = connectorMap.keys(); en.hasMoreElements(); ) {
+		for(Enumeration<?> en = connectorMap.keys(); en.hasMoreElements(); ) {
 			String key = (String)en.nextElement();
 			String value = connectorMap.getProperty(key);
 			JMSConnectionProvider provider = new DefaultJMSConnectionProvider();

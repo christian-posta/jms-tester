@@ -1,48 +1,57 @@
 package com.fusesource.forge.jmstest.rrd;
 
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;
 import org.rrd4j.core.FetchRequest;
 import org.rrd4j.core.RrdDb;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-@ContextConfiguration(locations={
-	"classpath:com/fusesource/forge/jmstest/rrd/RRDConfig.xml"})
+import com.fusesource.forge.jmstest.probe.AbstractProbe;
+import com.fusesource.forge.jmstest.probe.Probe;
+import com.fusesource.forge.jmstest.probe.ProbeDescriptor;
+import com.fusesource.forge.jmstest.probe.RandomProbe;
 
-public class SimpleRRDTest extends AbstractTestNGSpringContextTests {
+public class SimpleRRDTest {
 
-	private final static int NUM_VALUES = 120;
+	private final static int NUM_VALUES = 30;
 	
 	@Test
 	public void rrdTest() {
-		Random rnd = new Random(System.currentTimeMillis());
+		Probe randomProbe = new RandomProbe("RandomProbe", 1000.0);
+
+		ProbeDescriptor pd = randomProbe.getDescriptor();
+		List<ProbeDescriptor> descriptors = new ArrayList<ProbeDescriptor>();
+		descriptors.add(pd);
 		
-		long startTime = System.currentTimeMillis() / 1000;
+		Rrd4jSamplePersistenceAdapter controller = new Rrd4jSamplePersistenceAdapter(descriptors);
+		((AbstractProbe)randomProbe).addObserver(controller);
 
-		Rrd4jSamplePersistenceAdapter controller = (Rrd4jSamplePersistenceAdapter)applicationContext.getBean("RRDDatabase");
+		controller.setStartTime(System.currentTimeMillis() / 1000 - 1);
+		controller.setStep(1);
 		controller.setArchiveLength((int) (NUM_VALUES / controller.getStep()));
-		BenchmarkSampleRecorderImpl recorder = (BenchmarkSampleRecorderImpl)applicationContext.getBean("RRDRecorder1");
-
+		controller.setCacheSize(10);
+		
 		try {
 			controller.start();
 			
 			long step = controller.getStep();
 			
 			for(int i=0; i<NUM_VALUES; i++) {
-				recorder.record(startTime + i*step, rnd.nextDouble()*100);
+				randomProbe.probe();
+				try {
+					Thread.sleep(controller.getStep() * 1000);
+				} catch (InterruptedException ie) {}
 			}
 			
 			controller.release();
 
 			RrdDb db = controller.getDatabase();
 			Assert.assertEquals(db.getDsCount(), 1);
-			Assert.assertEquals(recorder.getName(), db.getDsNames()[0]);
-			FetchRequest fr = db.createFetchRequest(ConsolFun.AVERAGE, startTime, startTime + (NUM_VALUES-1) * step);
+			FetchRequest fr = db.createFetchRequest(ConsolFun.AVERAGE, controller.getStartTime(), controller.getStartTime() + (NUM_VALUES-1) * step);
 			FetchData data = fr.fetchData();
 			System.out.println(data.dump());
 		} catch (Exception e) {

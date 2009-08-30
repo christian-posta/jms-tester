@@ -1,31 +1,24 @@
 package com.fusesource.forge.jmstest.benchmark.command;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
+import com.fusesource.forge.jmstest.benchmark.BenchmarkConfig;
+import com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig;
+import com.fusesource.forge.jmstest.benchmark.command.handler.DefaultCommandHandler;
+import com.fusesource.forge.jmstest.benchmark.command.transport.CommandTransport;
 import com.fusesource.forge.jmstest.executor.BenchmarkRunStatus;
-import com.fusesource.forge.jmstest.executor.GraphingPostProcessor;
+import com.fusesource.forge.jmstest.executor.ReleaseManager;
 import com.fusesource.forge.jmstest.executor.Releaseable;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
 public class BenchmarkCoordinator extends DefaultCommandHandler implements Releaseable {
 
@@ -59,26 +52,11 @@ public class BenchmarkCoordinator extends DefaultCommandHandler implements Relea
 			}
 		case CommandTypes.PRODUCER_FINISHED: 
 			synchronized (benchmarks) {
-				ProducerFinished response = (ProducerFinished)command;
+				ProducerFinishedCommand response = (ProducerFinishedCommand)command;
 				BenchmarkRunner runner = benchmarks.get(response.getBenchmarkId());
 				if (runner != null) {
 					runner.finishProducer(response);
 					return true;
-				} else {
-					return false;
-				}
-			}
-		case CommandTypes.REPORT_STATS:
-			synchronized (benchmarks) {
-				ReportStatsCommand stats = (ReportStatsCommand)command;
-				if (stats.getClientId() != null) {
-					BenchmarkRunner runner = benchmarks.get(stats.getClientId().getBenchmarkId());
-					if (runner != null) {
-						runner.recordStats(stats);
-						return true;
-					} else {
-						return false;
-					}
 				} else {
 					return false;
 				}
@@ -174,7 +152,7 @@ public class BenchmarkCoordinator extends DefaultCommandHandler implements Relea
 			}
 		}
 		
-		public void finishProducer(ProducerFinished finished) {
+		public void finishProducer(ProducerFinishedCommand finished) {
 			ClientId clientId = finished.getClientId();
 			log().debug("Producer finished: " + clientId);
 			
@@ -184,40 +162,6 @@ public class BenchmarkCoordinator extends DefaultCommandHandler implements Relea
 					if (state.getCurrentState() != BenchmarkRunStatus.State.FINISHED) {
 						state.setState(BenchmarkRunStatus.State.FINISHED);
 						latch.countDown();
-					}
-				}
-			}
-		}
-		
-		private File getWorkingDir() {
-			File f = new File(System.getProperty("user.dir") + "/" + config.getBenchmarkId());
-			if (!f.exists()) {
-				f.mkdirs();
-			}
-			return f;
-		}
-		
-		public void recordStats(ReportStatsCommand stats) {
-			
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-			
-			OutputStream os = null;
-			ObjectOutputStream oos = null;
-			
-			try {
-				File rawData = new File(getWorkingDir(), sdf.format(new Date()) + "-" + stats.hashCode() + ".raw");
-				log().debug("Writing benchmark raw data to : " + rawData.getAbsolutePath());
-				os = new FileOutputStream(rawData, false);
-				oos = new ObjectOutputStream(os);
-				oos.writeObject(stats);
-			} catch (Exception e) {
-				log().debug("Error Writing benchmark raw data.");
-			} finally {
-				if (oos != null) {
-					try {
-						oos.close();
-					} catch (IOException e) {
-						// ignore
 					}
 				}
 			}
@@ -286,18 +230,10 @@ public class BenchmarkCoordinator extends DefaultCommandHandler implements Relea
 		public void run() {
 			log().info("Executing Benchmark: " + config.getBenchmarkId());
 			
-			try {
-				FileUtils.deleteDirectory(getWorkingDir());
-				getWorkingDir();
-			} catch (Exception e) {
-				// TODO:Handle
-			}
-			
 			clientStates = new HashMap<String, BenchmarkRunStatus>();
 
 			synchronized (clientStates) {
 				for(BenchmarkPartConfig partCfg: config.getBenchmarkParts()) {
-					// make sure all part Ids are set
 					partCfg.getPartID();
 					if (!partCfg.isAcceptAllConsumers()) {
 						addClientStates(ClientType.CONSUMER, partCfg);
@@ -324,11 +260,6 @@ public class BenchmarkCoordinator extends DefaultCommandHandler implements Relea
 			} else {
 				log().error("Invalid client configuration for benchmark (" + config.getBenchmarkId() + "). Execution skipped.");
 			}
-			
-			log().debug("Running pos processors for benchmark: " + config.getBenchmarkId());
-			
-			new GraphingPostProcessor().processData(getWorkingDir());
-			
 			log().info("Finished Benchmark: " + config.getBenchmarkId());
 		}
 		

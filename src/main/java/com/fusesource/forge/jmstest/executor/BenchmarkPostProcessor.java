@@ -4,5 +4,6 @@ import java.io.File;
 
 public interface BenchmarkPostProcessor {
 
-	public void processData(File workDir);
+	public void setWorkDir(File workDir);
+	public void processData();
 }

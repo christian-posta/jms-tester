@@ -58,7 +58,7 @@ public class AsyncConsumer extends AsyncClient implements MessageListener{
 				Message response = getSession().createTextMessage("Response");
 				response.setStringProperty("ServedBy", getName());
 				response.setJMSCorrelationID(msg.getJMSCorrelationID());
-				for(Enumeration en=msg.getPropertyNames(); en.hasMoreElements(); ) {
+				for(Enumeration<?> en=msg.getPropertyNames(); en.hasMoreElements(); ) {
 					String key = (String)en.nextElement();
 					Object value = msg.getObjectProperty(key);
 					if (key.equals("BrokerStamp")) {

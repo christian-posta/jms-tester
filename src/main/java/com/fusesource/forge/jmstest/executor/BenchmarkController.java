@@ -9,12 +9,12 @@ import org.apache.activemq.broker.BrokerService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.fusesource.forge.jmstest.benchmark.command.BenchmarkClientInfo;
+import com.fusesource.forge.jmstest.benchmark.command.BenchmarkClientInfoCommand;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCommand;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCoordinator;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkGetClientInfo;
 import com.fusesource.forge.jmstest.benchmark.command.CommandTypes;
-import com.fusesource.forge.jmstest.benchmark.command.DefaultCommandHandler;
+import com.fusesource.forge.jmstest.benchmark.command.handler.DefaultCommandHandler;
 
 import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
@@ -22,7 +22,7 @@ public class BenchmarkController extends AbstractBenchmarkExecutionContainer {
 
 	private Log log = null;
 	
-	private Map<String, BenchmarkClientInfo> clients = new TreeMap<String, BenchmarkClientInfo>();
+	private Map<String, BenchmarkClientInfoCommand> clients = new TreeMap<String, BenchmarkClientInfoCommand>();
 	private BenchmarkCoordinator coordinator = null;
 	private BrokerService broker = null;
 	
@@ -33,7 +33,7 @@ public class BenchmarkController extends AbstractBenchmarkExecutionContainer {
 		getConnector().addHandler(new DefaultCommandHandler() {
 			public boolean handleCommand(BenchmarkCommand command) {
 				if (command.getCommandType() == CommandTypes.CLIENT_INFO) {
-					BenchmarkClientInfo info = (BenchmarkClientInfo)command;
+					BenchmarkClientInfoCommand info = (BenchmarkClientInfoCommand)command;
 					synchronized (clients) {
 						clients.put(info.getClientName(), info);
 					}
@@ -105,6 +105,7 @@ public class BenchmarkController extends AbstractBenchmarkExecutionContainer {
 			broker = new BrokerService();
 			broker.addConnector("tcp://0.0.0.0:" + getConnector().getPort());
 			broker.setPersistent(false);
+			broker.setUseJmx(false);
 			broker.start();
 			broker.waitUntilStarted();
 		}
@@ -116,11 +117,5 @@ public class BenchmarkController extends AbstractBenchmarkExecutionContainer {
 			log = LogFactory.getLog(this.getClass());
 		}
 		return log;
-	}
-	
-	public static void main(String[] args) {
-		final BenchmarkController controller = new BenchmarkController();
-		controller.setAutoTerminate(false);
-		controller.start(args);
 	}
 }

@@ -21,11 +21,25 @@ public class JMXProbe extends AbstractProbe {
 	private MBeanServerConnection jmxConnection;
 	private Log log = null;
 	
+	public JMXProbe() {
+		super();
+	}
+	
+	public JMXProbe(String objectName) {
+		super();
+		setObjectNameString(objectName);
+	}
+
+	public JMXProbe(String name, String objectName) {
+		super(name);
+		setObjectNameString(objectName);
+	}
+
 	@Override
 	public Number getValue() {
 		if (!isActive()) {
-			log().warn("JMXProbe is not accessible...value might not make sense.");
-			return Double.MIN_VALUE;
+			log().warn("JMXProbe " + getName() + " is not accessible...value might not make sense.");
+			return 0.0;
 		}
 		
 		Object attribute = null;
@@ -34,7 +48,7 @@ public class JMXProbe extends AbstractProbe {
 		} catch (Exception e) {
 			log().error("Error retrieving Attribute for: " + getObjectName().toString() + "[" + getAttributeName() + "]", e);
 			setActive(false);
-			return Double.MIN_VALUE;
+			return 0.0;
 		}
 		
 		if (attribute instanceof Number) {
@@ -42,7 +56,7 @@ public class JMXProbe extends AbstractProbe {
 		} else {
 			log.error("Attribute:" + getObjectName().toString() + "[" + getAttributeName() + "] does not represent a number");
 			setActive(false);
-			return Double.MIN_VALUE;
+			return 0.0;
 		}
 	}
 	

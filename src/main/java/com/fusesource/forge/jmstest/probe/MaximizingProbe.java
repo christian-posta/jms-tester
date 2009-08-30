@@ -4,6 +4,14 @@ public class MaximizingProbe extends AbstractProbe {
 
 	private double current = Double.MIN_VALUE;
 
+	public MaximizingProbe() {
+		super();
+	}
+
+	public MaximizingProbe(String name) {
+		super(name);
+	}
+
 	synchronized public void reset() {
 		current = Double.MIN_VALUE;
 	}
@@ -18,4 +26,5 @@ public class MaximizingProbe extends AbstractProbe {
 	public Number getValue() {
 		return current;
 	}
+	
 }

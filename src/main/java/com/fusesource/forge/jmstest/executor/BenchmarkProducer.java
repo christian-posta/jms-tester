@@ -9,37 +9,23 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkExecutionException;
-import com.fusesource.forge.jmstest.message.DefaultMessageFactory;
 import com.fusesource.forge.jmstest.message.MessageFactory;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
 
 public class BenchmarkProducer extends AbstractJMSClientComponent {
     private transient Log log;
     
-    private MessageFactory messageFactory = null;
     private MessageProducer messageProducer;
-
     private CountingProbe messageCounter;
+    
+    private long msgNumber = 0;
 
-    public BenchmarkProducer(BenchmarkClientWrapper container) {
+    public BenchmarkProducer(AbstractBenchmarkJMSClient container) {
     	super(container);
     }
 
 	public MessageFactory getMessageFactory() {
-		if (messageFactory == null) {
-			messageFactory = (MessageFactory)getContainer().getBean(
-				new String[] { 
-					getContainer().getConfig().getMessageFactoryName(),
-					MessageFactory.DEFAULT_BEAN_NAME
-				}, MessageFactory.class
-			);
-		}
-		if (messageFactory == null) {
-			log().warn("Could not resolve message factory object. Creating Default ...");
-			messageFactory = new DefaultMessageFactory();
-			((DefaultMessageFactory)messageFactory).setPrefix(getContainer().getClientId().toString());
-		}
-		return messageFactory;
+		return getContainer().getMessageFactory();
 	}
 
     public void setMessageCounter(CountingProbe messageCounter) {
@@ -48,7 +34,8 @@ public class BenchmarkProducer extends AbstractJMSClientComponent {
 
     public void start() throws BenchmarkExecutionException {
         try {
-            String destName = getContainer().getConfig().getTestDestinationName();
+        	super.prepare();
+            String destName = getContainer().getPartConfig().getTestDestinationName();
             Destination destination = getDestinationProvider().getDestination(getSession(), destName);
             messageProducer = getSession().createProducer(destination);
         } catch (Exception e) {
@@ -60,12 +47,15 @@ public class BenchmarkProducer extends AbstractJMSClientComponent {
         try {
             Message msg = getMessageFactory().createMessage(getSession());
             msg.setLongProperty("SendTime", System.currentTimeMillis());
-            msg.setLongProperty("MessageNumber", messageCounter.increment());
-            messageProducer.send(msg, getContainer().getConfig().getDeliveryMode().getCode(), 4, 0);
+            messageProducer.send(msg, getContainer().getPartConfig().getDeliveryMode().getCode(), 4, 0);
             if (messageCounter != null) {
             	messageCounter.increment();
+            	msgNumber = messageCounter.getValue().longValue();
+            } else {
+            	msgNumber++;
             }
-            if (getContainer().getConfig().isTransacted()) {
+            msg.setLongProperty("MessageNumber", msgNumber);
+            if (getContainer().getPartConfig().isTransacted()) {
                 getSession().commit();
             }
         } catch (Exception e) {
@@ -89,7 +79,6 @@ public class BenchmarkProducer extends AbstractJMSClientComponent {
         }
 
         super.release();
-        log().debug("Released Producer for client: " + getContainer().getClientId().toString());
     }
 
     private Log log() {

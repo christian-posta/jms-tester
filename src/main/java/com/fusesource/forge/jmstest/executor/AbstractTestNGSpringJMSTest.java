@@ -7,20 +7,18 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
-import com.fusesource.forge.jmstest.benchmark.BenchmarkContext;
-import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
-import com.fusesource.forge.jmstest.benchmark.command.BenchmarkPartConfig;
+import com.fusesource.forge.jmstest.benchmark.BenchmarkConfig;
+import com.fusesource.forge.jmstest.benchmark.command.SubmitBenchmarkCommand;
 import com.fusesource.forge.jmstest.config.BrokerServicesFactory;
-import com.fusesource.forge.jmstest.probe.ProbeRunner;
-import com.fusesource.forge.jmstest.rrd.Rrd4jSamplePersistenceAdapter;
-import com.fusesource.forge.jmstest.rrd.GraphGenerator;
-import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
+import com.fusesource.forge.jmstest.frontend.Benchmark;
+import com.fusesource.forge.jmstest.frontend.CommandLineClient;
 
 public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTests {
 
+	private Benchmark benchmark = null;
 	private transient Log log = null; 
 	
-	protected Object getBeanByClass(Class clazz) {
+	protected Object getBeanByClass(Class<?> clazz) {
 		Object result = null;
 		String [] beanNames = applicationContext.getBeanNamesForType(clazz);
 		if (beanNames != null && beanNames.length > 0) {
@@ -37,41 +35,10 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 		return (BrokerServicesFactory)getBeanByClass(BrokerServicesFactory.class);
 	}
 	
-	public BenchmarkClientWrapper getProducerWrapper() {
-		return (BenchmarkClientWrapper)getBeanByClass(BenchmarkProducerWrapper.class);
-	}
-
-	private void startRRDBackends() {
-		String [] beanNames = applicationContext.getBeanNamesForType(Rrd4jSamplePersistenceAdapter.class);
-		
-		for(String name: beanNames) {
-			Rrd4jSamplePersistenceAdapter controller = (Rrd4jSamplePersistenceAdapter)applicationContext.getBean(name);
-			controller.setArchiveLength((int)((BenchmarkContext.getInstance().getProfile().getTotalDuration() + 5) / controller.getStep() + 1));
-			try {
-				if (controller.isAutoStart()) {
-					controller.start();
-				}
-			} catch (Exception e) {
-				Assert.fail("Could not start RRD Backend", e);
-			}
-		}
-	}
-	
-	private void startProbeRunner() {
-		String [] beanNames = applicationContext.getBeanNamesForType(ProbeRunner.class);
-
-		for(String name: beanNames) {
-			ProbeRunner runner = (ProbeRunner)applicationContext.getBean(name);
-			runner.setDuration(BenchmarkContext.getInstance().getProfile().getTotalDuration());
-			runner.start();
-		}
-	}
-
 	@BeforeClass
 	public void setUp() {
 		try {
 			log().info("Initializing Test ...");
-			BenchmarkContext.getInstance().setApplicationContext(applicationContext);
 			BrokerServicesFactory bsf = getBrokerServicesFactory();
 			if (bsf == null) {
 				log().warn("No BrokerServicesFactory configured in Test ...");
@@ -79,50 +46,26 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 			    bsf.startAll();
 			}
 			
-			BenchmarkIteration profile = (BenchmarkIteration)getBeanByClass(BenchmarkIteration.class);
-			if (profile == null) {
-				log().error("No profile set for Testrun.");
-				Assert.fail();
-			} else {
-				BenchmarkContext.getInstance().setProfile(profile);
-			}
+			benchmark = new Benchmark();
+			benchmark.setController(Boolean.TRUE.toString());
+			benchmark.setClient(Boolean.TRUE.toString());
+			benchmark.setRecorder(Boolean.TRUE.toString());
 			
-			BenchmarkPartConfig testrunConfig = (BenchmarkPartConfig)getBeanByClass(BenchmarkPartConfig.class);
-			if (profile == null) {
-				log().error("No testrun config set for Testrun.");
-				Assert.fail();
-			} else {
-				BenchmarkContext.getInstance().setTestrunConfig(testrunConfig);
-			}
-			
-//			ProducerToConsumerListener listener = (ProducerToConsumerListener)getBeanByClass(ProducerToConsumerListener.class);
-//			if (listener != null) {
-//				listener.initialize();
-//			}
-
-			startRRDBackends();
-			startProbeRunner();
 		} catch (Exception e) {
 			Assert.fail("Unexpected exception setting up test", e);
 		}
 	}
 	
 	public void benchmark() {
-		if (getProducerWrapper() != null) {
-			getProducerWrapper().start();
+		benchmark.start(new String[] {});
+		CommandLineClient clc = new CommandLineClient();
+		String[] beanNames = applicationContext.getBeanNamesForType(BenchmarkConfig.class);
+		for(String name: beanNames) {
+			BenchmarkConfig cfg = (BenchmarkConfig)applicationContext.getBean(name);
+			clc.sendCommand(new SubmitBenchmarkCommand(cfg));
 		}
 	}
 	
-	public void createGraphs() {
-		// Make sure to flush all stats
-		ReleaseManager.getInstance().run();
-		String[] beanNames = applicationContext.getBeanNamesForType(GraphGenerator.class);
-		for(String name: beanNames) {
-			GraphGenerator gg = (GraphGenerator)applicationContext.getBean(name);
-			gg.createGraphs();
-		}
-	}
-
 	@AfterClass
 	public void tearDown() {
 		try {
@@ -133,6 +76,7 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 			} else {
 				getBrokerServicesFactory().stopAll();
 			}
+			ReleaseManager.getInstance().run();
 		} catch (Exception e) {
 			Assert.fail("Unexpected exception cleaning up test", e);
 		}

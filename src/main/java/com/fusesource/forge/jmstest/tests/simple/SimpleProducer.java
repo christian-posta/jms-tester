@@ -1,7 +1,5 @@
 package com.fusesource.forge.jmstest.tests.simple;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.ObjectFactory;
 
 import com.fusesource.forge.jmstest.tests.AbstractJMSTest;
@@ -10,8 +8,6 @@ import com.fusesource.forge.jmstest.tests.AsyncProducer;
 public class SimpleProducer extends AbstractJMSTest {
 
 	private final static int NUM_PRODUCERS = 5;
-	
-	private transient Log log = null;
 
 	protected String[] getConfigLocations() {
 		return new String[] {
@@ -35,10 +31,4 @@ public class SimpleProducer extends AbstractJMSTest {
 		bs.run();
 	}
 
-	private Log log() {
-		if (log == null) {
-			log = LogFactory.getLog(this.getClass());
-		}
-		return log;
-	}
 }

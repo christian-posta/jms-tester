@@ -5,10 +5,10 @@ import java.net.UnknownHostException;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 
-import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCommandChainHandler;
-import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCommandHandler;
-import com.fusesource.forge.jmstest.benchmark.command.CommandTransport;
-import com.fusesource.forge.jmstest.benchmark.command.JMSCommandTransport;
+import com.fusesource.forge.jmstest.benchmark.command.handler.BenchmarkCommandChainHandler;
+import com.fusesource.forge.jmstest.benchmark.command.handler.BenchmarkCommandHandler;
+import com.fusesource.forge.jmstest.benchmark.command.transport.CommandTransport;
+import com.fusesource.forge.jmstest.benchmark.command.transport.JMSCommandTransport;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
 import com.fusesource.forge.jmstest.config.impl.DefaultDestinationProvider;

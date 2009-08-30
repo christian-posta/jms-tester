@@ -28,7 +28,6 @@ import com.fusesource.forge.jmstest.tests.AsyncProducer;
 
 public abstract class AbstractNetworkOfBrokersTest extends AbstractTestNGSpringJMSTest {
 
-
 	protected static final Log LOG = LogFactory.getLog(SystemaTestExternalBrokers.class);
     
     protected final static int INTERVAL      = 60; //seconds

@@ -4,15 +4,19 @@ import java.lang.reflect.Method;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.ApplicationContext;
 
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCommand;
-import com.fusesource.forge.jmstest.benchmark.command.CommandTransport;
+import com.fusesource.forge.jmstest.benchmark.command.transport.CommandTransport;
+import com.fusesource.forge.jmstest.config.SpringConfigHelper;
 import com.fusesource.forge.jmstest.frontend.BenchmarkConnector;
 
 public abstract class AbstractBenchmarkExecutor {
 
 	private BenchmarkConnector benchmarkConnector = new BenchmarkConnector();
 	private Log log = null;
+	private SpringConfigHelper springConfigHelper = new SpringConfigHelper();
+	
 	
 	protected BenchmarkConnector getConnector() {
 		return benchmarkConnector;
@@ -38,6 +42,20 @@ public abstract class AbstractBenchmarkExecutor {
 		getConnector().setDestinationName(destinationName);
 	}
 
+	public void setSpringConfigLocations(String springConfigDirs) {
+		this.springConfigHelper.setSpringConfigLocations(springConfigDirs);
+	}
+	
+	protected ApplicationContext getApplicationContext() {
+		return springConfigHelper.getApplicationContext();
+	}
+
+	protected ApplicationContext getApplicationContext(String springConfigDirs) {
+		SpringConfigHelper sch = new SpringConfigHelper();
+		sch.setSpringConfigLocations(springConfigDirs);
+		return sch.getApplicationContext();
+	}
+
 	protected Method getSetterByName(String propName) {
 		
 		log().debug("Trying to find setter method for: " + propName);
@@ -59,7 +77,7 @@ public abstract class AbstractBenchmarkExecutor {
 			if (args[i].startsWith("-")) {
 				String propName = args[i].substring(1);
 				String value = null;
-				if (args.length > i && !(args[i+1].startsWith("-"))) {
+				if (args.length > (i+1) && !(args[i+1].startsWith("-"))) {
 					value = args[++i];
 				} else {
 					value = Boolean.TRUE.toString();
@@ -71,7 +89,7 @@ public abstract class AbstractBenchmarkExecutor {
 						m.invoke(this, value);
 					}
 				} catch (Exception e) {
-					log().warn("Property " + propName + " not set.");
+					log().warn("Property " + propName + " not set.", e);
 				}
 			} else {
 				log().warn("Ignoring command line argument: " + args[i]);

@@ -1,32 +1,41 @@
 package com.fusesource.forge.jmstest.probe;
 
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.annotations.BeforeMethod;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.fusesource.forge.jmstest.rrd.Rrd4jSamplePersistenceAdapter;
-
-@ContextConfiguration(locations={
-	"classpath:com/fusesource/forge/jmstest/probe/ProbeConfig.xml"})
-
-public class ProbeRunnerTest extends AbstractTestNGSpringContextTests{
+public class ProbeRunnerTest implements Observer {
 	
-	@BeforeMethod
-	public void init() {
+	private final static int RUN_COUNT = 10;
+	
+	public void update(Observable o, Object arg) {
+		((CountingProbe)((Object)o)).increment();
 	}
 	
 	@Test
 	public void runProbes() {
+		CountingProbe p = new CountingProbe("CountingProbe");
+		p.addObserver(this);
+		ProbeRunner pr = new ProbeRunner();
+		pr.setDuration(RUN_COUNT);
+		pr.setInterval(1);
+		pr.setName("Test");
+		List<Probe> probes = new ArrayList<Probe>();
+		probes.add(p);
+		pr.setProbes(probes);
+		
 		try {
-			Rrd4jSamplePersistenceAdapter controller = (Rrd4jSamplePersistenceAdapter)applicationContext.getBean("RRDDatabase");
-			controller.start();
-			ProbeRunner runner = (ProbeRunner)applicationContext.getBean("ProbeRunner");
-			runner.start();
-			runner.waitUntilFinished();
+			pr.start();
+			pr.waitUntilFinished();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		Assert.assertTrue((RUN_COUNT-1 <= p.getValue().intValue()) && (p.getValue().intValue() <= RUN_COUNT+1));
 	}
 }

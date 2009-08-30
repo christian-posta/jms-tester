@@ -5,12 +5,20 @@ import org.hyperic.sigar.SigarException;
 
 public class CpuStat extends AbstractSigarProbe {
 	
+	public CpuStat() {
+		super();
+	}
+
+	public CpuStat(String name) {
+		super(name);
+	}
+
 	@Override
-	public Number getValue() {
+	protected Number getValue() {
 		
 		try {
 			CpuPerc cpu = getSigar().getCpuPerc();
-			return cpu.getCombined();
+			return cpu.getCombined() * 100;
 		} catch (SigarException se) {
 			se.printStackTrace();
 		}

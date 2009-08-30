@@ -1,7 +1,6 @@
 package com.fusesource.forge.jmstest.config.impl;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.activemq.broker.BrokerService;
@@ -21,9 +20,9 @@ public class SpringBrokerServicesFactory extends AbstractBrokerServicesFactory i
 	public Map<String, BrokerService> getBrokerServices() {
 		if (brokerServices == null) {
 			brokerServices = new HashMap<String, BrokerService>();
-
-			for (Iterator it = ac.getBeansOfType(BrokerService.class).values().iterator(); it.hasNext();) {
-				BrokerService broker = (BrokerService) (it.next());
+			
+			for(String name: ac.getBeanNamesForType(BrokerService.class)) {
+				BrokerService broker = (BrokerService) ac.getBean(name);
 				log().info("Found broker definition for broker : " + broker.getBrokerName());
 				brokerServices.put(broker.getBrokerName(), broker);
 			}

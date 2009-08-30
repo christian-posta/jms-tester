@@ -9,10 +9,9 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCommand;
 import com.fusesource.forge.jmstest.benchmark.command.CommandTypes;
-import com.fusesource.forge.jmstest.benchmark.command.DefaultCommandHandler;
+import com.fusesource.forge.jmstest.benchmark.command.handler.DefaultCommandHandler;
 
 public class AbstractBenchmarkExecutionContainer extends AbstractBenchmarkExecutor implements Releaseable, Runnable {
 	
@@ -64,6 +63,7 @@ public class AbstractBenchmarkExecutionContainer extends AbstractBenchmarkExecut
 	protected void init() {
 		log().info("Initializing Benchmarking framework ...");
 		ReleaseManager.getInstance().register(this); 
+		getCmdTransport();
 		createHandlerChain();
 	}
 	

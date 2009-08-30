@@ -1,40 +1,35 @@
 package com.fusesource.forge.jmstest.rrd;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Observable;
 import java.util.TreeMap;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 import com.fusesource.forge.jmstest.benchmark.command.ClientId;
+import com.fusesource.forge.jmstest.executor.ReleaseManager;
 import com.fusesource.forge.jmstest.executor.Releaseable;
+import com.fusesource.forge.jmstest.probe.BenchmarkProbeValue;
+import com.fusesource.forge.jmstest.probe.Probe;
+import com.fusesource.forge.jmstest.probe.ProbeDescriptor;
 
 public abstract class CachingSamplePersistenceAdapter implements Releaseable, BenchmarkSamplePersistenceAdapter {
 	
-	private Map<String, BenchmarkSampleRecorder> rrdRecorder;
-
+	public final static int DEFAULT_CACHE_SIZE = 100;
+	
 	private ClientId clientId;
 	private boolean initialized = false;
-	private boolean autoStart = true;
+	private int cacheSize = DEFAULT_CACHE_SIZE;
 	
-	private ScheduledThreadPoolExecutor executor = null;
-	private TreeMap<Long, BenchmarkSample> valueCache;
+	private Map<ProbeDescriptor, Long> lastRecorded = null;
+	private Map<ProbeDescriptor, String> dataSources = null;
+	private TreeMap<Long, List<BenchmarkProbeValue>> valueCache;
 	
 	public CachingSamplePersistenceAdapter(ClientId clientId) {
-		valueCache = new TreeMap<Long, BenchmarkSample>();
+		valueCache = new TreeMap<Long, List<BenchmarkProbeValue>>();
 		this.clientId = clientId;
-	}
-
-	public boolean isAutoStart() {
-		return autoStart;
-	}
-
-	public void setAutoStart(boolean autoStart) {
-		this.autoStart = autoStart;
+		lastRecorded = new HashMap<ProbeDescriptor, Long>();
 	}
 
 	public ClientId getClientId() {
@@ -45,62 +40,71 @@ public abstract class CachingSamplePersistenceAdapter implements Releaseable, Be
 		this.clientId = clientId;
 	}
 
-	synchronized public Map<String, BenchmarkSampleRecorder> getRrdRecorder() {
-		if (rrdRecorder == null) {
-			rrdRecorder = new HashMap<String, BenchmarkSampleRecorder>();
-		}
-		return rrdRecorder;
+	public void setCacheSize(int cacheSize) {
+		this.cacheSize = cacheSize;
 	}
 	
-	synchronized public void addRecorder(BenchmarkSampleRecorder recorder) {
-		if (!getRrdRecorder().containsKey(recorder.getName())) {
-			getRrdRecorder().put(recorder.getName(), recorder);
-		}
+	public int getCacheSize() {
+		return cacheSize;
 	}
 
-	public void record(BenchmarkSampleRecorder recorder, long timestamp, Number value) {
+	public Map<ProbeDescriptor, String> getDataSources() {
+		if (dataSources == null) {
+			dataSources = new TreeMap<ProbeDescriptor, String>();
+		}
+		return dataSources;
+	}
+	
+	public ProbeDescriptor getDescriptorByPhysicalName(String name) {
+		ProbeDescriptor result = null;
+		
+		for (ProbeDescriptor pd: getDataSources().keySet()) {
+			if (getDataSources().get(pd).equals(name)) {
+				result = pd;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	public void record(BenchmarkProbeValue value) {
+		
+		if (!getDataSources().containsKey(value.getDescriptor())) { 
+			getDataSources().put(value.getDescriptor(), "" + getDataSources().size());
+		}
+	
+		lastRecorded.put(value.getDescriptor(), new Long(value.getTimestamp()));
+		
 		synchronized (valueCache) {
-			if (!getRrdRecorder().containsKey(recorder.getName())) {
-				addRecorder(recorder);
+			List<BenchmarkProbeValue> values = valueCache.get(value.getTimestamp());
+			if (values == null) {
+				values = new ArrayList<BenchmarkProbeValue>();
+				valueCache.put(new Long(value.getTimestamp()), values);
 			}
-			BenchmarkSample sample = valueCache.get(timestamp);
-			if (sample == null) {
-				sample = new BenchmarkSample(timestamp);
-				sample.setDsType(recorder.getDsType());
-				valueCache.put(new Long(timestamp), sample);
+			values.add(value);
+			
+			if (valueCache.size() > getCacheSize()) {
+				flushCache(false);
 			}
-			sample.setValue(recorder.getName(), value.doubleValue());
 		}
 	}
 
 	public void init() {
-		log().debug("Initializing RRDController ...");
 		ReleaseManager.getInstance().register(this);
 	}
 	
 	synchronized public void start() {
-		
 		if (initialized) {
 			return;
 		}
 	
 		init();
 		
-		executor = new ScheduledThreadPoolExecutor(1);
-		executor.scheduleAtFixedRate(new Runnable() {
-			public void run() {
-				flushSamples(false);
-			}
-		}, 5, 5, TimeUnit.SECONDS);
 		initialized = true;
-		log().debug("RRDController initialization complete.");
 	}
 	
 	public void release() {
-		if (executor != null) {
-			executor.shutdown();
-		}
-		flushSamples(true);
+		flushCache(true);
 		ReleaseManager.getInstance().deregister(this);
 	}
 	
@@ -108,15 +112,12 @@ public abstract class CachingSamplePersistenceAdapter implements Releaseable, Be
 		release();
 	}
 	
-	protected abstract void flushSample(BenchmarkSample sample);
+	protected abstract void flushValues(List<BenchmarkProbeValue> sample);
 
 	protected void startFlush() {}
 	protected void finishFlush() {}
 	
-	final protected void flushSamples(boolean complete) {
-		
-		log().debug("Flushing Samples ...");
-		
+	final protected void flushCache(boolean flushCompletely) {
 		synchronized (valueCache) {
 			if (valueCache == null || valueCache.isEmpty()) {
 				return;
@@ -124,21 +125,38 @@ public abstract class CachingSamplePersistenceAdapter implements Releaseable, Be
 
 			startFlush();
 			
-			log().debug(valueCache.size() + " values in cache.");
-			long currentTime = System.currentTimeMillis() / 1000;
-
-			while((!valueCache.isEmpty()) && (complete || valueCache.firstKey() < currentTime)) {
-				BenchmarkSample s = valueCache.remove(valueCache.firstKey());
-				flushSample(s);
+			while(!valueCache.isEmpty()) {
+				Long timeStamp = valueCache.firstKey();
+				if (flushCompletely || isComplete(timeStamp)) {
+					flushValues(valueCache.remove(valueCache.firstKey()));
+				} else {
+					break;
+				}
 			}
 			
 			finishFlush();
-
-			log().debug("Pushed Metrics to RRD backend; " + valueCache.size() + " values remaining in cache.");
 		}
 	}
+
+	protected boolean isComplete(Long timeStamp) {
+		boolean result = true;
+		
+		for(ProbeDescriptor pd: getDataSources().keySet()) {
+			Long recorded = lastRecorded.get(pd);
+			if (recorded == null || recorded < timeStamp) {
+				result = false;
+				break;
+			}
+		}
+		return result;
+	}
 	
-	private Log log() {
-		return LogFactory.getLog(this.getClass());
+	public void update(Observable o, Object arg) {
+		if ((Object)o instanceof Probe) {
+			if (arg instanceof BenchmarkProbeValue) {
+				BenchmarkProbeValue value = (BenchmarkProbeValue)arg;
+				record(value);
+			}
+		}
 	}
 }

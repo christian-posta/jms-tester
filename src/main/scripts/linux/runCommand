@@ -10,5 +10,5 @@ done
 
 export PATH=$PATH:$APP_HOME/../lib
 
-java -classpath $APPCP com.fusesource.forge.jmstest.executor.CommandLineClient $@
+java -classpath $APPCP com.fusesource.forge.jmstest.frontend.CommandLineClient $@
 

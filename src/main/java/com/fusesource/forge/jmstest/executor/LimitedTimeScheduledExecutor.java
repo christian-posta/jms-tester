@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 
 public class LimitedTimeScheduledExecutor implements Runnable, Releaseable {
 
@@ -100,7 +99,7 @@ public class LimitedTimeScheduledExecutor implements Runnable, Releaseable {
 	}
 	
 	public void run() {
-	  	log().info(getName() + " starting");
+	  	log().info(getClass().getSimpleName() + " " + getName() + " starting.");
 	  	
 	  	getReleaseManager().register(this);
 	  	
@@ -126,7 +125,7 @@ public class LimitedTimeScheduledExecutor implements Runnable, Releaseable {
 	  		} catch (Exception e) {}
 	  	}
 		isRunning = false;
-	  	log().info("ProbeRunner finished");
+	  	log().info(getClass().getSimpleName() + " " + getName() + " finished.");
 	}
 	
 	public void release() {

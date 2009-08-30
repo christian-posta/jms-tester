@@ -5,13 +5,14 @@ import java.util.List;
 
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCommand;
 import com.fusesource.forge.jmstest.benchmark.command.ClientId;
-import com.fusesource.forge.jmstest.benchmark.command.CommandTransport;
 import com.fusesource.forge.jmstest.benchmark.command.ReportStatsCommand;
+import com.fusesource.forge.jmstest.benchmark.command.transport.CommandTransport;
+import com.fusesource.forge.jmstest.probe.BenchmarkProbeValue;
 
 public class CommandSamplePersistenceAdapter extends CachingSamplePersistenceAdapter {
 	
 	private CommandTransport transport;
-	private List<BenchmarkSample> samples;
+	private List<BenchmarkProbeValue> values;
 	
 	public CommandSamplePersistenceAdapter(ClientId clientId, CommandTransport transport) {
 		super(clientId);
@@ -25,18 +26,18 @@ public class CommandSamplePersistenceAdapter extends CachingSamplePersistenceAda
 	@Override
 	protected void startFlush() {
 		super.startFlush();
-		samples = new ArrayList<BenchmarkSample>();
+		values = new ArrayList<BenchmarkProbeValue>();
 	}
 	
 	@Override
 	protected void finishFlush() {
 		super.finishFlush();
-		BenchmarkCommand cmd = new ReportStatsCommand(getClientId(), samples);
+		BenchmarkCommand cmd = new ReportStatsCommand(getClientId(), values);
 		getTransport().sendCommand(cmd);
 	}
 
 	@Override
-	protected void flushSample(BenchmarkSample sample) {
-		samples.add(sample);
+	protected void flushValues(List<BenchmarkProbeValue> reportValues) {
+		values.addAll(reportValues);
 	}
 }

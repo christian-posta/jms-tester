@@ -1,5 +1,7 @@
 package com.fusesource.forge.jmstest.benchmark.command;
 
+import com.fusesource.forge.jmstest.benchmark.BenchmarkConfig;
+
 public class SubmitBenchmarkCommand extends BaseBenchmarkCommand {
 
 	private static final long serialVersionUID = -1061721082313649016L;

@@ -7,13 +7,12 @@ import javax.jms.Session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.fusesource.forge.jmstest.benchmark.ReleaseManager;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
 
 public abstract class AbstractJMSClientComponent implements Releaseable {
 
-	private BenchmarkClientWrapper container = null;
+	private AbstractBenchmarkJMSClient container = null;
 	private BenchmarkRunStatus benchmarkStatus;
 
 	private Connection conn;
@@ -21,11 +20,11 @@ public abstract class AbstractJMSClientComponent implements Releaseable {
     
     private Log log = null;
 
-	public AbstractJMSClientComponent(BenchmarkClientWrapper container) {
+	public AbstractJMSClientComponent(AbstractBenchmarkJMSClient container) {
 		this.container = container;
 	}
 	
-    public BenchmarkClientWrapper getContainer() {
+    public AbstractBenchmarkJMSClient getContainer() {
 		return container;
 	}
 
@@ -51,8 +50,8 @@ public abstract class AbstractJMSClientComponent implements Releaseable {
 	public Session getSession() throws Exception {
 		if (session == null) {
 			session = getConnection().createSession(
-				getContainer().getConfig().isTransacted(), 
-				getContainer().getConfig().getAcknowledgeMode().getCode()
+				getContainer().getPartConfig().isTransacted(), 
+				getContainer().getPartConfig().getAcknowledgeMode().getCode()
 			);
 		}
 		return session;
