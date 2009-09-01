@@ -81,6 +81,11 @@ JMS Test Framework overview
 
   The post processors have one thing in common: they gather the existence of the different probes dynamically and include them in the reports.
   All you need to do to include an additional element in your reports is to activate another probe. 
+  
+  * The test framework has been built primarily to benchmark and test ActiveMQ. This having said, you can plug in any JMS provider into the 
+  test framework by simply changing the connection factory. We have not used any ActiveMQ specific code within the framework and have made no 
+  assumptions about the JMS provider under test. However, ActiveMQ is used by the framework components internally to communicate with each 
+  other. In theory you could change that as well, but why should you ;). 
 
   []  
      

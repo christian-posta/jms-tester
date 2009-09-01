@@ -10,10 +10,9 @@
             <item name="Home" href="index.html"/>
             <item name="Tutorials" >
               <item name="Load Profiles" />
-              <item name="Simple run" />
+              <item name="Simple run" href="simple.html"/>
               <item name="Distributing clients" />
-              <item name="Active MQ specifics">
-              <item>
+              <item name="Active MQ specifics" />
             </item>
             <item name="For Developers" >
               <item name="Architecture" />

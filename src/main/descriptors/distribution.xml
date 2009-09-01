@@ -35,6 +35,10 @@
         <include>log4j.properties</include>
       </includes>
     </fileSet>
+    <fileSet>
+      <directory>target/site</directory>
+      <outputDirectory>doc</outputDirectory>
+    </fileSet>
   </fileSets>
   <dependencySets>
     <dependencySet>
