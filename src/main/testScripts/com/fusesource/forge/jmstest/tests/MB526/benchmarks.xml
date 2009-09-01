@@ -15,7 +15,9 @@
 
 	<property name="probeConfigurations">
 		<list>
-			<bean class="com.fusesource.forge.jmstest.benchmark.command.BenchmarkProbeConfig" />
+			<bean class="com.fusesource.forge.jmstest.benchmark.command.BenchmarkProbeConfig" >
+			  <property name="clientNames" value="TestClient1" />
+			</bean>
 		</list>
 	</property>    
 	
@@ -29,8 +31,8 @@
 	      <property name="transacted" value="false" />
 	      <property name="numConsumers" value="1" />
 	      <property name="profileName" value="testProfile" />
-	      <property name="producerClients" value="All" />
-	      <property name="consumerClients" value="All" />
+	      <property name="producerClients" value="TestClient1" />
+	      <property name="consumerClients" value="TestClient2" />
 	    </bean>
 	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
 	      <property name="partID" value="part2" />
@@ -40,8 +42,8 @@
 	      <property name="transacted" value="false" />
 	      <property name="numConsumers" value="1" />
 	      <property name="profileName" value="testProfile" />
-	      <property name="producerClients" value="All" />
-	      <property name="consumerClients" value="All" />
+	      <property name="producerClients" value="TestClient1" />
+	      <property name="consumerClients" value="TestClient2" />
 	    </bean>
 	  </list> 
     </property>

@@ -6,4 +6,5 @@ public interface BenchmarkPostProcessor {
 
 	public void setWorkDir(File workDir);
 	public void processData();
+	public void resetStatistics();
 }

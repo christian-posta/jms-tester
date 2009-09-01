@@ -11,7 +11,7 @@ import com.fusesource.forge.jmstest.probe.BenchmarkProbeValue;
 import com.fusesource.forge.jmstest.probe.ProbeDescriptor;
 import com.fusesource.forge.jmstest.rrd.Rrd4jSamplePersistenceAdapter;
 
-public class AbstractRRDPostProcessor extends  AbstractBenchmarkPostProcessor {
+public abstract class AbstractRRDPostProcessor extends  AbstractBenchmarkPostProcessor {
 	
 	private final static String RRD_FILE = "benchmark.rrd";
 	private Log log = null;

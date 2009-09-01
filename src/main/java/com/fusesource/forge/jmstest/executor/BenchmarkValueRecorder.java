@@ -79,6 +79,7 @@ public class BenchmarkValueRecorder extends AbstractBenchmarkExecutionContainer 
 						executor.schedule(new Runnable() {
 							public void run() {
 								for(BenchmarkPostProcessor processor : getPostProcessors()) {
+									processor.resetStatistics();
 									processor.setWorkDir(getBenchmarkWorkDirectory(benchmarkId));
 									processor.processData();
 								}

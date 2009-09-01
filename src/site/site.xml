@@ -8,6 +8,16 @@
         </links>
         <menu name="JMS Test Framework">
             <item name="Home" href="index.html"/>
+            <item name="Tutorials" >
+              <item name="Load Profiles" />
+              <item name="Simple run" />
+              <item name="Distributing clients" />
+              <item name="Active MQ specifics">
+              <item>
+            </item>
+            <item name="For Developers" >
+              <item name="Architecture" />
+            </item>
         </menu>
     
     ${reports}

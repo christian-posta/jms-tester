@@ -1,7 +1,10 @@
 package com.fusesource.forge.jmstest.probe;
 
+import java.util.Observer;
+
 public interface Probe {
 
+	public void setName(String name);
 	public String getName();
 	public void probe();
 	
@@ -11,4 +14,6 @@ public interface Probe {
 	public BenchmarkProbeValue getProbeValue();
 	public BenchmarkProbeValue.ValueType getValueType();
 	public ProbeDescriptor getDescriptor();
+	
+	public void addObserver(Observer observer);
 }

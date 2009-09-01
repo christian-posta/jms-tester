@@ -11,7 +11,6 @@ import com.fusesource.forge.jmstest.benchmark.BenchmarkConfig;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkProbeConfig;
 import com.fusesource.forge.jmstest.benchmark.command.ClientId;
 import com.fusesource.forge.jmstest.benchmark.command.ClientType;
-import com.fusesource.forge.jmstest.probe.AbstractProbe;
 import com.fusesource.forge.jmstest.probe.Probe;
 
 public class BenchmarkProbeWrapper extends AbstractBenchmarkClient {
@@ -64,8 +63,8 @@ public class BenchmarkProbeWrapper extends AbstractBenchmarkClient {
 						Probe p = (Probe)getBean(
 							new String[] { probeName }, null
 						);
-						((AbstractProbe)p).setName(getClientId().toString() + p.getName());
-						((AbstractProbe)p).addObserver(getSamplePersistenceAdapter());
+						p.setName(getClientId().toString() + p.getName());
+						p.addObserver(getSamplePersistenceAdapter());
 						getProbeRunner().addProbe(p);
 					} catch (Exception e) {
 						log().error("Could not create probe: " + probeName, e);

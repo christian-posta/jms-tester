@@ -11,7 +11,7 @@
     <property name="name" value="testProfile" />
     <property name="duration"    value="10"/>
     <property name="initialRate" value="500"/>
-    <property name="maxRate"     value="2500" />
+    <property name="maxRate"     value="700" />
     <property name="increment"   value="100" />
   </bean>
   

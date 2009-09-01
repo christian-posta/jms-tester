@@ -36,6 +36,16 @@ public abstract class AbstractBenchmarkPostProcessor implements BenchmarkPostPro
 		return workDir;
 	}
 	
+	public void resetStatistics() {
+		startTime = null;
+		endTime = null; 
+		valueCount = null;
+		if (distinctProbes != null) {
+			distinctProbes.clear();
+		}
+		distinctProbes = null;
+	}
+	
 	private void gatherStats() {
 
 		startTime = new MinimizingProbe();
@@ -52,9 +62,14 @@ public abstract class AbstractBenchmarkPostProcessor implements BenchmarkPostPro
 				distinctProbes.put(value.getDescriptor().getName(), value.getDescriptor());
 			}
 		}
+		
+		long start = startTime.getValue().longValue();
+		long end = endTime.getValue().longValue();
+		
 		log().debug("Found " + valueCount + " BenchmarkProbes");
-		log().debug("StartTime: " + startTime.getValue().longValue());
-		log().debug("EndTime: " + endTime.getValue().longValue());
+		log().debug("StartTime: " + start);
+		log().debug("EndTime: " + end);
+		log().debug("Duration : " + (end - start) + "s");
 	}
 
 	protected Map<String, ProbeDescriptor> getDistinctProbes() {
