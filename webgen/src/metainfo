@@ -16,13 +16,13 @@
   # Define the project properties here, these can be accessed in the 
   # pages using the {var:} syntax.
   # -------------------------------------------------------------------
-  project_name: "MyProject"
-  project_slogan: 'a great open source project!'
-  project_id: 'myproject'
-  project_jira_key: 'MYPROJECT'
-  project_issue_url: 'http://fusesource.com/issues/browse/MYPROJECT'
+  project_name: "JMSTester"
+  project_slogan: 'Benchmarking JMS applications made easy!'
+  project_id: 'jmstester'
+  project_jira_key: 'JMSTESTER'
+  project_issue_url: 'http://fusesource.com/issues/browse/JMSTESTER'
   project_forums_url: 'http://fusesource.com/forums'
-  project_wiki_url: 'http://fusesource.com/wiki/display/MYPROJECT'
+  project_wiki_url: 'http://fusesource.com/wiki/display/JMSTESTER'
   project_logo: "/images/project-logo.gif"
 
   # -------------------------------------------------------------------
