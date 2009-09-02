@@ -123,7 +123,11 @@ public class BenchmarkJMSProducerWrapper extends AbstractBenchmarkJMSClient impl
 	    			log.debug("Shutting down producers.");
 	    			executor.shutdown();
 	    			for (BenchmarkProducer producer: producers) {
-	    				producer.release();
+	    				try {
+	    					producer.release();
+	    				} catch (Exception e) {
+	    					log().error("Error releasing producer.");
+	    				}
 	    			}
 	    			latch.countDown();
 	    		} catch (Exception e) {}

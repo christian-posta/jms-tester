@@ -7,12 +7,20 @@
     <property name="brokerURL" value="tcp://localhost:61616" />
   </bean>
     
-  <bean id="testProfile" class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration" scope="prototype">
-    <property name="name" value="testProfile" />
+  <bean id="testProfile1" class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration" scope="prototype">
+    <property name="name" value="testProfile1" />
     <property name="duration"    value="10"/>
     <property name="initialRate" value="500"/>
     <property name="maxRate"     value="700" />
     <property name="increment"   value="100" />
+  </bean>
+  
+  <bean id="testProfile2" class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration" scope="prototype">
+    <property name="name" value="testProfile2" />
+    <property name="duration"    value="10"/>
+    <property name="initialRate" value="10000"/>
+    <property name="maxRate"     value="15000" />
+    <property name="increment"   value="1000" />
   </bean>
   
   <bean id="JMXConnector" class="com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory" >

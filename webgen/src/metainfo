@@ -28,11 +28,11 @@
   # -------------------------------------------------------------------
   # TODO it would be nice to define these in terms of the project_id variable!
   # -------------------------------------------------------------------
-  project_svn_url: 'http://fusesource.com/forge/svn/myproject/trunk'
-  project_svn_branches_url: 'http://fusesource.com/forge/svn/myproject/branches'
-  project_svn_tags_url: 'http://fusesource.com/forge/svn/myproject/tags'
-  project_maven_groupId: 'org.fusesource.myproject'
-  project_maven_artifactId: myproject
+  #project_svn_url: 'http://fusesource.com/forge/svn/myproject/trunk'
+  #project_svn_branches_url: 'http://fusesource.com/forge/svn/myproject/branches'
+  #project_svn_tags_url: 'http://fusesource.com/forge/svn/myproject/tags'
+  project_maven_groupId: 'org.fusesource.jmstester'
+  project_maven_artifactId: jmstester
 
 blog/*/**/*:
   template: /styles/impact/blog.template
