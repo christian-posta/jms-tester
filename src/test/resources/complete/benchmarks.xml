@@ -1,0 +1,95 @@
+<beans
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
+
+  <bean id="connFactoryResolver" class="java.util.HashMap">
+    <constructor-arg>
+      <map>
+        <entry>
+          <key><bean class="java.lang.String"><constructor-arg value="(.)*-1" /></bean></key>
+          <value>node1_ConnFactory</value>
+        </entry>
+        <entry>
+          <key><bean class="java.lang.String"><constructor-arg value="(.)*-2" /></bean></key>
+          <value>node2_ConnFactory</value>
+        </entry>
+      </map>
+    </constructor-arg>
+  </bean>
+
+  <bean id="jmxFactoryResolver" class="java.util.HashMap">
+    <constructor-arg>
+      <map>
+        <entry>
+          <key><bean class="java.lang.String"><constructor-arg value="(.)*-1" /></bean></key>
+          <value>jmx-host1-(.)*</value>
+        </entry>
+        <entry>
+          <key><bean class="java.lang.String"><constructor-arg value="(.)*-2" /></bean></key>
+          <value>jmx-host2-(.)*</value>
+        </entry>
+      </map>
+    </constructor-arg>
+  </bean>
+
+  <bean id="complete" class="com.fusesource.forge.jmstest.benchmark.BenchmarkConfig">
+    <property name="benchmarkId" value="complete" />
+    <property name="configLocations">
+    	<list>
+    		<bean class="java.lang.String">
+    		  <constructor-arg value="conf/complete" />
+    		</bean>
+    	</list>
+    </property>
+
+    <!-- Run the System related probes on all hosts that have a messaging broker. -->
+	<property name="probeConfigurations">
+		<list>
+			<bean class="com.fusesource.forge.jmstest.benchmark.command.BenchmarkProbeConfig" >
+			  <property name="clientNames" value="Monitor(.)*" />
+			  <property name="jmxConnectionFactoryNames" ref="jmxFactoryResolver" />
+			</bean>
+		</list>
+	</property>    
+
+	<!-- Define one benchmarkPart for each destination and producer -->
+    <property name="benchmarkParts">
+	  <list>
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="eventEngineCommands" />
+	      <property name="testDestinationName" value="queue:eventEngineCommands" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="1" />
+	      <property name="profileName" value="tricklingProfile" />
+	      <property name="producerClients" value="API(.)*" />
+	      <property name="consumerClients" value="API(.)*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
+	    
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="webmailRelay" />
+	      <property name="testDestinationName" value="webmailRelay" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="1" />
+	      <property name="profileName" value="mediumProfile" />
+	      <property name="producerClients" value="API*" />
+	      <property name="consumerClients" value="WebMail*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
+
+		  <!--  bean id="webmailRelaySize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
+		  <bean id="sendUserSmsSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
+		  <bean id="sourceActivitiesSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
+		  <bean id="webmailRelayUserUserChangeSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
+		  <bean id="groupChangesSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
+		  <bean id="webmailRelayContactChangesSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
+		  <bean id="relayToZybSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe" -->
+	  </list> 
+    </property>
+  </bean>    
+</beans>
