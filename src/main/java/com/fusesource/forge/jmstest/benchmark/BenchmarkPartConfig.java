@@ -31,6 +31,7 @@ public class BenchmarkPartConfig implements Serializable {
 	private String jmsConnectionProviderName = null;
 	private String jmsDestinationProviderName = null;
 	private String messageFactoryName = null;
+	private int maxConsumerRatePerThread = 1000;
 
     public BenchmarkConfig getParent() {
 		return parent;
@@ -145,6 +146,14 @@ public class BenchmarkPartConfig implements Serializable {
 
 	public void setJmsDestinationProviderName(String jmsDestinationProviderName) {
 		this.jmsDestinationProviderName = jmsDestinationProviderName;
+	}
+
+	public int getMaxConsumerRatePerThread() {
+		return maxConsumerRatePerThread;
+	}
+
+	public void setMaxConsumerRatePerThread(int maxConsumerRatePerThread) {
+		this.maxConsumerRatePerThread = maxConsumerRatePerThread;
 	}
 
 	@Override

@@ -27,7 +27,6 @@ public class BenchmarkJMSProducerWrapper extends AbstractBenchmarkJMSClient impl
     private TimeUnit sendingDelayUnit = TimeUnit.MICROSECONDS;
     private long sendingDelay;
     private CountDownLatch benchmarkIterationLatch;
-    private long maxRatePerProducerThread = 5000;
     private CountingProbe probe;
     private Boolean started = false;
 
@@ -39,10 +38,6 @@ public class BenchmarkJMSProducerWrapper extends AbstractBenchmarkJMSClient impl
 	public ClientType getClientType() {
 		return ClientType.PRODUCER;
 	}
-    
-    public void setMaxRatePerProducerThread(long maxRatePerProducerThread) {
-        this.maxRatePerProducerThread = maxRatePerProducerThread;
-    }
 
     public CountingProbe getProbe() {
 		return probe;
@@ -89,8 +84,7 @@ public class BenchmarkJMSProducerWrapper extends AbstractBenchmarkJMSClient impl
                      + "[actualDelay: " + delayInMicroSeconds + "]");
         }
 
-        // break it down so that we get at least 200 microseconds to publish each message
-        int producersNeeded = (int)(rate / maxRatePerProducerThread);
+        int producersNeeded = (int)(rate / getPartConfig().getMaxConsumerRatePerThread());
         if (producersNeeded == 0) {
             producersNeeded++;
         }
