@@ -44,7 +44,7 @@ public class BenchmarkProbeWrapper extends AbstractBenchmarkClient {
 		ArrayList<JMXConnectionFactory> result = new ArrayList<JMXConnectionFactory>();
 		String jmxNamePattern = probeConfig.getPreferredJmxConnectionFactoryName(getContainer().getClientInfo().getClientName());
 		
-		for(String name: getApplicationContext().getBeanNamesForType(BenchmarkProbeConfig.class)) {
+		for(String name: getApplicationContext().getBeanNamesForType(JMXConnectionFactory.class)) {
 			if (name.matches(jmxNamePattern)) {
 				result.add((JMXConnectionFactory)getApplicationContext().getBean(name));
 			}

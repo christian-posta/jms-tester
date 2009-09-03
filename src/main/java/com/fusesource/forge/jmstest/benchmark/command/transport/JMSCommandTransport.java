@@ -123,7 +123,7 @@ public class JMSCommandTransport extends AbstractCommandTransport implements Mes
 	}
 
 	public void setJmsDestinationProvider(
-			JMSDestinationProvider jmsDestinationProvider) {
+		JMSDestinationProvider jmsDestinationProvider) {
 		this.jmsDestinationProvider = jmsDestinationProvider;
 	}
 

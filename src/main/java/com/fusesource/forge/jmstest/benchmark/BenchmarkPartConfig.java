@@ -141,7 +141,7 @@ public class BenchmarkPartConfig implements Serializable {
 		return connectionFactoryNames;
 	}
 
-	public void setConnectionFactoryName(Map<String, String> connectionFactoryNames) {
+	public void setConnectionFactoryNames(Map<String, String> connectionFactoryNames) {
 		this.connectionFactoryNames = connectionFactoryNames;
 	}
 

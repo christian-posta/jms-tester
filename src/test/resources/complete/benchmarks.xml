@@ -64,7 +64,7 @@
 	      <property name="transacted" value="false" />
 	      <property name="numConsumers" value="1" />
 	      <property name="profileName" value="tricklingProfile" />
-	      <property name="producerClients" value="API(.)*" />
+	      <property name="producerClients" value="API-1" />
 	      <property name="consumerClients" value="API(.)*" />
 	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
 	    </bean>
@@ -77,18 +77,179 @@
 	      <property name="transacted" value="false" />
 	      <property name="numConsumers" value="1" />
 	      <property name="profileName" value="mediumProfile" />
-	      <property name="producerClients" value="API*" />
-	      <property name="consumerClients" value="WebMail*" />
+	      <property name="producerClients" value="API-1" />
+	      <property name="consumerClients" value="WebMail(.)*" />
 	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
 	    </bean>
 
-		  <!--  bean id="webmailRelaySize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-		  <bean id="sendUserSmsSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-		  <bean id="sourceActivitiesSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-		  <bean id="webmailRelayUserUserChangeSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-		  <bean id="groupChangesSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-		  <bean id="webmailRelayContactChangesSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-		  <bean id="relayToZybSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe" -->
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="sendUserSms" />
+	      <property name="testDestinationName" value="sendUserSms" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="1" />
+	      <property name="profileName" value="mediumProfile" />
+	      <property name="producerClients" value="API-1" />
+	      <property name="consumerClients" value="SMS(.)*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
+	    
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="sendAppSms" />
+	      <property name="testDestinationName" value="sendAppSms" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="1" />
+	      <property name="profileName" value="mediumProfile" />
+	      <property name="producerClients" value="API-1" />
+	      <property name="consumerClients" value="SMS(.)*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
+
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="sourceActivities" />
+	      <property name="testDestinationName" value="sourceActivities" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="1" />
+	      <property name="profileName" value="fastProfile" />
+	      <property name="producerClients" value="API-1" />
+	      <property name="consumerClients" value="API(.)*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
+	    
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="webmailRelayUserChange" />
+	      <property name="testDestinationName" value="webmailRelayUserChange" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="1" />
+	      <property name="profileName" value="mediumProfile" />
+	      <property name="producerClients" value="API-1" />
+	      <property name="consumerClients" value="WebMail(.)*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
+
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="groupChanges" />
+	      <property name="testDestinationName" value="groupChanges" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="1" />
+	      <property name="profileName" value="mediumProfile" />
+	      <property name="producerClients" value="API-1" />
+	      <property name="consumerClients" value="API(.)*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
+
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="webmailRelayContactChanges" />
+	      <property name="testDestinationName" value="webmailRelayContactChanges" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="1" />
+	      <property name="profileName" value="mediumProfile" />
+	      <property name="producerClients" value="API-1" />
+	      <property name="consumerClients" value="WebMail(.)*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
+
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="relayToZyb" />
+	      <property name="testDestinationName" value="relayToZyb" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="1" />
+	      <property name="profileName" value="mediumProfile" />
+	      <property name="producerClients" value="API-1" />
+	      <property name="consumerClients" value="API(.)*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
+
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="activities" />
+	      <property name="testDestinationName" value="topic:activities" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="5" />
+	      <property name="profileName" value="fastProfile" />
+	      <property name="producerClients" value="API-1,RPG-1" />
+	      <property name="consumerClients" value="API(.)*,RPG(.)*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
+
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="contactChanges" />
+	      <property name="testDestinationName" value="topic:contactChanges" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="5" />
+	      <property name="profileName" value="fastProfile" />
+	      <property name="producerClients" value="API-1,RPG-1" />
+	      <property name="consumerClients" value="API(.)*,RPG(.)*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
+
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="identityChanges" />
+	      <property name="testDestinationName" value="topic:identityChanges" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="5" />
+	      <property name="profileName" value="fastProfile" />
+	      <property name="producerClients" value="API-1,RPG-1" />
+	      <property name="consumerClients" value="API(.)*,RPG(.)*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
+
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="invitations" />
+	      <property name="testDestinationName" value="topic:invitations" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="5" />
+	      <property name="profileName" value="fastProfile" />
+	      <property name="producerClients" value="API-1,RPG-1" />
+	      <property name="consumerClients" value="API(.)*,RPG(.)*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
+
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="profileChanges" />
+	      <property name="testDestinationName" value="topic:profileChanges" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="5" />
+	      <property name="profileName" value="fastProfile" />
+	      <property name="producerClients" value="API-1,RPG-1" />
+	      <property name="consumerClients" value="API(.)*,RPG(.)*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
+
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="userChanges" />
+	      <property name="testDestinationName" value="topic:userChanges" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="5" />
+	      <property name="profileName" value="fastProfile" />
+	      <property name="producerClients" value="API-1,RPG-1" />
+	      <property name="consumerClients" value="API(.)*,RPG(.)*" />
+	      <property name="connectionFactoryNames" ref="connFactoryResolver" />
+	    </bean>
 	  </list> 
     </property>
   </bean>    

@@ -100,7 +100,6 @@
   </bean>
 
   <bean id="ThreadCounter" class="com.fusesource.forge.jmstest.probe.jmx.JMXProbe">
-    <property name="jmxConnectionFactory" ref="JMXConnector" />
     <property name="name" value="ThreadCounter" />
     <property name="objectNameString" value="java.lang:type=Threading" />
     <property name="attributeName" value="ThreadCount" />
@@ -108,55 +107,46 @@
 
   <bean id="eventEngineCommandsSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
     <constructor-arg value="eventEngineCommands" />
-    <property name="jmxConnectionFactory" ref="JMXConnector" />
     <property name="attributeName" value="QueueSize" />
   </bean>
 
   <bean id="webmailRelaySize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
     <constructor-arg value="webmailRelay" />
-    <property name="jmxConnectionFactory" ref="JMXConnector" />
     <property name="attributeName" value="QueueSize" />
   </bean>
 
   <bean id="sendUserSmsSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
     <constructor-arg value="sendUserSms" />
-    <property name="jmxConnectionFactory" ref="JMXConnector" />
     <property name="attributeName" value="QueueSize" />
   </bean>
 
   <bean id="sourceActivitiesSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
     <constructor-arg value="sourceActivities" />
-    <property name="jmxConnectionFactory" ref="JMXConnector" />
     <property name="attributeName" value="QueueSize" />
   </bean>
 
   <bean id="sendAppSmsSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
     <constructor-arg value="sendAppSms" />
-    <property name="jmxConnectionFactory" ref="JMXConnector" />
     <property name="attributeName" value="QueueSize" />
   </bean>
 
   <bean id="webmailRelayUserUserChangeSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
     <constructor-arg value="webmailRelayUserChange" />
-    <property name="jmxConnectionFactory" ref="JMXConnector" />
     <property name="attributeName" value="QueueSize" />
   </bean>
 
   <bean id="groupChangesSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
     <constructor-arg value="groupChanges" />
-    <property name="jmxConnectionFactory" ref="JMXConnector" />
     <property name="attributeName" value="QueueSize" />
   </bean>
 
   <bean id="webmailRelayContactChangesSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
     <constructor-arg value="webmailRelayContactChanges" />
-    <property name="jmxConnectionFactory" ref="JMXConnector" />
     <property name="attributeName" value="QueueSize" />
   </bean>
 
   <bean id="relayToZybSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
     <constructor-arg value="relayToZyb" />
-    <property name="jmxConnectionFactory" ref="JMXConnector" />
     <property name="attributeName" value="QueueSize" />
   </bean>
 

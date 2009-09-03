@@ -6,6 +6,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.broker.TransportConnector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -103,7 +104,9 @@ public class BenchmarkController extends AbstractBenchmarkExecutionContainer {
 	private BrokerService getBroker() throws Exception {
 		if (broker == null) {
 			broker = new BrokerService();
-			broker.addConnector("tcp://0.0.0.0:" + getConnector().getPort());
+			TransportConnector connector = broker.addConnector("tcp://0.0.0.0:" + getConnector().getPort());
+			log().info("Clients can connect to " + connector.getUri().toString());
+			setJmsPort(connector.getUri().getPort());
 			broker.setPersistent(false);
 			broker.setUseJmx(false);
 			broker.start();

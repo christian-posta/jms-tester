@@ -34,6 +34,10 @@ public abstract class AbstractBenchmarkExecutor {
 		getConnector().setPort(jmsPort);
 	}
 
+	public int getJmsPort() {
+		return getConnector().getPort();
+	}
+	
 	public void setHostname(String hostname) {
 		getConnector().setHostName(hostname);
 	}

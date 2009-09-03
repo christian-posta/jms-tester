@@ -46,7 +46,7 @@ public class BenchmarkProbeConfig implements Serializable {
 	public String getPreferredJmxConnectionFactoryName(String clientName) {
 		
 		for(String key: getJmxConnectionFactoryNames().keySet()) {
-			if (key.matches(clientName)) {
+			if (clientName.matches(key)) {
 				return getJmxConnectionFactoryNames().get(key);
 			}
 		}
