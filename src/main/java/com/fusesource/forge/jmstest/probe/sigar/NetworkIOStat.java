@@ -20,7 +20,7 @@ public class NetworkIOStat extends AbstractSigarProbe {
 		super(name);
 	}
 
-	public void setIOStatType(NetworkIOStatType type) {
+	public void setType(NetworkIOStatType type) {
 		this.type =  type;
 	}
 	

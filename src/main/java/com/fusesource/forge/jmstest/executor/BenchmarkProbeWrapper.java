@@ -12,11 +12,12 @@ import com.fusesource.forge.jmstest.benchmark.command.BenchmarkProbeConfig;
 import com.fusesource.forge.jmstest.benchmark.command.ClientId;
 import com.fusesource.forge.jmstest.benchmark.command.ClientType;
 import com.fusesource.forge.jmstest.probe.Probe;
+import com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory;
+import com.fusesource.forge.jmstest.probe.jmx.JMXProbe;
 
 public class BenchmarkProbeWrapper extends AbstractBenchmarkClient {
 	
 	private ClientId clientId = null;
-	
 	private Log log = null;
 	
 	public BenchmarkProbeWrapper(BenchmarkClient container, BenchmarkConfig config) {
@@ -36,6 +37,37 @@ public class BenchmarkProbeWrapper extends AbstractBenchmarkClient {
 			);
 		}
 		return clientId;
+	}
+	
+	private List<JMXConnectionFactory> getJmxConnectionFactories(BenchmarkProbeConfig probeConfig) {
+		
+		ArrayList<JMXConnectionFactory> result = new ArrayList<JMXConnectionFactory>();
+		String jmxNamePattern = probeConfig.getPreferredJmxConnectionFactoryName(getContainer().getClientInfo().getClientName());
+		
+		for(String name: getApplicationContext().getBeanNamesForType(BenchmarkProbeConfig.class)) {
+			if (name.matches(jmxNamePattern)) {
+				result.add((JMXConnectionFactory)getApplicationContext().getBean(name));
+			}
+		}
+		
+		if (result.isEmpty()) {
+			result.add((JMXConnectionFactory)getBean(
+				new String[] {
+					JMXConnectionFactory.DEFAULT_JMX_CONNECTION_FACTORY_NAME + "-" + getContainer().getClientInfo().getClientName(),
+					JMXConnectionFactory.DEFAULT_JMX_CONNECTION_FACTORY_NAME
+				}, JMXConnectionFactory.class
+			));
+		}
+		
+		if (result.isEmpty()) {
+			log().warn("Could not resolve jmxConnectionFactory. Creating default.");
+			JMXConnectionFactory cf = new JMXConnectionFactory();
+			cf.setUsername("smx");
+			cf.setPassword("smx");
+			result.add(cf);
+		}
+		
+		return result;
 	}
 	
 	@Override
@@ -60,12 +92,21 @@ public class BenchmarkProbeWrapper extends AbstractBenchmarkClient {
 				
 				for(String probeName : probeNames) {
 					try {
-						Probe p = (Probe)getBean(
-							new String[] { probeName }, null
-						);
-						p.setName(getClientId().toString() + p.getName());
-						p.addObserver(getSamplePersistenceAdapter());
-						getProbeRunner().addProbe(p);
+						Probe p = (Probe)getBean(new String[] { probeName }, null );
+						
+						if (p instanceof JMXProbe) {
+  						    for(JMXConnectionFactory cf: getJmxConnectionFactories(probeConfig)) {
+  								Probe jmxProbe = (Probe)getBean(new String[] { probeName }, null );
+  								jmxProbe.setName(cf.getUrl().toString() + p.getName());
+  								jmxProbe.addObserver(getSamplePersistenceAdapter());
+  							    ((JMXProbe)jmxProbe).setJmxConnectionFactory(cf);
+  								getProbeRunner().addProbe(jmxProbe);
+						    }
+						} else {
+							p.setName(getClientId().toString() + p.getName());
+							p.addObserver(getSamplePersistenceAdapter());
+							getProbeRunner().addProbe(p);
+						}
 					} catch (Exception e) {
 						log().error("Could not create probe: " + probeName, e);
 					}

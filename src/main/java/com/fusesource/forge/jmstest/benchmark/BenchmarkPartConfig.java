@@ -8,6 +8,8 @@
 package com.fusesource.forge.jmstest.benchmark;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import com.fusesource.forge.jmstest.config.AcknowledgeMode;
@@ -28,7 +30,7 @@ public class BenchmarkPartConfig implements Serializable {
 	private String profileName;
 	private String consumerClients = "ALL";
 	private String producerClients = "ALL";
-	private String jmsConnectionProviderName = null;
+	private Map<String, String> connectionFactoryNames = null;
 	private String jmsDestinationProviderName = null;
 	private String messageFactoryName = null;
 	private int maxConsumerRatePerThread = 1000;
@@ -132,12 +134,15 @@ public class BenchmarkPartConfig implements Serializable {
 		this.profileName = profileName;
 	}
 
-	public String getJmsConnectionProviderName() {
-		return jmsConnectionProviderName;
+	public Map<String, String> getConnectionFactoryNames() {
+		if (connectionFactoryNames == null) {
+			connectionFactoryNames = new HashMap<String, String>();
+		}
+		return connectionFactoryNames;
 	}
 
-	public void setJmsConnectionProviderName(String jmsConnectionProviderName) {
-		this.jmsConnectionProviderName = jmsConnectionProviderName;
+	public void setConnectionFactoryName(Map<String, String> connectionFactoryNames) {
+		this.connectionFactoryNames = connectionFactoryNames;
 	}
 
 	public String getJmsDestinationProviderName() {
@@ -162,18 +167,19 @@ public class BenchmarkPartConfig implements Serializable {
 		int result = 1;
 		result = prime * result
 				+ ((acknowledgeMode == null) ? 0 : acknowledgeMode.hashCode());
+		result = prime
+				* result
+				+ ((connectionFactoryNames == null) ? 0
+						: connectionFactoryNames.hashCode());
 		result = prime * result
 				+ ((consumerClients == null) ? 0 : consumerClients.hashCode());
 		result = prime * result
 				+ ((deliveryMode == null) ? 0 : deliveryMode.hashCode());
 		result = prime
 				* result
-				+ ((jmsConnectionProviderName == null) ? 0
-						: jmsConnectionProviderName.hashCode());
-		result = prime
-				* result
 				+ ((jmsDestinationProviderName == null) ? 0
 						: jmsDestinationProviderName.hashCode());
+		result = prime * result + maxConsumerRatePerThread;
 		result = prime
 				* result
 				+ ((messageFactoryName == null) ? 0 : messageFactoryName
@@ -206,8 +212,7 @@ public class BenchmarkPartConfig implements Serializable {
 	public String toString() {
 		return "BenchmarkPartConfig [acknowledgeMode=" + acknowledgeMode
 				+ ", consumerClients=" + consumerClients + ", deliveryMode="
-				+ deliveryMode + ", jmsConnectionProviderName="
-				+ jmsConnectionProviderName + ", jmsDestinationProviderName="
+				+ deliveryMode + ", jmsDestinationProviderName="
 				+ jmsDestinationProviderName + ", messageFactoryName="
 				+ messageFactoryName + ", numConsumers=" + numConsumers
 				+ ", parent=" + parent + ", partID=" + partID
@@ -231,6 +236,11 @@ public class BenchmarkPartConfig implements Serializable {
 				return false;
 		} else if (!acknowledgeMode.equals(other.acknowledgeMode))
 			return false;
+		if (connectionFactoryNames == null) {
+			if (other.connectionFactoryNames != null)
+				return false;
+		} else if (!connectionFactoryNames.equals(other.connectionFactoryNames))
+			return false;
 		if (consumerClients == null) {
 			if (other.consumerClients != null)
 				return false;
@@ -241,17 +251,13 @@ public class BenchmarkPartConfig implements Serializable {
 				return false;
 		} else if (!deliveryMode.equals(other.deliveryMode))
 			return false;
-		if (jmsConnectionProviderName == null) {
-			if (other.jmsConnectionProviderName != null)
-				return false;
-		} else if (!jmsConnectionProviderName
-				.equals(other.jmsConnectionProviderName))
-			return false;
 		if (jmsDestinationProviderName == null) {
 			if (other.jmsDestinationProviderName != null)
 				return false;
 		} else if (!jmsDestinationProviderName
 				.equals(other.jmsDestinationProviderName))
+			return false;
+		if (maxConsumerRatePerThread != other.maxConsumerRatePerThread)
 			return false;
 		if (messageFactoryName == null) {
 			if (other.messageFactoryName != null)

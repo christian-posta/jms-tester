@@ -13,6 +13,8 @@ import org.apache.commons.logging.LogFactory;
 
 public class JMXConnectionFactory {
 	
+	public final static String DEFAULT_JMX_CONNECTION_FACTORY_NAME = "jmxConnector";
+	
 	private JMXConnector connector = null;
 	private String username = null;
 	private String password = null;

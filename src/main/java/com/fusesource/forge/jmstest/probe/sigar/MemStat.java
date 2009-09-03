@@ -17,7 +17,7 @@ public class MemStat extends AbstractSigarProbe {
 		super(name);
 	}
 
-	public void setIOStatType(MemStatType type) {
+	public void setType(MemStatType type) {
 		this.type =  type;
 	}
 	

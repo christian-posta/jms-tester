@@ -78,19 +78,25 @@ public abstract class AbstractBenchmarkJMSClient extends AbstractBenchmarkClient
 		return clientId;
 	}
 	
-	protected JMSConnectionProvider getJmsConnectionProvider() {
-		if (jmsConnectionProvider == null) {
-			jmsConnectionProvider = (JMSConnectionProvider)getBean(
-				new String[] { 
-					partConfig.getJmsConnectionProviderName(),
-					JMSConnectionProvider.DEFAULT_BEAN_NAME
-				}, JMSConnectionProvider.class
-			);
+	private String getPreferredConnectionFactoryName() {
+		
+		for(String key: getPartConfig().getConnectionFactoryNames().keySet()) {
+			if (key.matches(getContainer().getClientInfo().getClientName())) {
+				return getPartConfig().getConnectionFactoryNames().get(key);
+			}
 		}
+		return JMSConnectionProvider.DEFAULT_CONNECTION_FACTORY_NAME + "-" + getContainer().getClientInfo().getClientName();
+	}
+	
+	protected JMSConnectionProvider getJmsConnectionProvider() {
 		if (jmsConnectionProvider == null) {
 			log().warn("Creating default JMS Connection Provider.");
 			ConnectionFactory cf = (ConnectionFactory)getBean(
-				new String[] { "connectionFactory" }, ConnectionFactory.class
+				new String[] { 
+				  getPreferredConnectionFactoryName(),
+				  JMSConnectionProvider.DEFAULT_CONNECTION_FACTORY_NAME + "-" + getContainer().getClientInfo().getClientName(),
+				  JMSConnectionProvider.DEFAULT_CONNECTION_FACTORY_NAME
+				}, ConnectionFactory.class
 			);
 			if (cf != null) {
 				jmsConnectionProvider = new DefaultJMSConnectionProvider();

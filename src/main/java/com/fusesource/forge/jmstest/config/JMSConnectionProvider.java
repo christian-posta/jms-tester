@@ -14,7 +14,7 @@ import javax.jms.TopicConnection;
 
 public interface JMSConnectionProvider {
 	
-  public final static String DEFAULT_BEAN_NAME = "connectionProvider";
+  public final static String DEFAULT_CONNECTION_FACTORY_NAME = "connectionFactory";
 	
   public ConnectionFactory getConnectionFactory() throws Exception;	
   public Connection getConnection() throws Exception;

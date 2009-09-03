@@ -21,7 +21,7 @@ public class IOStat extends AbstractSigarProbe {
 		super(name);
 	}
 
-	public void setIOStatType(IOStatType type) {
+	public void setType(IOStatType type) {
 		this.type =  type;
 	}
 	
