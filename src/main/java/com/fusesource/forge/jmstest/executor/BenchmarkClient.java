@@ -26,15 +26,8 @@ import com.fusesource.forge.jmstest.benchmark.command.handler.DefaultCommandHand
 public class BenchmarkClient extends AbstractBenchmarkExecutionContainer {
 
 	private BenchmarkClientInfoCommand clientInfo = null;
-	private Map<String, AbstractBenchmarkClient> activeClients;
-
+	private Map<String, AbstractBenchmarkClient> activeClients = new HashMap<String, AbstractBenchmarkClient>();
 	private Log log = null;
-	
-	@Override
-	protected void init() {
-		super.init();
-		activeClients = new HashMap<String, AbstractBenchmarkClient>();
-	}
 	
 	public BenchmarkClientInfoCommand getClientInfo() {
 		if (clientInfo == null) {
@@ -129,6 +122,14 @@ public class BenchmarkClient extends AbstractBenchmarkExecutionContainer {
 			}
 		}
 	}
+	
+	@Override
+	public void release() {
+		for(AbstractBenchmarkClient bc: activeClients.values()) {
+			bc.release();
+		}
+		super.release();
+	}
 
 	@Override
 	protected void createHandlerChain() {
@@ -202,7 +203,7 @@ public class BenchmarkClient extends AbstractBenchmarkExecutionContainer {
 		}
 		return false;
 	}
-	
+
 	private Log log() {
 		if (log == null) {
 			log = LogFactory.getLog(this.getClass());

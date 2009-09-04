@@ -73,23 +73,24 @@ public class BenchmarkController extends AbstractBenchmarkExecutionContainer {
 	@Override
 	synchronized public void stop() {
 
+		coordinator.release();
+		super.stop();
+
 		log().info("BenchmarkController going down in 5 Seconds");
 		
-		final CountDownLatch latch = new CountDownLatch(1);
+		final CountDownLatch brokerStopLatch = new CountDownLatch(1);
 		final ScheduledThreadPoolExecutor waiter = new ScheduledThreadPoolExecutor(1);
 		waiter.schedule(new Runnable() {
 			public void run() {
-				latch.countDown();
+				brokerStopLatch.countDown();
 				waiter.shutdown();
 			}
 		}, 5, TimeUnit.SECONDS);
 		
 		try {
-			latch.await();
+			brokerStopLatch.await();
 		} catch (InterruptedException e1) {
 		}
-
-		super.stop();
 		
 		if (broker != null) {
 			log().info("Stopping embedded broker for Benchmark framework: ");

@@ -98,9 +98,7 @@ public class BenchmarkConfigTest extends AbstractTestNGSpringContextTests {
 		
 		for(String clientName: clientNames) {
 			BenchmarkClient client = new BenchmarkClient();
-			BenchmarkClientInfoCommand clientInfo = new BenchmarkClientInfoCommand();
-			clientInfo.setClientName(clientName);
-			client.setClientInfo(clientInfo);
+			client.setName(clientName);
 			client.setJmsPort(jmsPort);
 			switch (mode) {
 				case 0: {
@@ -121,19 +119,18 @@ public class BenchmarkConfigTest extends AbstractTestNGSpringContextTests {
 					if (bpw.getProbeDescriptors().size() > 0) {
 						result.add(clientName);
 					}
-					
+					bpw.release();
 					break;
 				}
 				default: 
 					// ignore
 			}
-				
+			client.release();
 		}
 		return result;
 	}
 	
 	private void checkBenchmarkParts() {
-		
 		
 		for(BenchmarkPartConfig part: getConfig().getBenchmarkParts()) {
 			log().info("Analyzing Benchmark Part: " + part.getPartID());

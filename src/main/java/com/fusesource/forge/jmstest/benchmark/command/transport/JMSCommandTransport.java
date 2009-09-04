@@ -39,7 +39,7 @@ public class JMSCommandTransport extends AbstractCommandTransport implements Mes
 
 	public void start() {
 		synchronized (lock) {
-			if (started) {
+			if (started || released) {
 				return;
 			}
 			ReleaseManager.getInstance().register(this);

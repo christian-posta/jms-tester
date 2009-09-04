@@ -48,7 +48,7 @@ public class AbstractTestNGSpringJMSTest extends AbstractTestNGSpringContextTest
 			
 			benchmark = new Benchmark();
 			benchmark.setController(Boolean.TRUE.toString());
-			benchmark.setClient(Boolean.TRUE.toString());
+			benchmark.setClientNames("TestClient");
 			benchmark.setRecorder(Boolean.TRUE.toString());
 			
 		} catch (Exception e) {
