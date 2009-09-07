@@ -1,0 +1,40 @@
+ACTIVEMQ_HOME: /Users/andreasgies/install/apache-activemq-5.3-SNAPSHOT
+ACTIVEMQ_BASE: /Users/andreasgies/install/apache-activemq-5.3-SNAPSHOT
+Loading message broker from: xbean:file:/Users/andreasgies/install/TestHarness/amq-config/dynamic-network/brokerA.xml
+INFO  BrokerService                  - Using Persistence Adapter: AMQPersistenceAdapter(/tmp/brokerA)
+INFO  AMQPersistenceAdapter          - AMQStore starting using directory: /tmp/brokerA
+INFO  AMQPersistenceAdapter          - Journal deleted: 
+INFO  KahaStore                      - Kaha Store successfully deleted data directory /tmp/brokerA/kr-store/data
+INFO  KahaStore                      - Kaha Store successfully deleted data directory /tmp/brokerA/kr-store/state
+INFO  KahaStore                      - Kaha Store using data directory /tmp/brokerA/kr-store/state
+INFO  AMQPersistenceAdapter          - Active data files: []
+INFO  BrokerService                  - ActiveMQ 5.3-SNAPSHOT JMS Message Broker (BrokerA) is starting
+INFO  BrokerService                  - For help or more information please see: http://activemq.apache.org/
+INFO  ManagementContext              - JMX consoles can connect to service:jmx:rmi:///jndi/rmi://localhost:1100/jmxrmi
+INFO  KahaStore                      - Kaha Store using data directory /tmp/brokerA/kr-store/data
+INFO  TransportServerThreadSupport   - Listening for connections at: tcp://localhost:61616
+INFO  TransportConnector             - Connector tcp://localhost:61616 Started
+INFO  NetworkConnector               - Network Connector localhost Started
+INFO  BrokerService                  - ActiveMQ JMS Message Broker (BrokerA, ID:andreas-giess-macbook-pro.local-51248-1240821083592-0:0) started
+INFO  DiscoveryNetworkConnector      - Establishing network connection from vm://BrokerA to tcp://localhost:61620
+INFO  TransportConnector             - Connector vm://BrokerA Started
+INFO  DemandForwardingBridge         - Network connection between vm://BrokerA#0 and tcp://localhost/127.0.0.1:61620(BrokerC) has been established.
+INFO  DiscoveryNetworkConnector      - Establishing network connection from vm://BrokerA to tcp://localhost:61618
+INFO  DemandForwardingBridge         - Network connection between vm://BrokerA#2 and tcp://localhost/127.0.0.1:61618(BrokerB) has been established.
+WARN  ManagedTransportConnection     - Failed to register MBean: org.apache.activemq:BrokerName=BrokerA,Type=Connection,ConnectorName=tcp_//localhost_61616,Connection=NC_BrokerC_outbound
+INFO  DemandForwardingBridge         - BrokerA bridge to BrokerC stopped
+INFO  TransportConnector             - Connector vm://BrokerA Stopped
+INFO  DemandForwardingBridge         - BrokerA bridge to BrokerB stopped
+INFO  DiscoveryNetworkConnector      - Establishing network connection from vm://BrokerA to tcp://localhost:61620
+INFO  TransportConnector             - Connector vm://BrokerA Started
+INFO  DiscoveryNetworkConnector      - Establishing network connection from vm://BrokerA to tcp://localhost:61618
+INFO  DemandForwardingBridge         - Network connection between vm://BrokerA#6 and tcp://localhost/127.0.0.1:61618(BrokerB) has been established.
+INFO  DemandForwardingBridge         - Network connection between vm://BrokerA#4 and tcp://localhost/127.0.0.1:61620(BrokerC) has been established.
+INFO  BrokerService                  - ActiveMQ Message Broker (BrokerA, ID:andreas-giess-macbook-pro.local-51248-1240821083592-0:0) is shutting down
+INFO  DemandForwardingBridge         - BrokerA bridge to BrokerB stopped
+WARN  ManagedTransportConnection     - Failed to unregister mbean: org.apache.activemq:BrokerName=BrokerA,Type=Connection,ConnectorName=tcp_//localhost_61616,Connection=NC_BrokerC_outbound
+INFO  TransportConnector             - Connector vm://BrokerA Stopped
+INFO  DemandForwardingBridge         - BrokerA bridge to BrokerC stopped
+INFO  NetworkConnector               - Network Connector localhost Stopped
+INFO  TransportConnector             - Connector tcp://localhost:61616 Stopped
+INFO  BrokerService                  - ActiveMQ JMS Message Broker (BrokerA, ID:andreas-giess-macbook-pro.local-51248-1240821083592-0:0) stopped

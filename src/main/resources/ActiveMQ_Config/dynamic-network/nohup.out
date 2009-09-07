@@ -1,0 +1,138 @@
+nohup: /bin/activemq: No such file or directory
+nohup: /bin/activemq: No such file or directory
+nohup: /bin/activemq: No such file or directory
+ACTIVEMQ_HOME: /Users/andreasgies/install/apache-activemq-5.3-SNAPSHOT
+ACTIVEMQ_BASE: /Users/andreasgies/install/apache-activemq-5.3-SNAPSHOT
+ACTIVEMQ_HOME: /Users/andreasgies/install/apache-activemq-5.3-SNAPSHOT
+ACTIVEMQ_BASE: /Users/andreasgies/install/apache-activemq-5.3-SNAPSHOT
+ACTIVEMQ_HOME: /Users/andreasgies/install/apache-activemq-5.3-SNAPSHOT
+ACTIVEMQ_BASE: /Users/andreasgies/install/apache-activemq-5.3-SNAPSHOT
+Loading message broker from: xbean:file:/Users/andreasgies/install/TestHarness/amq-config/dynamic-network/brokerB.xml
+Loading message broker from: xbean:file:/Users/andreasgies/install/TestHarness/amq-config/dynamic-network/brokerA.xml
+Loading message broker from: xbean:file:/Users/andreasgies/install/TestHarness/amq-config/dynamic-network/brokerC.xml
+INFO  ResourceXmlApplicationContext  - Refreshing org.apache.xbean.spring.context.ResourceXmlApplicationContext@909385: display name [org.apache.xbean.spring.context.ResourceXmlApplicationContext@909385]; startup date [Thu Apr 09 18:09:19 CEST 2009]; root of context hierarchy
+INFO  ResourceXmlApplicationContext  - Refreshing org.apache.xbean.spring.context.ResourceXmlApplicationContext@909385: display name [org.apache.xbean.spring.context.ResourceXmlApplicationContext@909385]; startup date [Thu Apr 09 18:09:19 CEST 2009]; root of context hierarchy
+INFO  XBeanXmlBeanDefinitionReader   - Loading XML bean definitions from URL [file:/Users/andreasgies/install/TestHarness/amq-config/dynamic-network/brokerA.xml]
+INFO  XBeanXmlBeanDefinitionReader   - Loading XML bean definitions from URL [file:/Users/andreasgies/install/TestHarness/amq-config/dynamic-network/brokerB.xml]
+INFO  ResourceXmlApplicationContext  - Refreshing org.apache.xbean.spring.context.ResourceXmlApplicationContext@909385: display name [org.apache.xbean.spring.context.ResourceXmlApplicationContext@909385]; startup date [Thu Apr 09 18:09:19 CEST 2009]; root of context hierarchy
+INFO  XBeanXmlBeanDefinitionReader   - Loading XML bean definitions from URL [file:/Users/andreasgies/install/TestHarness/amq-config/dynamic-network/brokerC.xml]
+INFO  ResourceXmlApplicationContext  - Bean factory for application context [org.apache.xbean.spring.context.ResourceXmlApplicationContext@909385]: org.springframework.beans.factory.support.DefaultListableBeanFactory@627bc7
+INFO  ResourceXmlApplicationContext  - Bean factory for application context [org.apache.xbean.spring.context.ResourceXmlApplicationContext@909385]: org.springframework.beans.factory.support.DefaultListableBeanFactory@627bc7
+INFO  PropertyPlaceholderConfigurer  - Loading properties file from URL [file:/Users/andreasgies/install/TestHarness/amq-config/dynamic-network/settings.properties]
+INFO  DefaultListableBeanFactory     - Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@627bc7: defining beans [settings,store,org.apache.activemq.xbean.XBeanBrokerService#0]; root of factory hierarchy
+INFO  PropertyPlaceholderConfigurer  - Loading properties file from URL [file:/Users/andreasgies/install/TestHarness/amq-config/dynamic-network/settings.properties]
+INFO  DefaultListableBeanFactory     - Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@627bc7: defining beans [settings,store,org.apache.activemq.xbean.XBeanBrokerService#0]; root of factory hierarchy
+INFO  ResourceXmlApplicationContext  - Bean factory for application context [org.apache.xbean.spring.context.ResourceXmlApplicationContext@909385]: org.springframework.beans.factory.support.DefaultListableBeanFactory@627bc7
+INFO  PropertyPlaceholderConfigurer  - Loading properties file from URL [file:/Users/andreasgies/install/TestHarness/amq-config/dynamic-network/settings.properties]
+INFO  DefaultListableBeanFactory     - Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@627bc7: defining beans [settings,store,org.apache.activemq.xbean.XBeanBrokerService#0]; root of factory hierarchy
+INFO  BrokerService                  - Using Persistence Adapter: AMQPersistenceAdapter(/tmp/brokerA)
+INFO  AMQPersistenceAdapter          - AMQStore starting using directory: /tmp/brokerA
+INFO  BrokerService                  - Using Persistence Adapter: AMQPersistenceAdapter(/tmp/brokerB)
+INFO  AMQPersistenceAdapter          - AMQStore starting using directory: /tmp/brokerB
+INFO  AMQPersistenceAdapter          - Journal deleted: 
+INFO  KahaStore                      - Kaha Store successfully deleted data directory /tmp/brokerA/kr-store/data
+INFO  KahaStore                      - Kaha Store successfully deleted data directory /tmp/brokerA/kr-store/state
+INFO  KahaStore                      - Kaha Store using data directory /tmp/brokerA/kr-store/state
+INFO  AMQPersistenceAdapter          - Journal deleted: 
+INFO  KahaStore                      - Kaha Store successfully deleted data directory /tmp/brokerB/kr-store/data
+INFO  KahaStore                      - Kaha Store successfully deleted data directory /tmp/brokerB/kr-store/state
+INFO  KahaStore                      - Kaha Store using data directory /tmp/brokerB/kr-store/state
+INFO  BrokerService                  - Using Persistence Adapter: AMQPersistenceAdapter(/tmp/brokerC)
+INFO  AMQPersistenceAdapter          - Active data files: []
+INFO  BrokerService                  - ActiveMQ 5.3-SNAPSHOT JMS Message Broker (BrokerA) is starting
+INFO  BrokerService                  - For help or more information please see: http://activemq.apache.org/
+INFO  AMQPersistenceAdapter          - AMQStore starting using directory: /tmp/brokerC
+INFO  AMQPersistenceAdapter          - Active data files: []
+INFO  ManagementContext              - JMX consoles can connect to service:jmx:rmi:///jndi/rmi://localhost:1100/jmxrmi
+INFO  BrokerService                  - ActiveMQ 5.3-SNAPSHOT JMS Message Broker (BrokerB) is starting
+INFO  BrokerService                  - For help or more information please see: http://activemq.apache.org/
+INFO  AMQPersistenceAdapter          - Journal deleted: 
+INFO  KahaStore                      - Kaha Store successfully deleted data directory /tmp/brokerC/kr-store/data
+INFO  KahaStore                      - Kaha Store successfully deleted data directory /tmp/brokerC/kr-store/state
+INFO  KahaStore                      - Kaha Store using data directory /tmp/brokerC/kr-store/state
+INFO  ManagementContext              - JMX consoles can connect to service:jmx:rmi:///jndi/rmi://localhost:1101/jmxrmi
+INFO  AMQPersistenceAdapter          - Active data files: []
+INFO  BrokerService                  - ActiveMQ 5.3-SNAPSHOT JMS Message Broker (BrokerC) is starting
+INFO  BrokerService                  - For help or more information please see: http://activemq.apache.org/
+INFO  KahaStore                      - Kaha Store using data directory /tmp/brokerA/kr-store/data
+INFO  ManagementContext              - JMX consoles can connect to service:jmx:rmi:///jndi/rmi://localhost:1102/jmxrmi
+INFO  TransportServerThreadSupport   - Listening for connections at: tcp://localhost:61616
+INFO  TransportConnector             - Connector tcp://localhost:61616 Started
+INFO  NetworkConnector               - Network Connector localhost Started
+INFO  BrokerService                  - ActiveMQ JMS Message Broker (BrokerA, ID:andreas-giess-macbook-pro.local-49354-1239293359939-0:0) started
+ERROR: java.net.URISyntaxException: Illegal character in path at index 0: >
+java.net.URISyntaxException: Illegal character in path at index 0: >
+	at java.net.URI$Parser.fail(URI.java:2816)
+	at java.net.URI$Parser.checkChars(URI.java:2989)
+	at java.net.URI$Parser.parseHierarchical(URI.java:3073)
+	at java.net.URI$Parser.parse(URI.java:3031)
+	at java.net.URI.<init>(URI.java:578)
+	at org.apache.activemq.console.command.StartCommand.runTask(StartCommand.java:85)
+	at org.apache.activemq.console.command.AbstractCommand.execute(AbstractCommand.java:57)
+	at org.apache.activemq.console.command.ShellCommand.runTask(ShellCommand.java:129)
+	at org.apache.activemq.console.command.AbstractCommand.execute(AbstractCommand.java:57)
+	at org.apache.activemq.console.command.ShellCommand.main(ShellCommand.java:79)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.activemq.console.Main.runTaskClass(Main.java:225)
+	at org.apache.activemq.console.Main.main(Main.java:106)
+INFO  BrokerService                  - ActiveMQ Message Broker (BrokerA, ID:andreas-giess-macbook-pro.local-49354-1239293359939-0:0) is shutting down
+INFO  NetworkConnector               - Network Connector localhost Stopped
+INFO  KahaStore                      - Kaha Store using data directory /tmp/brokerB/kr-store/data
+INFO  TransportServerThreadSupport   - Listening for connections at: tcp://localhost:61618
+INFO  TransportConnector             - Connector tcp://localhost:61618 Started
+INFO  NetworkConnector               - Network Connector localhost Started
+INFO  BrokerService                  - ActiveMQ JMS Message Broker (BrokerB, ID:andreas-giess-macbook-pro.local-49357-1239293359991-0:0) started
+ERROR: java.net.URISyntaxException: Illegal character in path at index 0: >
+java.net.URISyntaxException: Illegal character in path at index 0: >
+	at java.net.URI$Parser.fail(URI.java:2816)
+	at java.net.URI$Parser.checkChars(URI.java:2989)
+	at java.net.URI$Parser.parseHierarchical(URI.java:3073)
+	at java.net.URI$Parser.parse(URI.java:3031)
+	at java.net.URI.<init>(URI.java:578)
+	at org.apache.activemq.console.command.StartCommand.runTask(StartCommand.java:85)
+	at org.apache.activemq.console.command.AbstractCommand.execute(AbstractCommand.java:57)
+	at org.apache.activemq.console.command.ShellCommand.runTask(ShellCommand.java:129)
+	at org.apache.activemq.console.command.AbstractCommand.execute(AbstractCommand.java:57)
+	at org.apache.activemq.console.command.ShellCommand.main(ShellCommand.java:79)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.activemq.console.Main.runTaskClass(Main.java:225)
+	at org.apache.activemq.console.Main.main(Main.java:106)
+INFO  BrokerService                  - ActiveMQ Message Broker (BrokerB, ID:andreas-giess-macbook-pro.local-49357-1239293359991-0:0) is shutting down
+INFO  NetworkConnector               - Network Connector localhost Stopped
+INFO  KahaStore                      - Kaha Store using data directory /tmp/brokerC/kr-store/data
+INFO  TransportServerThreadSupport   - Listening for connections at: tcp://localhost:61620
+INFO  TransportConnector             - Connector tcp://localhost:61620 Started
+INFO  NetworkConnector               - Network Connector localhost Started
+INFO  BrokerService                  - ActiveMQ JMS Message Broker (BrokerC, ID:andreas-giess-macbook-pro.local-49362-1239293360111-0:0) started
+ERROR: java.net.URISyntaxException: Illegal character in path at index 0: >
+java.net.URISyntaxException: Illegal character in path at index 0: >
+	at java.net.URI$Parser.fail(URI.java:2816)
+	at java.net.URI$Parser.checkChars(URI.java:2989)
+	at java.net.URI$Parser.parseHierarchical(URI.java:3073)
+	at java.net.URI$Parser.parse(URI.java:3031)
+	at java.net.URI.<init>(URI.java:578)
+	at org.apache.activemq.console.command.StartCommand.runTask(StartCommand.java:85)
+	at org.apache.activemq.console.command.AbstractCommand.execute(AbstractCommand.java:57)
+	at org.apache.activemq.console.command.ShellCommand.runTask(ShellCommand.java:129)
+	at org.apache.activemq.console.command.AbstractCommand.execute(AbstractCommand.java:57)
+	at org.apache.activemq.console.command.ShellCommand.main(ShellCommand.java:79)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.apache.activemq.console.Main.runTaskClass(Main.java:225)
+	at org.apache.activemq.console.Main.main(Main.java:106)
+INFO  BrokerService                  - ActiveMQ Message Broker (BrokerC, ID:andreas-giess-macbook-pro.local-49362-1239293360111-0:0) is shutting down
+INFO  NetworkConnector               - Network Connector localhost Stopped
+INFO  TransportConnector             - Connector tcp://localhost:61616 Stopped
+INFO  BrokerService                  - ActiveMQ JMS Message Broker (BrokerA, ID:andreas-giess-macbook-pro.local-49354-1239293359939-0:0) stopped
+INFO  TransportConnector             - Connector tcp://localhost:61618 Stopped
+INFO  BrokerService                  - ActiveMQ JMS Message Broker (BrokerB, ID:andreas-giess-macbook-pro.local-49357-1239293359991-0:0) stopped
+INFO  TransportConnector             - Connector tcp://localhost:61620 Stopped
+INFO  BrokerService                  - ActiveMQ JMS Message Broker (BrokerC, ID:andreas-giess-macbook-pro.local-49362-1239293360111-0:0) stopped

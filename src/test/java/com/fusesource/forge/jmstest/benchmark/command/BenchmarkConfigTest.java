@@ -22,8 +22,8 @@ import com.fusesource.forge.jmstest.executor.BenchmarkProbeWrapper;
 import com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory;
 
 @ContextConfiguration(locations={
-		"classpath:complete/benchmarks.xml",
-		"classpath:complete/beans.xml"})
+		"classpath:testScripts/complete/benchmarks.xml",
+		"classpath:testScripts/complete/beans.xml"})
 public class BenchmarkConfigTest extends AbstractTestNGSpringContextTests {
 
 	private String[] clientNames = {
@@ -55,7 +55,7 @@ public class BenchmarkConfigTest extends AbstractTestNGSpringContextTests {
 		if (config == null) {
 			config = (BenchmarkConfig)applicationContext.getBean("complete");
 			List<String> configLocations = new ArrayList<String>();
-			configLocations.add("src/test/resources/complete");
+			configLocations.add("src/main/resources/testScripts/complete");
 			config.setConfigLocations(configLocations);
 
 			Assert.assertEquals(config.getBenchmarkId(), "complete");

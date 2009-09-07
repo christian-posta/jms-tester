@@ -3,6 +3,7 @@
   <id>bin</id>
   <formats>
     <format>tar.gz</format>
+    <format>zip</format>
   </formats>
   <fileSets>
     <fileSet>
@@ -15,7 +16,7 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>src/main/testScripts</directory>
+      <directory>src/main/resources</directory>
       <outputDirectory>conf</outputDirectory>
       <includes>
         <include>**/*</include>
@@ -26,13 +27,6 @@
       <outputDirectory>lib</outputDirectory>
       <includes>
         <include>**/*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>src/main/resources</directory>
-      <outputDirectory>conf</outputDirectory>
-      <includes>
-        <include>log4j.properties</include>
       </includes>
     </fileSet>
     <fileSet>
