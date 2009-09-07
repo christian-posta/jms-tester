@@ -21,11 +21,11 @@ template: ~
 </head>
 <body>
   
-  <div id="navigation">
-  	<div class="wrapper">
-      {menu: {max_levels: 1, used_nodes: files}}
-  	</div>
-  </div>
+<div id="navigation">
+	<div class="wrapper">
+    {menu: {max_levels: 1, used_nodes: files}}
+	</div>
+</div>
   
 <% if context.node.node_info[:page].blocks.has_key?('overview') %>
   <div id="overview">
