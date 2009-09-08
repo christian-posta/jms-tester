@@ -41,21 +41,20 @@ sort_info: 1
         .spot-balloon
           %ul
             %li
-              %a(href="{relocatable: /community.html}") 
+              %a(href="{relocatable: /community.html}")
                 Discussions
             %li
-              %a(href="{project_issue_url:}") 
+              %a(href="{project_issue_url:}")
                 Issue Tracker
             %li
-              %a(href="{project_wiki_url:}") 
+              %a(href="{project_wiki_url:}")
                 Wiki
             %li
-              %a(href="{relocatable: /source.html}") 
+              %a(href="{relocatable: /source.html}")
                 Source Code
 
         %a(href='{relocatable: /community.html}')
           .main
             Join the community!
 
---- name:content
 
