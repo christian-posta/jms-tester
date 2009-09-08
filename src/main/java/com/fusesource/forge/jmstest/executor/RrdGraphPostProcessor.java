@@ -47,7 +47,7 @@ public class RrdGraphPostProcessor extends AbstractRRDPostProcessor {
 						graphDef.setStep(arch.getArcStep());
 						graphDef.setWidth(800);
 						graphDef.setHeight(600);
-						graphDef.line(dsName, Color.BLACK, probeName);
+						graphDef.line(dsName, Color.BLUE, probeName, 2.0f);
 						graphDef.setImageFormat("PNG");
 						graphDef.setFilename(getWorkDir().getAbsolutePath() + "/" + probeName + ".png");
 						RrdGraph graph = new RrdGraph(graphDef);

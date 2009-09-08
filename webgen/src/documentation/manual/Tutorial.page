@@ -5,3 +5,142 @@ title: JMSTester Tutorials
 --- name:content pipeline:tags,textile
 h1. Simple run
 
+Let us walk through the most simple run for {project_name:}. We simply want to run a one producer and one consumer 
+on a single destination. The producer shall produce 500, 600, 700 during 3 intervals of 10 seconds. We will run 
+this test against an ActiveMQ implementation that consists of only one broker. See "Starting ActiveMQ" for more details
+on how ActiveMQ can be started for our tests.
+
+h2. Start up the benchmarking framework 
+
+We assume that you have downloaded the binary distribution of {project_name:} and have extracted the downloaded archive 
+in a directory of your choice. We will refer to that directory as *$JMSTESTER_HOME* in this tutorial. 
+
+In the directory *$JMSTESTER_HOME* you will find a *bin* sub directory that contains all the necessary scripts to work 
+with {project_name:}. The script you need to bring up the framework is called *runBenchmark* (don't worry, we won't 
+break anything by executing it - yet;) ). 
+
+So, from $JMSTESTER_HOME execute:
+
+{coderay:: plaintext}
+  ./bin/runBenchmark -controller -clientNames TestClient -recorder -springConfigLocations conf/testScripts
+{coderay}
+  
+You will see the benchmarking framework start -- and do nothing, so what have we actually done? - Well, we have started
+a JVM hosting the components of the benchmarking framework.  
+
+* The *clientNames* option is a comma separated list of names to identify benchmarking clients. For each client name given 
+  a separate client instance would be started in the JVM. For now you don't need to bother with client names or configurations 
+  that accept more than one client - just keep in mind they are there in case you need them. 
+* A client does nothing by itself. It needs a *controller* to be run. So we have also started a controller in the JVM using 
+  the *controller* option. For it is sufficient to know, the benchmark front-ends will send commands to the controller 
+  (for example an execute benchmark command). 
+* Now we have a client and a controller instance, but these would not do any reporting. To enable reporting we also need 
+  to start the reporting engine using the *recorder* flag. The recorder will then record all data sent from the clients
+  in raw format and execute post-processors on the data after the benchmark has finished. You might be asking, which 
+  post-processors? - We have defined those with the *springConfigLocations* flag. This points at a directory containing 
+  one or more xml-files that are interpreted as spring configuration files. The recorder will execute all post-processors
+  that fulfill the BenchmarkPostProcessor interface. 
+
+h2. Execute the benchmark
+
+Now, that the benchmark framework is sitting there doing nothing, we could just as well submit a benchmark, right? Again, from 
+$JMSTESTER_HOME execute
+
+{coderay:: plaintext}
+  ./bin/runCommand -command submit:conf/testScripts/simple
+{coderay}
+  
+This will start a simple command line client and read in the spring configuration(s) in the given directory. In those 
+configurations the command line client will find all BenchmarkConfiguration objects and create a submit benchmark command 
+from them. The benchmarks will be submitted to the benchmark controller and there they will be executed one by one. 
+
+h2. Examine the benchmark results
+
+You have probably noticed something happened in the window were you started the benchmark framework after you have 
+submitted the benchmark. You will note a number of warnings, which can safely be ignored. They are just telling you
+that you have not configured spring objects for the message factory, the destination provider and the connection 
+provider. After the framework has created default objects for those, the benchmark is run and you will note log 
+messages like 
+
+{coderay:: plaintext}
+...BenchmarkIteration [testProfile1] stepping to 500 msg/s for 10 s]
+...BenchmarkIteration [testProfile1] stepping to 600 msg/s for 10 s]
+...BenchmarkIteration [testProfile1] stepping to 700 msg/s for 10 s]
+{coderay}
+
+So it seems that the benchmark runs exactly through the message rates we wanted. We will explain later in this document 
+how we achieved this. 
+
+Once the benchmark has finished, you will note log entries like:
+
+{coderay:: plaintext}
+... Creating Graph: CONSUMER-TestClient-simple-part1-0-Counter 2009-09-08-11:09:24-2009-09-08-11:09:54
+... Creating Graph: CONSUMER-TestClient-simple-part1-0-Latency 2009-09-08-11:09:24-2009-09-08-11:09:54
+... Creating Graph: CONSUMER-TestClient-simple-part1-0-MsgSize 2009-09-08-11:09:24-2009-09-08-11:09:54
+... Creating Graph: PRODUCER-TestClient-simple-part1-COUNTER 2009-09-08-11:09:24-2009-09-08-11:09:54
+... Written probe Values to : /Users/andreasgies/tmp/jmstester-1.0-SNAPSHOT/simple/benchmark.csv
+{coderay}
+
+This is telling you that the benchmark has been finished and that the os-processors have run. One Post-processor 
+has produced a graph for each metric that has been gathered throughout the benchmark, while another one has produced 
+a csv-file containing all the values that have been gathered for further processing with a spreadsheet processor of your choice.
+
+Have a look at the graph below to get an impression of the graphs that will be generated. The graph title is constructed
+from the client type, the benchmark id, the benchmark part id and the name of the metric. The graph title will also contain 
+the timestamps of when the benchmark was started and when the benchmark was finished.
+
+!{relocatable: ../../images/simple/PRODUCER-TestClient-simple-part1-COUNTER.png}!
+
+Finally let's have a look at a couple of lines of the generated csv file:
+
+{coderay:: plaintext}
+Timestamp,Date,CONSUMER-TestClient-simple-part1-0-Counter,CONSUMER-TestClient-simple-part1-0-Latency,CONSUMER-TestClient-simple-part1-0-MsgSize,PRODUCER-TestClient-simple-part1-COUNTER
+1252400964,2009-09-08-11:09:24,0,0.0,0.0,0
+1252400965,2009-09-08-11:09:25,492,0.7174796747967485,1000.0,493
+1252400966,2009-09-08-11:09:26,992,0.5389221556886223,1000.0,993
+...
+{coderay}
+
+The csv file contains a column for the raw time stamp (the number of seconds that have passed since January, 1st 1970 0:00), the time stamp in human readable form
+and a column for each metric that has been gathered.
+
+h2. The benchmark configuration
+
+After you have run the example above, you might want to look behind the curtain and study the benchmark configuration that we
+have used. So here it is
+
+{coderay:: {lang: xml, line_numbers: true}} 
+{include_file: {filename: ../src/main/resources/testScripts/simple/benchmarks.xml, process_output: true, escape_html: false}}
+{coderay}
+
+Let's walk through the configuration file step by step:
+
+# The most important thing the definition of the BenchmarkConfig in line 7, which contains references to all other objects (or their 
+  name if needed. 
+  ** First, we give the benchmark a name in line 8. The name of the benchmark will be part of the names for all metrics that will be 
+     gathered and also this is the name of a subdirectory the recorder will create to hold this benchmarks data.
+  ** The next option might seem a bit strange as it points to the configuration locations for this benchmark. You may think "hold on a 
+     second - config locations as properties when I am already in this object?" - Yes, consider a more complex scenario where you might 
+     want to keep the benchmark definitions separate from the profiles and/or the accompanying objects. Then you would have knowledge 
+     about the file containing the benchmark configuration file as such, but not necessarily about the other objects. 
+     <br/>
+     At the end of the day, the *configLocations* property holds a list of file and directory names, that is used to search for xml 
+     files, which would in turn be used to create a benchmark specific spring application context. 
+  ** In line 17 the ultimate definition of the benchmark starts. As you can see, a benchmark consists of one or more parts, where each part 
+     would specify the benchmark execution on one JMS destination. Having more than one part would allow you to simulate simultaneous 
+     traffic on various destinations in one benchmark. 
+     <br/>
+     As you can see the benchmark configuration allows you to set some basic JMS parameters. Note the number of consumers, 
+     this is the number of consumer for each client participating in the benchmark that is relevant for this benchmark part. 
+     If more than one producer client is identified, each of them will inject the message load defined in the profile. 
+     <br/>
+     The profile name references the bean name of a spring bean that implements *BenchmarkIteration*. 
+     <br/>
+     Further, the benchmark part references relevant clients by name. In our simple example we have started only one client named *TestClient*
+     and we use the special name *All*, so that all clients would be matched for consumers and producers.
+# I n line 34 you find the definition of a JMS connection factory object with the bean name *connectionFactory*. If the benchmark 
+  has no special settings regarding the connection factory to be used, the framework looks for the bean named *connectionFactory* 
+  and uses that for establishing JMS connections.
+# Last not least you see the definition of the load profile in line 38. Note that the profile has a name *testProfile1* which matches
+  the *profileName* attribute in the benchmark configuration. Apart from that the definition is straight forward: the profile 
+  starts at 500 msg/s and iterates to 700 msg/s in steps of 100 msg/s. Each iteration lasts 10 seconds. 
