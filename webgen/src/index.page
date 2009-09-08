@@ -19,21 +19,21 @@ sort_info: 1
         %h2
           Learn More
 
-        %a(href='{relocatable: /documentation}')
+        %a{:href => "{relocatable: /documentation}"}
           .main
             Documentation
             %br
-            %img(src='{relocatable: /images/spot-learn-more.jpg}')
+            %img{:src => "{relocatable: /images/spot-learn-more.jpg}"}
 
       %td
         %h2
           Get Started
 
-        %a(href='{relocatable: /images/spot-download-releases.jpg}')
+        %a{:href => "{relocatable: /download.html}"}
           .main
             Get the latest version here
             %br
-            %img(src='{relocatable: /images/spot-download-releases.jpg}')
+            %img{:src => "{relocatable: /images/spot-download-releases.jpg}"}
 
       %td
         %h2
@@ -41,19 +41,19 @@ sort_info: 1
         .spot-balloon
           %ul
             %li
-              %a(href="{relocatable: /community.html}")
+              %a{:href => "{relocatable: /community.html}"}
                 Discussions
             %li
-              %a(href="{project_issue_url:}")
+              %a{:href => "{project_issue_url:}"}
                 Issue Tracker
             %li
-              %a(href="{project_wiki_url:}")
+              %a{:href => "{project_wiki_url:}"}
                 Wiki
             %li
-              %a(href="{relocatable: /source.html}")
+              %a{:href => "{relocatable: /source.html}"}
                 Source Code
 
-        %a(href='{relocatable: /community.html}')
+        %a{:href => "{relocatable: /community.html}"}
           .main
             Join the community!
 
