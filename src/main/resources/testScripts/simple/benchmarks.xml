@@ -1,0 +1,45 @@
+<beans
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
+
+  <bean id="simple" class="com.fusesource.forge.jmstest.benchmark.BenchmarkConfig">
+    <property name="benchmarkId" value="simple" />
+    <property name="configLocations">
+    	<list>
+    		<bean class="java.lang.String">
+    		  <constructor-arg value="conf/testScripts/simple/" />
+    		</bean>
+    	</list>
+    </property>
+
+    <property name="benchmarkParts">
+	  <list>
+	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+	      <property name="partID" value="part1" />
+	      <property name="testDestinationName" value="queue:test1" />
+	      <property name="deliveryMode" value="NON_PERSISTENT" />
+	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+	      <property name="transacted" value="false" />
+	      <property name="numConsumers" value="1" />
+	      <property name="profileName" value="testProfile1" />
+	      <property name="producerClients" value="all" />
+	      <property name="consumerClients" value="all" />
+	    </bean>
+	  </list> 
+    </property>
+  </bean>    
+  
+  <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="tcp://localhost:61616" />
+  </bean>
+    
+  <bean id="testProfile1" class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration" scope="prototype">
+    <property name="name" value="testProfile1" />
+    <property name="duration"    value="10"/>
+    <property name="initialRate" value="500"/>
+    <property name="maxRate"     value="700" />
+    <property name="increment"   value="100" />
+  </bean>
+
+</beans>
