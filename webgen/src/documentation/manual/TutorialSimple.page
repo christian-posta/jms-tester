@@ -1,9 +1,11 @@
 ---
-title: JMSTester Tutorials
---- name:head pipeline:tags
-<link href="{relocatable: book.css}" rel="stylesheet" type="text/css" />
+title: JMSTester Simple Tutorial
+--- name:overview pipeline:tags,textile
+h1. {title:}
+
+Just get used to {project_name:}
+
 --- name:content pipeline:tags,textile
-h1. Simple run
 
 Let us walk through the most simple run for {project_name:}. We simply want to run a one producer and one consumer 
 on a single destination. The producer shall produce 500, 600, 700 during 3 intervals of 10 seconds. We will run 

@@ -3,12 +3,12 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
 
-  <bean id="benchmark1" class="com.fusesource.forge.jmstest.benchmark.BenchmarkConfig">
-    <property name="benchmarkId" value="benchmark-1" />
+  <bean id="probes" class="com.fusesource.forge.jmstest.benchmark.BenchmarkConfig">
+    <property name="benchmarkId" value="probes" />
     <property name="configLocations">
     	<list>
     		<bean class="java.lang.String">
-    		  <constructor-arg value="src/main/testScripts/com/fusesource/forge/jmstest/tests/MB526" />
+    		  <constructor-arg value="conf/testScripts/probes" />
     		</bean>
     	</list>
     </property>
@@ -31,17 +31,6 @@
 	      <property name="transacted" value="false" />
 	      <property name="numConsumers" value="1" />
 	      <property name="profileName" value="testProfile1" />
-	      <property name="producerClients" value="all" />
-	      <property name="consumerClients" value="all" />
-	    </bean>
-	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
-	      <property name="partID" value="part2" />
-	      <property name="testDestinationName" value="queue:test2" />
-	      <property name="deliveryMode" value="NON_PERSISTENT" />
-	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
-	      <property name="transacted" value="false" />
-	      <property name="numConsumers" value="1" />
-	      <property name="profileName" value="testProfile2" />
 	      <property name="producerClients" value="all" />
 	      <property name="consumerClients" value="all" />
 	    </bean>

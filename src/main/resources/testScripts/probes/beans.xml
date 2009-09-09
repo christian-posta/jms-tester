@@ -15,14 +15,6 @@
     <property name="increment"   value="100" />
   </bean>
   
-  <bean id="testProfile2" class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration" scope="prototype">
-    <property name="name" value="testProfile2" />
-    <property name="duration"    value="10"/>
-    <property name="initialRate" value="10000"/>
-    <property name="maxRate"     value="15000" />
-    <property name="increment"   value="1000" />
-  </bean>
-  
   <bean id="JMXConnector" class="com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory" >
     <property name="url" value="service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi" />
     <property name="username" value="smx" />
@@ -42,14 +34,9 @@
     <property name="attributeName" value="QueueSize" />
   </bean>
 
-  <bean id="test2Size" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-    <constructor-arg value="test2" />
-    <property name="jmxConnectionFactory" ref="JMXConnector" />
-    <property name="attributeName" value="QueueSize" />
-  </bean>
 
-  <!-- bean id="CpuMonitor" class="com.fusesource.forge.jmstest.probe.sigar.CpuStat" >
+  <bean id="CpuMonitor" class="com.fusesource.forge.jmstest.probe.sigar.CpuStat" >
     <property name="name" value="CpuMonitor" />
-  </bean -->
+  </bean>
 
 </beans>

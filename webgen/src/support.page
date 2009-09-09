@@ -8,17 +8,16 @@ sort_info: 55
 We can help!
 
 --- name:content pipeline:textile,tags
-You can get "Enterprise Support, Mentoring and Training":http://fusesource.com/enterprise-support/ from "fusesource.com":http://fusesource.com/ - please do <a href="http://fusesource.com/contact">get in touch</a> we'd love to help!
+This project was created by the FUSE consulting team to help you understand and apply FUSE software even better. Though there is no support you could purchase for this
+particular project, you can get "Enterprise Support, Mentoring and Training for all FUSE products":http://fusesource.com/enterprise-support/ from "fusesource.com":http://fusesource.com/. 
+Furthermore, our consultants would be glad to help you with your particular benchmarking scenario - please do <a href="http://fusesource.com/contact">get in touch</a> we'd love to help!
 
 You may also find the "Frequently Asked Questions (FAQ)":documentation/faq.html useful.
 
 We love feedback of all kinds; whether it's thoughts, suggestions, or bug reports. To submit feedback please use the <a href="{project_issue_url:}">{project_name:} Issue Tracker</a>.
-
 
 h3. See Also
 
   * "FAQ":documentation/faq.html
   * <a href="{project_issue_url:}">Issue Tracker</a>
   * <a href="http://fusesource.com/contact">Contact Us</a>
-  
-

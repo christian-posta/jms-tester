@@ -23,7 +23,7 @@ All the information you need to be become an expert with {project_name:}
     </td>
     <td>
       <h2>Manual</h2>
-      <a class='main' href='{relocatable: manual/overview.html}'>
+      <a class='main' href='{relocatable: manual/}'>
         <img src='{relocatable: /images/spot-manual.jpg}'/>
         <br />
         User Manual

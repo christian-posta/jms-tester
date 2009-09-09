@@ -1,12 +1,11 @@
 ---
 title: JMSTester User's Guide
---- name:head pipeline:tags
-<link href="{relocatable: book.css}" rel="stylesheet" type="text/css" />
---- name:content pipeline:tags,textile
+--- name:overview pipeline:tags,textile
 h1. {title:}
 
-h2. {project_name:} overview
+The place to go for questions about {project_name:}
 
+--- name:content pipeline:tags,textile
 As you are reading this introduction you have probably downloaded the JMS Test Framework. Why have you done that?
 There might be a number of reasons:
   

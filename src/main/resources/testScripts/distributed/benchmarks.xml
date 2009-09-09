@@ -38,7 +38,7 @@
     <property name="configLocations">
     	<list>
     		<bean class="java.lang.String">
-    		  <constructor-arg value="conf/complete" />
+    		  <constructor-arg value="conf/testScripts/complete" />
     		</bean>
     	</list>
     </property>
