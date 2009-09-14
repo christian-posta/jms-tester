@@ -92,7 +92,7 @@ public class CompositeBenchmarkIteration extends AbstractBenchmarkIteration {
 		for(BenchmarkIteration iteration: getIterations()) {
 			result += iteration.getTotalDuration();
 		}
-		return result;
+		return result * getRepititions();
 	}
 	
 	private void adjustCurrentSequence() {

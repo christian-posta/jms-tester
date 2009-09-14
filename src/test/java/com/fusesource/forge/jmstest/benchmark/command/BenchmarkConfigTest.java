@@ -18,6 +18,7 @@ import com.fusesource.forge.jmstest.benchmark.BenchmarkConfig;
 import com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.executor.BenchmarkClient;
 import com.fusesource.forge.jmstest.executor.BenchmarkController;
+import com.fusesource.forge.jmstest.executor.BenchmarkJMSConsumerWrapper;
 import com.fusesource.forge.jmstest.executor.BenchmarkProbeWrapper;
 import com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory;
 
@@ -27,8 +28,7 @@ import com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory;
 public class BenchmarkConfigTest extends AbstractTestNGSpringContextTests {
 
 	private String[] clientNames = {
-		"API-1", "API-2", "WebMail-1", "WebMail-2", "SMS-1", "SMS-2", 
-		"RPG-1", "RPG-2", "Monitor-1", "Monitor-2"
+		"ERP-1", "ERP-2", "DWH-1", "DWH-2", "Monitor-1", "Monitor-2"
 	};
 	
 	private BenchmarkConfig config = null;
@@ -53,26 +53,23 @@ public class BenchmarkConfigTest extends AbstractTestNGSpringContextTests {
 	
 	private BenchmarkConfig getConfig() {
 		if (config == null) {
-			config = (BenchmarkConfig)applicationContext.getBean("complete");
+			config = (BenchmarkConfig)applicationContext.getBean("distributed");
 			List<String> configLocations = new ArrayList<String>();
 			configLocations.add("src/main/resources/testScripts/distributed");
 			config.setConfigLocations(configLocations);
 
-			Assert.assertEquals(config.getBenchmarkId(), "complete");
+			Assert.assertEquals(config.getBenchmarkId(), "distributed");
 		}
 		return config;
 	}
 	
 	private void checkPartNames() {
 		String[] queuePartIDs = new String[] {
-			"eventEngineCommands", "webmailRelay", "sendUserSms", "sourceActivities",
-			"sendAppSms", "webmailRelayUserChange", "groupChanges", "webmailRelayContactChanges",
-			"relayToZyb"
+			"ERPToDWH", "DWHToERP"
 		};
 		
 		String[] topicPartIDs = new String[] {
-			"activities", "contactChanges", "identityChanges", "invitations", 
-			"profileChanges", "userChanges"
+			"Events"
 		};
 
 		List<BenchmarkPartConfig> parts = getConfig().getBenchmarkParts();
@@ -131,7 +128,6 @@ public class BenchmarkConfigTest extends AbstractTestNGSpringContextTests {
 	}
 	
 	private void checkBenchmarkParts() {
-		
 		for(BenchmarkPartConfig part: getConfig().getBenchmarkParts()) {
 			log().info("Analyzing Benchmark Part: " + part.getPartID());
 			Assert.assertTrue(part.getTestDestinationName().endsWith(part.getPartID()));
@@ -146,13 +142,27 @@ public class BenchmarkConfigTest extends AbstractTestNGSpringContextTests {
 				Assert.assertEquals(consumerCount, 2);
 				Assert.assertEquals(producerCount, 1);
 			}
+			
+			checkClients(part);
+		}
+	}
+
+	private void checkClients(BenchmarkPartConfig partConfig) {
+		for(String clientName: clientNames) {
+			BenchmarkClient client = new BenchmarkClient();
+			client.setName(clientName);
+			if (clientName.matches("(ERP|DWH)-(.)*")) {
+				BenchmarkJMSConsumerWrapper bcw = new BenchmarkJMSConsumerWrapper(client, partConfig);
+				String connFactoryName = bcw.getPreferredConnectionFactoryName();
+				Assert.assertTrue(connFactoryName.startsWith("node" + clientName.substring(clientName.length())));
+			}
 		}
 	}
 	
 	@Test
 	public void testBenchmarkConfig() {
 		String[] beanNames = getConfig().getApplicationContext().getBeanNamesForType(JMXConnectionFactory.class);
-		Assert.assertEquals(beanNames.length, 4);
+		Assert.assertEquals(beanNames.length, 2);
 		
 		beanNames = getConfig().getApplicationContext().getBeanNamesForType(ConnectionFactory.class);
 		Assert.assertEquals(beanNames.length, 2);
@@ -161,7 +171,6 @@ public class BenchmarkConfigTest extends AbstractTestNGSpringContextTests {
 		checkBenchmarkParts();
 		
 		Assert.assertEquals(matchingClients(2, null).size(), 2);
-
 	}
 	
 	private Log log() {

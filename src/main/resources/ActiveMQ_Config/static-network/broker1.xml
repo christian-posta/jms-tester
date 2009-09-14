@@ -20,11 +20,12 @@
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
   <bean id="store" class="org.apache.activemq.store.amq.AMQPersistenceAdapter" >
-    <property name="directory" value="~/tmp/broker1" />
+    <property name="directory" value="activemq-data/broker1" />
   </bean>
 
   <broker xmlns="http://activemq.org/config/1.0" 
-    useJmx="false" 
+    brokerName="broker1"
+    useJmx="true" 
     deleteAllMessagesOnStartup="true" 
     persistenceAdapter="#store" > 
 

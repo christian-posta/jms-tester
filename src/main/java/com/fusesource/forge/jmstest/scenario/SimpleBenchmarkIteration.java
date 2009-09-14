@@ -74,14 +74,13 @@ public class SimpleBenchmarkIteration extends AbstractBenchmarkIteration {
     		if (increment == 0) {
     			increment = 1;
     		}
-    		return maxRate - initialRate;
     	} 
     	return increment;
     }
 
     public long getRunsNeeded() {
-    	long result = (getMaxRate() - getInitialRate()) / getIncrement();
-    	if ((getMaxRate() - getInitialRate()) % getIncrement() == 0) {
+    	long result = ((getMaxRate() - getInitialRate()) / getIncrement()) + 1;
+    	if ((getMaxRate() - getInitialRate()) % getIncrement() != 0) {
     		result++;
     	}
     	return result;

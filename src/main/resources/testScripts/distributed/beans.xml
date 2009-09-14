@@ -5,11 +5,11 @@
 
   <!-- Definining a dedicated connectionFactory for each Node in the NWOB -->
   <bean id="node1_ConnFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-    <property name="brokerURL" value="failover:(tcp://localhost:61616,tcp://localhost:61618)?randomize=false" />
+    <property name="brokerURL" value="tcp://localhost:61616" />
   </bean>
     
   <bean id="node2_ConnFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
-    <property name="brokerURL" value="failover:(tcp://localhost:61620,tcp://localhost:61622)?randomize=false" />
+    <property name="brokerURL" value="tcp://localhost:61618" />
   </bean>
 
   <!-- Define some profiles  - all of them last 60 seconds -->
@@ -75,26 +75,14 @@
     </property>
   </bean>
 
-  <bean id="jmx-host1-Broker-1-1" class="com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory" >
+  <bean id="jmx-host1-Broker-1" class="com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory" >
     <property name="url" value="service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi" />
     <property name="username" value="smx" />
     <property name="password" value="smx" />
   </bean>
   
-  <bean id="jmx-host1-Broker-2-2" class="com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory" >
-    <property name="url" value="service:jmx:rmi:///jndi/rmi://localhost:1102/jmxrmi" />
-    <property name="username" value="smx" />
-    <property name="password" value="smx" />
-  </bean>
-
-  <bean id="jmx-host2-Broker-2-1" class="com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory" >
+  <bean id="jmx-host2-Broker-2" class="com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory" >
     <property name="url" value="service:jmx:rmi:///jndi/rmi://localhost:1100/jmxrmi" />
-    <property name="username" value="smx" />
-    <property name="password" value="smx" />
-  </bean>
-
-  <bean id="jmx-host2-Broker-1-2" class="com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory" >
-    <property name="url" value="service:jmx:rmi:///jndi/rmi://localhost:1101/jmxrmi" />
     <property name="username" value="smx" />
     <property name="password" value="smx" />
   </bean>
@@ -105,48 +93,13 @@
     <property name="attributeName" value="ThreadCount" />
   </bean>
 
-  <bean id="eventEngineCommandsSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-    <constructor-arg value="eventEngineCommands" />
+  <bean id="ERPToDWH-Size" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
+    <constructor-arg value="ERPToDWH" />
     <property name="attributeName" value="QueueSize" />
   </bean>
 
-  <bean id="webmailRelaySize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-    <constructor-arg value="webmailRelay" />
-    <property name="attributeName" value="QueueSize" />
-  </bean>
-
-  <bean id="sendUserSmsSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-    <constructor-arg value="sendUserSms" />
-    <property name="attributeName" value="QueueSize" />
-  </bean>
-
-  <bean id="sourceActivitiesSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-    <constructor-arg value="sourceActivities" />
-    <property name="attributeName" value="QueueSize" />
-  </bean>
-
-  <bean id="sendAppSmsSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-    <constructor-arg value="sendAppSms" />
-    <property name="attributeName" value="QueueSize" />
-  </bean>
-
-  <bean id="webmailRelayUserUserChangeSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-    <constructor-arg value="webmailRelayUserChange" />
-    <property name="attributeName" value="QueueSize" />
-  </bean>
-
-  <bean id="groupChangesSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-    <constructor-arg value="groupChanges" />
-    <property name="attributeName" value="QueueSize" />
-  </bean>
-
-  <bean id="webmailRelayContactChangesSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-    <constructor-arg value="webmailRelayContactChanges" />
-    <property name="attributeName" value="QueueSize" />
-  </bean>
-
-  <bean id="relayToZybSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
-    <constructor-arg value="relayToZyb" />
+  <bean id="DWHToERP-Size" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
+    <constructor-arg value="DWHToERP" />
     <property name="attributeName" value="QueueSize" />
   </bean>
 

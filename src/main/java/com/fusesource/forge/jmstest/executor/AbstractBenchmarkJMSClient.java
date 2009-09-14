@@ -78,14 +78,24 @@ public abstract class AbstractBenchmarkJMSClient extends AbstractBenchmarkClient
 		return clientId;
 	}
 	
-	private String getPreferredConnectionFactoryName() {
+	public String getPreferredConnectionFactoryName() {
+		
+		String result = null;
 		
 		for(String key: getPartConfig().getConnectionFactoryNames().keySet()) {
-			if (key.matches(getContainer().getClientInfo().getClientName())) {
-				return getPartConfig().getConnectionFactoryNames().get(key);
+			if (getContainer().getClientInfo().getClientName().matches(key)) {
+				result = getPartConfig().getConnectionFactoryNames().get(key);
+				break;
 			}
 		}
-		return JMSConnectionProvider.DEFAULT_CONNECTION_FACTORY_NAME + "-" + getContainer().getClientInfo().getClientName();
+		
+		if (result == null) {
+			result = JMSConnectionProvider.DEFAULT_CONNECTION_FACTORY_NAME + "-" + getContainer().getClientInfo().getClientName();
+		}
+		
+		log().debug("Preferred JMS Connection Factory Name is : " + result);
+		
+		return result;
 	}
 	
 	protected JMSConnectionProvider getJmsConnectionProvider() {

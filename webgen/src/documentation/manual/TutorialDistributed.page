@@ -1,146 +1,341 @@
 ---
-title: JMSTester Simple Tutorial
---- name:head pipeline:tags
-<link href="{relocatable: book.css}" rel="stylesheet" type="text/css" />
+title: JMSTester Distributed Tutorial
+--- name:overview pipeline:tags,textile
+h1. {title:}
+
+Learn how to define and execute a distributed benchmark
+
 --- name:content pipeline:tags,textile
-h1. Simple run
+So, you really want to use {project_name:} to simulate the messaging traffic with multiple hosts involved. 
+This tutorial should get you started with planning, defining and executing your benchmark. Before we actually get 
+our hands dirty: Whenever you get lost or you are not sure what a certain concept means, you can refer to the 
+"simple tutorial":{relocatable: TutorialSimple.html}, the "probe tutorial":{relocatable: TutorialProbes.html}
+the "documentation":{relocatable: index.html}.
 
-Let us walk through the most simple run for {project_name:}. We simply want to run a one producer and one consumer 
-on a single destination. The producer shall produce 500, 600, 700 during 3 intervals of 10 seconds. We will run 
-this test against an ActiveMQ implementation that consists of only one broker. See "Starting ActiveMQ" for more details
-on how ActiveMQ can be started for our tests.
+The first thing 
+you should get, is a picture of the scenario that you would like to run. We have done that already:
 
-h2. Start up the benchmarking framework 
+!{relocatable: ../../images/distributed/test-setup.png}!
 
-We assume that you have downloaded the binary distribution of {project_name:} and have extracted the downloaded archive 
-in a directory of your choice. We will refer to that directory as *$JMSTESTER_HOME* in this tutorial. 
+You can see, that our benchmark runs against an ActiveMQ network of two brokers that is distributed over 2 machines. 
+The message traffic itself is performed by 2 hypothetical applications. For each application we will define 
+two instances, one connected to each node of the network of brokers. For simplicity let's assume that the applications 
+are called *ERP* and *DWH*.
 
-In the directory *$JMSTESTER_HOME* you will find a *bin* sub directory that contains all the necessary scripts to work 
-with {project_name:}. The script you need to bring up the framework is called *runBenchmark* (don't worry, we won't 
-break anything by executing it - yet;) ). 
+The applications shall be tested for the following traffic:
 
-So, from $JMSTESTER_HOME execute:
+|_.From|_.To|_.Type|_.Destination|_.Message Rate|
+|ERP|DHW|Queue|ERP2DWH|500, with peeks to 1000 msg/s every for 15 seconds / minute|
+|DWH|ERP|Queue|ERP2DWH|500 flat|
+|ERP|DWH|Topic|Event|1000 flat|
 
-{coderay:: plaintext}
-  ./bin/runBenchmark -controller -clientNames TestClient -recorder -springConfigLocations conf/testScripts
+In addition we want to monitor the queue size for each queue on each broker throughout the benchmark. 
+
+Though the picture indicates that everything can be run distributed, the configuration files use localhost as 
+a host name, so that the example can be run locally as well.
+
+h2. Simulating Producers and Consumers
+
+All in all we need to simulate 2 applications with according consumers and producers to get a realistic behavior. 
+Those applications will be run in two instances on different machines, each connecting to a different JMS broker.
+
+Let us start with defining the connection factories to the ActiveMQ brokers, which are plain vanilla ActiveMQ 
+connection factory definitions:
+
+{coderay:: xml}
+  <bean id="node1_ConnFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="tcp://localhost:61616" />
+  </bean>
+    
+  <bean id="node2_ConnFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="tcp://localhost:61618" />
+  </bean>
+{coderay}
+
+h3. Matching JMS connections to clients
+
+Now we need to understand, how {project_name:} does find a connection factory. Each JMS Component run in the framework 
+has an optional property *connectionFactoryNames*, which can be populated with a map. They key to the map is a regular 
+expression, that will be matched against the names of the benchmarking clients. The value set for each key is the 
+name of a connection factory bean that will be used if the key matches the client name.
+
+If the property is not set or no match is found, the framework tries to find a bean with the name 
+
+{coderay:: java}
+beanName = "connectionFactory" + clientName;
+{coderay}
+
+If that is not found either, the framework uses 
+
+{coderay:: java}
+beanName = "connectionFactory";
+{coderay}
+
+If still no connection factory was found, the framework tries to find a bean implementing javax.jms.ConnectionFactory 
+and uses that. 
+
+With the explanation above in mind, we can now define the map for the connectionFactories:
+
+{coderay:: xml}
+  <bean id="connFactoryResolver" class="java.util.HashMap">
+    <constructor-arg>
+      <map>
+        <entry>
+          <key><bean class="java.lang.String"><constructor-arg value="(.)==*==-1" /></bean></key>
+          <value>node1_ConnFactory</value>
+        </entry>
+        <entry>
+          <key><bean class="java.lang.String"><constructor-arg value="(.)==*==-2" /></bean></key>
+          <value>node2_ConnFactory</value>
+        </entry>
+      </map>
+    </constructor-arg>
+  </bean>
+{coderay}
+
+With this we define, that all clients ending on *-1* use *node1_ConnFactory* and all clients ending on *-2* use
+*node2_ConnFactory*. Note that these names match the bean names we have used earlier for the connection factory 
+names.
+
+To activate that configuration, we must set the property *connectionFactoryNames* to the hashmap we have defined in 
+all benchmark part configurations. For example the definition for sending the messages from *ERP* to *DWH*:
+
+{coderay:: xml}
+<bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+  <property name="partID" value="ERPToDWH" />
+  <property name="testDestinationName" value="queue:ERPToDWH" />
+  <property name="deliveryMode" value="NON_PERSISTENT" />
+  <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
+  <property name="transacted" value="false" />
+  <property name="numConsumers" value="1" />
+  <property name="profileName" value="mediumProfile" />
+  <property name="producerClients" value="ERP==(.)*==" />
+  <property name="consumerClients" value="DWH==(.)*==" />
+  <property name="connectionFactoryNames" ref="connFactoryResolver" />
+</bean> 
+{coderay}
+
+The only thing that we need to remember now is to start our benchmark clients with the names *ERP-1*, *ERP-2*,
+*DHW-1* and *DWH-2*.
+                
+h2. Gathering statistics
+
+h3. Default Statistics
+
+Each producer will record the number of messages produced and report that number every second. Each consumer will record the number of 
+messages consumed, the message latency and the message size and will also report those every second. The metric names are prefixed with 
+the client type (PRODUCER|CONSUMER), the client name, the benchmark id and the part id, so that they can be easily identified. 
+
+So, in our example we would have the following probes:
+
+  * For Benchmark Part *ERPToDWH*
+  ** PRODUCER-ERP-1-distributed-ERPToDWH-COUNTER
+  ** PRODUCER-ERP-2-distributed-ERPToDWH-COUNTER
+  ** CONSUMER-DWH-1-distributed-ERPToDWH-Counter
+  ** CONSUMER-DWH-1-distributed-ERPToDWH-Latency
+  ** CONSUMER-DWH-1-distributed-ERPToDWH-MsgSize
+  * etc.
+
+h3. Additional Statistics
+  
+In addition you can run probes in dedicated benchmarking clients in order to measure a JMX metric or operating system level metric 
+on those machines. In our example we would like to measure the QueueSizes for *ERPToDWH* and *DHWToERP* and also the number of 
+current threads currently running in each of the brokers. In addition we would also like to monitor some statistics about the 
+memory consumption and the IO of the machines where the brokers are running. 
+
+To execute the probes, the benchmark framework knows a third client type *PROBER*. The prober in our example would be configured 
+in the benchmark configuration like this:
+
+{coderay:: xml}
+<property name="probeConfigurations">
+  <list>
+    <bean class="com.fusesource.forge.jmstest.benchmark.command.BenchmarkProbeConfig" >
+      <property name="clientNames" value="Monitor(.)*" />
+      <property name="jmxConnectionFactoryNames" ref="jmxFactoryResolver" />
+    </bean>
+  </list>
+</property>    
+{coderay}
+
+Here you can already see, that the probes will only be run in the benchmark clients that start with *Monitor*. 
+By default the probe runner will pick up all beans that fulfill the *Probe* interface, so in our example we would 
+pick up all probes.
+
+Next, let's have a look how the probes are defined. In the example configuration you will find entries like:
+
+{coderay:: xml}
+<bean id="CpuMonitor" class="com.fusesource.forge.jmstest.probe.sigar.CpuStat" >
+  <property name="name" value="CpuMonitor" />
+</bean>
+
+<bean id="FreeMemory" class="com.fusesource.forge.jmstest.probe.sigar.MemStat" >
+  <property name="name" value="FreeMemory" />
+  <property name="type" value="MEMORY_FREE" />
+</bean>
 {coderay}
   
-You will see the benchmarking framework start -- and do nothing, so what have we actually done? - Well, we have started
-a JVM hosting the components of the benchmarking framework.  
+for the operating system level probes. These probes will gather the operating system level metrics on the machine they are executed on
+every second and report those statistics to the *recorder*. In our example we need to run one instance of the OS level probes in each of the 
+monitoring clients.
 
-* The *clientNames* option is a comma separated list of names to identify benchmarking clients. For each client name given 
-  a separate client instance would be started in the JVM. For now you don't need to bother with client names or configurations 
-  that accept more than one client - just keep in mind they are there in case you need them. 
-* A client does nothing by itself. It needs a *controller* to be run. So we have also started a controller in the JVM using 
-  the *controller* option. For it is sufficient to know, the benchmark front-ends will send commands to the controller 
-  (for example an execute benchmark command). 
-* Now we have a client and a controller instance, but these would not do any reporting. To enable reporting we also need 
-  to start the reporting engine using the *recorder* flag. The recorder will then record all data sent from the clients
-  in raw format and execute post-processors on the data after the benchmark has finished. You might be asking, which 
-  post-processors? - We have defined those with the *springConfigLocations* flag. This points at a directory containing 
-  one or more xml-files that are interpreted as spring configuration files. The recorder will execute all post-processors
-  that fulfill the BenchmarkPostProcessor interface. 
+For the JMX related probes you will find entries like this in the example configuration files:
 
-h2. Execute the benchmark
+{coderay:: xml}
+<bean id="eventEngineCommandsSize" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
+  <constructor-arg value="eventEngineCommands" />
+  <property name="attributeName" value="QueueSize" />
+</bean>
+{coderay}
 
-Now, that the benchmark framework is sitting there doing nothing, we could just as well submit a benchmark, right? Again, from 
-$JMSTESTER_HOME execute
+This defines a JMX Probe which we would like to be executes against *broker-1* on node 1 and at the same time against *broker-2* on node 2. 
+Obviously we need 2 JMX Connections to help us connect with the brokers:
+
+{coderay:: xml}
+<bean id="jmx-host1-Broker-1" class="com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory" >
+  <property name="url" value="service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi" />
+  <property name="username" value="smx" />
+  <property name="password" value="smx" />
+</bean>
+  
+<bean id="jmx-host2-Broker-2" class="com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory" >
+  <property name="url" value="service:jmx:rmi:///jndi/rmi://localhost:1100/jmxrmi" />
+  <property name="username" value="smx" />
+  <property name="password" value="smx" />
+</bean>
+{coderay}
+
+Now we need to associate our JMX Probes with the correct JMX connection factories. To do that we follow a similar pattern as for the JMS connection
+factories with a subtle difference. Again, we define a map that will map from client name patterns to JMX connection factory bean names. The only 
+difference here is, that the factory name can also be a pattern. This would be required if we would run more than one JMX capable application on the 
+host of the benchmarking agent. 
+
+The rest is quite simple: During initialization the probe runner examines the patterns and creates one instance of a JMX probe for *ALL* JMX
+connection factories it finds in the map. If it doesn't find a JMX connection factory at all, it follows the same logic as the JMS clients, so 
+it will look for a bean named 
+
+{coderay:: java}
+  beanName = "jmxConnector-" + beanName;
+{coderay}
+
+If that is not found, it will look for a bean with the id
+
+{coderay:: java}
+  beanName = "jmxConnector";
+{coderay}
+
+As a last resort the probe runner will try to resolve a bean that is a *JMXConnectionHelper*.
+
+The final piece that is missing is the Map matching the clientNames to JMX connection factory names:
+
+{coderay:: xml}
+<bean id="jmxFactoryResolver" class="java.util.HashMap">
+  <constructor-arg>
+    <map>
+      <entry>
+        <key><bean class="java.lang.String"><constructor-arg value="==(.)*-1==" /></bean></key>
+        <value>==jmx-host1-(.)*==</value>
+      </entry>
+      <entry>
+        <key><bean class="java.lang.String"><constructor-arg value="==(.)*-2==" /></bean></key>
+        <value>==jmx-host2-(.)*==</value>
+      </entry>
+    </map>
+  </constructor-arg>
+</bean>
+{coderay}
+
+Digesting the above: If the client ends on *==-1==* we will use all JMX connection factories, that start with 
+*jmx-host1-* and accordingly all clients ending on *==-2==* will use all JMX connection factories starting with
+*jmx-host2-*. 
+
+The statistics collected are named 
 
 {coderay:: plaintext}
-  ./bin/runCommand -command submit:conf/testScripts/simple
+PROBE-<clientName>-<benchmarkId>-<probeName>
+{coderay}
+
+h2. Executing the benchmark
+
+We have provided all the configuration files to execute the benchmark on a single machine and leave it as a home work 
+to run the benchmark in a distributed fashion. 
+
+h3. Start the ActiveMQ brokers
+
+In *$JMSTESTER_HOME/conf/ActiveMQ_Config/static-network* you will find two broker configuration files that will help you to 
+start two ActiveMQ brokers that are connected to each other with a simple static network bride. *Broker1* will listen on 
+port 61616 for JMS connections and on port 1099 for JMX connections, while *Broker2* will use the ports 61618 and 1100.
+
+Assuming, that your ActiveMQ installation lives in *ACTIVEMQ_HOME*, you can start the brokers by 
+
+{coderay:: plaintext}
+$ACTIVEMQ_HOME/bin/activemq xbean:file:/$JMSTESTER_HOME/conf/ActiveMQ_Config/static-network/broker1.xml
+{coderay}
+
+or
+
+{coderay:: plaintext}
+$ACTIVEMQ_HOME/bin/activemq xbean:file:/$JMSTESTER_HOME/conf/ActiveMQ_Config/static-network/broker2.xml
+{coderay}
+
+h3. Start the Benchmark controller and recorder
+
+Next we will start the benchmark controller and recorder in a single JVM instance. As you probably already, the benchmark controller
+id the instance that controls all benchmarking agents and serves as a single point of contact for the benchmarking front-ends. The 
+recorder is the module that will collect all probe metrics and runs the post processors after the benchmark is done. 
+
+You can start these two components from a command line positioned in *JMSTESTER_HOME* with 
+
+{coderay:: plaintext}
+./bin/runBenchmark -controller -recorder -springConfigLocations conf/testScripts
+{coderay}
+
+The *springConfigLocations* parameter in this case points to a directory. The recorder will read the xml files in this directory
+and execute all BenchmarkPostProcessors found in the configuration files after each benchmark. In our case we have configured the graph 
+and the csv post processors. 
+
+h3. Start the Benchmark clients 
+
+To come close to a manner of running the benchmark framework distributed we will start 4 different JVMs with the following clients:
+
+  # ERP-1 and DWH-1
+  # ERP-2 and DWH-2
+  # Monitor-1
+  # Monitor-2
+  
+We will start different clientCombinations by using the *-clientNames* parameter together with the *-client* option when we use the 
+benchmark script from the *JMSTESTER_HOME* directory:
+
+{coderay:: plaintext}
+./bin/runBenchmark -client -clientNames ERP-1,DWH-1
 {coderay}
   
-This will start a simple command line client and read in the spring configuration(s) in the given directory. In those 
-configurations the command line client will find all BenchmarkConfiguration objects and create a submit benchmark command 
-from them. The benchmarks will be submitted to the benchmark controller and there they will be executed one by one. 
+h3. Execute the benchmark 
 
-h2. Examine the benchmark results
-
-You have probably noticed something happened in the window were you started the benchmark framework after you have 
-submitted the benchmark. You will note a number of warnings, which can safely be ignored. They are just telling you
-that you have not configured spring objects for the message factory, the destination provider and the connection 
-provider. After the framework has created default objects for those, the benchmark is run and you will note log 
-messages like 
+Now we can execute the benchmark using the commandLineClient from *JMSTESTER_HOME*:
 
 {coderay:: plaintext}
-...BenchmarkIteration [testProfile1] stepping to 500 msg/s for 10 s]
-...BenchmarkIteration [testProfile1] stepping to 600 msg/s for 10 s]
-...BenchmarkIteration [testProfile1] stepping to 700 msg/s for 10 s]
+./bin/runCommand -command submit:conf/testScripts/distributed
 {coderay}
 
-So it seems that the benchmark runs exactly through the message rates we wanted. We will explain later in this document 
-how we achieved this. 
+h2. Evaluate the benchmark
 
-Once the benchmark has finished, you will note log entries like:
+The benchmark will run for about a minute and at the end of the benchmark you will see, that the recorder instance generates all the graphs you have requested:
+
+*INSERT GRAPHS HERE*
+
+h2. Round and round again
+
+The graphs will indicate whether the JMS layer was able to sustain the message load that you have injected. If you see messqges piling up in a 
+particular destination, if the latency id to high, you might want to tune that particular aspect of your JMS environment.
+
+So, in a nutshell:
 
 {coderay:: plaintext}
-... Creating Graph: CONSUMER-TestClient-simple-part1-0-Counter 2009-09-08-11:09:24-2009-09-08-11:09:54
-... Creating Graph: CONSUMER-TestClient-simple-part1-0-Latency 2009-09-08-11:09:24-2009-09-08-11:09:54
-... Creating Graph: CONSUMER-TestClient-simple-part1-0-MsgSize 2009-09-08-11:09:24-2009-09-08-11:09:54
-... Creating Graph: PRODUCER-TestClient-simple-part1-COUNTER 2009-09-08-11:09:24-2009-09-08-11:09:54
-... Written probe Values to : /Users/andreasgies/tmp/jmstester-1.0-SNAPSHOT/simple/benchmark.csv
-{coderay}
-
-This is telling you that the benchmark has been finished and that the os-processors have run. One Post-processor 
-has produced a graph for each metric that has been gathered throughout the benchmark, while another one has produced 
-a csv-file containing all the values that have been gathered for further processing with a spreadsheet processor of your choice.
-
-Have a look at the graph below to get an impression of the graphs that will be generated. The graph title is constructed
-from the client type, the benchmark id, the benchmark part id and the name of the metric. The graph title will also contain 
-the timestamps of when the benchmark was started and when the benchmark was finished.
-
-!{relocatable: ../../images/simple/PRODUCER-TestClient-simple-part1-COUNTER.png}!
-
-Finally let's have a look at a couple of lines of the generated csv file:
-
-{coderay:: plaintext}
-Timestamp,Date,CONSUMER-TestClient-simple-part1-0-Counter,CONSUMER-TestClient-simple-part1-0-Latency,CONSUMER-TestClient-simple-part1-0-MsgSize,PRODUCER-TestClient-simple-part1-COUNTER
-1252400964,2009-09-08-11:09:24,0,0.0,0.0,0
-1252400965,2009-09-08-11:09:25,492,0.7174796747967485,1000.0,493
-1252400966,2009-09-08-11:09:26,992,0.5389221556886223,1000.0,993
-...
-{coderay}
-
-The csv file contains a column for the raw time stamp (the number of seconds that have passed since January, 1st 1970 0:00), the time stamp in human readable form
-and a column for each metric that has been gathered.
-
-h2. The benchmark configuration
-
-After you have run the example above, you might want to look behind the curtain and study the benchmark configuration that we
-have used. So here it is
-
-{coderay:: {lang: xml, line_numbers: true}} 
-{include_file: {filename: ../src/main/resources/testScripts/simple/benchmarks.xml, process_output: true, escape_html: false}}
-{coderay}
-
-Let's walk through the configuration file step by step:
-
-# The most important thing the definition of the BenchmarkConfig in line 7, which contains references to all other objects (or their 
-  name if needed. 
-  ** First, we give the benchmark a name in line 8. The name of the benchmark will be part of the names for all metrics that will be 
-     gathered and also this is the name of a subdirectory the recorder will create to hold this benchmarks data.
-  ** The next option might seem a bit strange as it points to the configuration locations for this benchmark. You may think "hold on a 
-     second - config locations as properties when I am already in this object?" - Yes, consider a more complex scenario where you might 
-     want to keep the benchmark definitions separate from the profiles and/or the accompanying objects. Then you would have knowledge 
-     about the file containing the benchmark configuration file as such, but not necessarily about the other objects. 
-     <br/>
-     At the end of the day, the *configLocations* property holds a list of file and directory names, that is used to search for xml 
-     files, which would in turn be used to create a benchmark specific spring application context. 
-  ** In line 17 the ultimate definition of the benchmark starts. As you can see, a benchmark consists of one or more parts, where each part 
-     would specify the benchmark execution on one JMS destination. Having more than one part would allow you to simulate simultaneous 
-     traffic on various destinations in one benchmark. 
-     <br/>
-     As you can see the benchmark configuration allows you to set some basic JMS parameters. Note the number of consumers, 
-     this is the number of consumer for each client participating in the benchmark that is relevant for this benchmark part. 
-     If more than one producer client is identified, each of them will inject the message load defined in the profile. 
-     <br/>
-     The profile name references the bean name of a spring bean that implements *BenchmarkIteration*. 
-     <br/>
-     Further, the benchmark part references relevant clients by name. In our simple example we have started only one client named *TestClient*
-     and we use the special name *All*, so that all clients would be matched for consumers and producers.
-# I n line 34 you find the definition of a JMS connection factory object with the bean name *connectionFactory*. If the benchmark 
-  has no special settings regarding the connection factory to be used, the framework looks for the bean named *connectionFactory* 
-  and uses that for establishing JMS connections.
-# Last not least you see the definition of the load profile in line 38. Note that the profile has a name *testProfile1* which matches
-  the *profileName* attribute in the benchmark configuration. Apart from that the definition is straight forward: the profile 
-  starts at 500 msg/s and iterates to 700 msg/s in steps of 100 msg/s. Each iteration lasts 10 seconds. 
+ while(!satisfied) {
+	 - Document the bottlenecks and how you would like to address them 
+	 - Implement the changes
+	 - Run the *SAME* benchmark again
+ }
+ {coderay}
+ 
+ 

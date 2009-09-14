@@ -19,13 +19,18 @@
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
   <bean id="store" class="org.apache.activemq.store.amq.AMQPersistenceAdapter" >
-    <property name="directory" value="~/tmp/broker2" />
+    <property name="directory" value="activemq-data/broker2" />
   </bean>
 
   <broker xmlns="http://activemq.org/config/1.0" 
-    useJmx="false" 
+    brokerName="broker2"
+    useJmx="true" 
     deleteAllMessagesOnStartup="true" 
     persistenceAdapter="#store" > 
+
+    <managementContext>
+      <managementContext connectorPort="1100" />
+    </managementContext>
 
     <transportConnectors>
       <transportConnector uri="tcp://localhost:61618"/>
@@ -38,17 +43,6 @@
       prefetchSize="1"/>
     </networkConnectors>
     
-	<destinationPolicy> 
-		<policyMap> 
-		   <policyEntries>
-			  <policyEntry queue=">" > 
-			    <prefetchPolicy>
-			      <prefetchPolicy queuePrefetch="1" />
-			    </prefetchPolicy>
-		     </policyEntry>
-	 	   </policyEntries>
-      </policyMap>
-   </destinationPolicy>
   </broker>
 
 </beans>
