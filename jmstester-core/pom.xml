@@ -24,12 +24,11 @@
 		<system>JIRA</system>
 		<url>http://fusesource.com/issues/browse/JMSTESTER</url>
 	</issueManagement>
-	
 	<scm>
-		<connection>scm:git:ssh://server_name[:port]/path_to_repository</connection>
-		<url>http://www.fusesource.com/forge/svn/jmstester/</url>
+		<connection>scm:svn:http://fusesource.com/forge/svn/jmstester/</connection>
+		<developerConnection>scm:svn:http://fusesource.com/forge/svn/jmstester/</developerConnection>
+		<url>http://fusesource.com/forge/svn/jmstester/</url>
 	</scm>
-	
 	<organization>
 		<name>FUSESource.com</name>
 		<url>http://www.fusesource.com</url>
