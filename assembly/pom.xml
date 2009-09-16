@@ -19,16 +19,6 @@
 			<artifactId>jmstester-core</artifactId>
 			<version>${version}</version>
 		</dependency>
-		<dependency>
-			<groupId>${groupId}</groupId>
-			<artifactId>jmstester-rrd</artifactId>
-			<version>${version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${groupId}</groupId>
-			<artifactId>jmstester-sigar</artifactId>
-			<version>${version}</version>
-		</dependency>
 	</dependencies>
 
   <build>
@@ -53,4 +43,22 @@
       </plugin>
 	</plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>progress</id>
+      <dependencies>
+	<dependency>
+  	  <groupId>${groupId}</groupId>
+	  <artifactId>jmstester-rrd</artifactId>
+	  <version>${version}</version>
+	</dependency>
+	<dependency>
+	  <groupId>${groupId}</groupId>
+	  <artifactId>jmstester-sigar</artifactId>
+	  <version>${version}</version>
+	  </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 </project>

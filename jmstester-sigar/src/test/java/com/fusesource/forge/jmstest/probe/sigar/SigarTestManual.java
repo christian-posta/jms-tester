@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
 
 import com.fusesource.forge.jmstest.probe.sigar.IOStat.IOStatType;
 
-public class SigarTest {
+public class SigarTestManual {
 	
 	@BeforeTest
 	public void addSigarLibs() {

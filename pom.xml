@@ -82,10 +82,8 @@
     </distributionManagement>  
 
 	<modules>
-		<module>jmstester-core</module>
-		<module>jmstester-rrd</module>
-		<module>jmstester-sigar</module>
-		<module>assembly</module>
+	  <module>jmstester-core</module>
+	  <module>assembly</module>
 	</modules>
 
 	<repositories>
@@ -325,4 +323,14 @@
       </plugin>
      </plugins>
   </reporting>
+
+  <profiles>
+    <profile>
+      <id>progress</id>
+      <modules>
+	<module>jmstester-rrd</module>
+	<module>jmstester-sigar</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

@@ -25,7 +25,7 @@ import com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory;
 @ContextConfiguration(locations={
 		"classpath:testScripts/distributed/benchmarks.xml",
 		"classpath:testScripts/distributed/beans.xml"})
-public class BenchmarkConfigTest extends AbstractTestNGSpringContextTests {
+public class BenchmarkConfigTestManual extends AbstractTestNGSpringContextTests {
 
 	private String[] clientNames = {
 		"ERP-1", "ERP-2", "DWH-1", "DWH-2", "Monitor-1", "Monitor-2"
