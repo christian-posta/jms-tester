@@ -42,6 +42,12 @@
 	  </license>
 	</licenses>
 
+	<modules>
+		<module>jmstester-core</module>
+		<module>jmstester-rrd</module>
+		<module>jmstester-sigar</module>
+	</modules>
+
 	<repositories>
 		<repository>
 			<id>open.iona.m2</id>

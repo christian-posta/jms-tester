@@ -1,4 +1,4 @@
-package com.fusesource.forge.jmstest.rrd;
+package com.fusesource.forge.jmstest.peristence;
 
 import java.io.File;
 import java.io.IOException;

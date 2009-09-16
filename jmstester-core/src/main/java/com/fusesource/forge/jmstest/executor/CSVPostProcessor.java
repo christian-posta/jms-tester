@@ -7,9 +7,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.fusesource.forge.jmstest.peristence.CSVSamplePersistenceAdapter;
 import com.fusesource.forge.jmstest.probe.BenchmarkProbeValue;
 import com.fusesource.forge.jmstest.probe.ProbeDescriptor;
-import com.fusesource.forge.jmstest.rrd.CSVSamplePersistenceAdapter;
 
 public class CSVPostProcessor extends  AbstractBenchmarkPostProcessor {
 	

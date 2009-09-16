@@ -107,7 +107,7 @@ public abstract class AbstractBenchmarkPostProcessor implements BenchmarkPostPro
 		return log;
 	}
 	
-	protected class SampleIterator implements Iterator<BenchmarkProbeValue> {
+	public class SampleIterator implements Iterator<BenchmarkProbeValue> {
 
 		private File workDir = null;
 		String[] fileNames = null;

@@ -12,10 +12,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfigurationException;
+import com.fusesource.forge.jmstest.peristence.BenchmarkSamplePersistenceAdapter;
 import com.fusesource.forge.jmstest.probe.AveragingProbe;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
-import com.fusesource.forge.jmstest.rrd.BenchmarkSamplePersistenceAdapter;
 
 public class BenchmarkConsumer extends AbstractJMSClientComponent implements MessageListener, Releaseable  {
     private transient Log log;

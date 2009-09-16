@@ -11,6 +11,6 @@
 	<artifactId>jmstester-core</artifactId>
 	
 	<packaging>jar</packaging>
-	<name>JMS Test Framework</name>
+	<name>JMS Test Framework - Core</name>
 
 </project>

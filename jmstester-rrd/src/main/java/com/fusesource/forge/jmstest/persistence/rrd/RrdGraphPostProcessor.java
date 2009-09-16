@@ -1,4 +1,4 @@
-package com.fusesource.forge.jmstest.executor;
+package com.fusesource.forge.jmstest.persistence.rrd;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;

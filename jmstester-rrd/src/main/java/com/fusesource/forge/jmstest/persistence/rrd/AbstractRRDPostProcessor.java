@@ -1,4 +1,4 @@
-package com.fusesource.forge.jmstest.executor;
+package com.fusesource.forge.jmstest.persistence.rrd;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -7,9 +7,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.fusesource.forge.jmstest.executor.AbstractBenchmarkPostProcessor;
 import com.fusesource.forge.jmstest.probe.BenchmarkProbeValue;
 import com.fusesource.forge.jmstest.probe.ProbeDescriptor;
-import com.fusesource.forge.jmstest.rrd.Rrd4jSamplePersistenceAdapter;
 
 public abstract class AbstractRRDPostProcessor extends  AbstractBenchmarkPostProcessor {
 	

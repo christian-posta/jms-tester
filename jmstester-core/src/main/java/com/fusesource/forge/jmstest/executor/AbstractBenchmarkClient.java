@@ -11,11 +11,11 @@ import com.fusesource.forge.jmstest.benchmark.BenchmarkConfig;
 import com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.benchmark.command.ClientId;
 import com.fusesource.forge.jmstest.benchmark.command.ClientType;
+import com.fusesource.forge.jmstest.peristence.BenchmarkSamplePersistenceAdapter;
+import com.fusesource.forge.jmstest.peristence.CommandSamplePersistenceAdapter;
 import com.fusesource.forge.jmstest.probe.Probe;
 import com.fusesource.forge.jmstest.probe.ProbeDescriptor;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
-import com.fusesource.forge.jmstest.rrd.BenchmarkSamplePersistenceAdapter;
-import com.fusesource.forge.jmstest.rrd.CommandSamplePersistenceAdapter;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
 
 public abstract class AbstractBenchmarkClient implements Releaseable {

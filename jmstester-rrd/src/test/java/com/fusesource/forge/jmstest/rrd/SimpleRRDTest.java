@@ -10,6 +10,7 @@ import org.rrd4j.core.RrdDb;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.fusesource.forge.jmstest.persistence.rrd.Rrd4jSamplePersistenceAdapter;
 import com.fusesource.forge.jmstest.probe.AbstractProbe;
 import com.fusesource.forge.jmstest.probe.Probe;
 import com.fusesource.forge.jmstest.probe.ProbeDescriptor;

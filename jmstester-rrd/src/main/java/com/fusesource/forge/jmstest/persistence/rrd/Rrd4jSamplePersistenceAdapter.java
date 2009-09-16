@@ -1,4 +1,4 @@
-package com.fusesource.forge.jmstest.executor;
+package com.fusesource.forge.jmstest.persistence.rrd;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +12,7 @@ import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDef;
 import org.rrd4j.core.Sample;
 
+import com.fusesource.forge.jmstest.peristence.ProbeAwarePeristenceAdapter;
 import com.fusesource.forge.jmstest.probe.BenchmarkProbeValue;
 import com.fusesource.forge.jmstest.probe.ProbeDescriptor;
 
