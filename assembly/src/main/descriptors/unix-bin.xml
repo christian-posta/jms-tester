@@ -3,9 +3,10 @@
   <id>bin</id>
   <formats>
     <format>tar.gz</format>
-    <format>zip</format>
   </formats>
+  
   <fileSets>
+    <!-- Just the start scripts to fire up the benchmark JVM's -->
     <fileSet>
       <directory>src/main/scripts/linux</directory>
       <outputDirectory>bin</outputDirectory>
@@ -15,28 +16,31 @@
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
+    
+    <!-- Include the tutorial samples -->
     <fileSet>
-      <directory>src/main/resources</directory>
+      <directory>../jmstester-core/src/main/resources</directory>
       <outputDirectory>conf</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>
     </fileSet>
+
+	<!-- Also include the documentation -->    
     <fileSet>
-      <directory>src/main/lib</directory>
-      <outputDirectory>lib</outputDirectory>
-      <includes>
-        <include>**/*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>target/site</directory>
+      <directory>../jmstester-core/target/site</directory>
       <outputDirectory>doc</outputDirectory>
     </fileSet>
   </fileSets>
+  
+  <!-- Copy all the dependencies to the archive -->
   <dependencySets>
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
+      <excludes>
+        <exclude>*:sigar</exclude>
+        <exclude>*:rrd4j</exclude>
+      </excludes>
     </dependencySet>
   </dependencySets>
 </assembly>
