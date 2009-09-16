@@ -8,9 +8,21 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>jmstester-core</artifactId>
+	<artifactId>jmstester-rrd</artifactId>
 	
 	<packaging>jar</packaging>
-	<name>JMS Test Framework</name>
+	<name>JMS Test Framework - RRD4J support</name>
 
+	<dependencies>
+		<dependency>
+			<groupId>net.java.dev.rrd4j</groupId>
+			<artifactId>rrd4j</artifactId>
+			<version>2.0.6</version>
+		</dependency>
+		<dependency>
+			<groupId>${groupId}</groupId>
+			<artifactId>jmstester-core</artifactId>
+			<version>${version}</version>
+		</dependency>
+	</dependencies>
 </project>

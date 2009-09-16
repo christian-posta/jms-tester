@@ -8,9 +8,22 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>jmstester-core</artifactId>
+	<artifactId>jmstester-sigar</artifactId>
 	
 	<packaging>jar</packaging>
-	<name>JMS Test Framework</name>
+	<name>JMS Test Framework - OS Level probes</name>
+	
+	<dependencies>
+		<dependency>
+			<groupId>${groupId}</groupId>
+			<artifactId>jmstester-core</artifactId>
+			<version>${version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hyperic</groupId>
+			<artifactId>sigar</artifactId>
+			<version>1.6.2.7</version>
+		</dependency>
+	</dependencies>
 
 </project>

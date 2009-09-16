@@ -1,4 +1,4 @@
-package com.fusesource.forge.jmstest.rrd;
+package com.fusesource.forge.jmstest.executor;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,7 +1,10 @@
-target/**
-test*/**
-test*
-temp*/**
-temp*
-jmstest.rrd
-webgen.cache
+**/target
+**/test*/**
+**/test*
+**/temp*/**
+**/temp*
+**/jmstest.rrd
+**/webgen.cache
+**/.project
+**/.classpath
+**/.settings
