@@ -3,24 +3,22 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
 
-  <bean id="probes" class="com.fusesource.forge.jmstest.benchmark.BenchmarkConfig">
-    <property name="benchmarkId" value="probes" />
+  <bean id="simple" class="com.fusesource.forge.jmstest.benchmark.BenchmarkConfig">
+    <property name="benchmarkId" value="simple" />
     <property name="configLocations">
     	<list>
     		<bean class="java.lang.String">
-    		  <constructor-arg value="conf/testScripts/probes" />
+    		  <constructor-arg value="conf/testScripts/simple/" />
     		</bean>
     	</list>
     </property>
 
 	<property name="probeConfigurations">
 		<list>
-			<bean class="com.fusesource.forge.jmstest.benchmark.command.BenchmarkProbeConfig" >
-			  <property name="clientNames" value="all" />
-			</bean>
+			<bean class="com.fusesource.forge.jmstest.benchmark.command.BenchmarkProbeConfig" />
 		</list>
 	</property>    
-	
+
     <property name="benchmarkParts">
 	  <list>
 	    <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
@@ -37,4 +35,41 @@
 	  </list> 
     </property>
   </bean>    
+  
+  <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+    <property name="brokerURL" value="tcp://localhost:61616" />
+  </bean>
+    
+  <bean id="testProfile1" class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration" scope="prototype">
+    <property name="name" value="testProfile1" />
+    <property name="duration"    value="10"/>
+    <property name="initialRate" value="500"/>
+    <property name="maxRate"     value="700" />
+    <property name="increment"   value="100" />
+  </bean>
+
+  <bean id="JMXConnector" class="com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory" >
+    <property name="url" value="service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi" />
+    <property name="username" value="smx" />
+    <property name="password" value="smx" />
+  </bean>
+  
+  <bean id="ThreadCounter" class="com.fusesource.forge.jmstest.probe.jmx.JMXProbe">
+    <property name="jmxConnectionFactory" ref="JMXConnector" />
+    <property name="name" value="ThreadCounter" />
+    <property name="objectNameString" value="java.lang:type=Threading" />
+    <property name="attributeName" value="ThreadCount" />
+  </bean>
+  
+  <bean id="test1Size" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
+    <constructor-arg value="test1" />
+    <property name="jmxConnectionFactory" ref="JMXConnector" />
+    <property name="attributeName" value="QueueSize" />
+  </bean>
+
+
+  <bean id="CpuMonitor" class="com.fusesource.forge.jmstest.probe.sigar.CpuStat" >
+    <property name="name" value="CpuMonitor" />
+  </bean>
+  
 </beans>

@@ -2,7 +2,6 @@ package com.fusesource.forge.jmstest.benchmark.command;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -209,24 +208,6 @@ public class BenchmarkCoordinator extends DefaultCommandHandler implements Relea
 			return result;
 		}
 		
-		private void addClientStates(ClientType clientType, BenchmarkPartConfig partCfg) {
-			
-			log().debug("Registering expected clients for Benchmark: " + config + "-" + partCfg.getPartID());
-			
-			StringTokenizer sTok = null;
-			if (clientType == ClientType.CONSUMER) {
-				sTok = new StringTokenizer(partCfg.getConsumerClients(), ",");
-			} else {
-				sTok = new StringTokenizer(partCfg.getProducerClients(), ",");
-			}
-			while(sTok.hasMoreTokens()) {
-				ClientId id = new ClientId(clientType, sTok.nextToken(), config.getBenchmarkId(), partCfg.getPartID());
-				BenchmarkRunStatus state = new BenchmarkRunStatus();
-				state.setState(BenchmarkRunStatus.State.SUBMITTED);
-				clientStates.put(id.toString(), state);
-			}
-		}
-		
 		public void run() {
 			log().info("Executing Benchmark: " + config.getBenchmarkId());
 			
@@ -235,12 +216,6 @@ public class BenchmarkCoordinator extends DefaultCommandHandler implements Relea
 			synchronized (clientStates) {
 				for(BenchmarkPartConfig partCfg: config.getBenchmarkParts()) {
 					partCfg.getPartID();
-					if (!partCfg.isAcceptAllConsumers()) {
-						addClientStates(ClientType.CONSUMER, partCfg);
-					}
-					if (!partCfg.isAcceptAllProducers()) {
-						addClientStates(ClientType.PRODUCER, partCfg);
-					}
 				}
 			}
 			

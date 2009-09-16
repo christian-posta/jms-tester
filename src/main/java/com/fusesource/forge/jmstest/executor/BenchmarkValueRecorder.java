@@ -45,6 +45,7 @@ public class BenchmarkValueRecorder extends AbstractBenchmarkExecutionContainer 
 		
 		for(String beanName: getApplicationContext().getBeanNamesForType(BenchmarkPostProcessor.class)) {
 			BenchmarkPostProcessor bpp = (BenchmarkPostProcessor)getApplicationContext().getBean(beanName);
+			log().debug("Found post processor : " + beanName + "(" + bpp.getClass().getSimpleName() + ")");
 			postProcessors.add(bpp);
 		}
 		return postProcessors;
