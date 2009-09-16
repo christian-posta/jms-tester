@@ -326,7 +326,7 @@ The benchmark will run for about a minute and at the end of the benchmark you wi
 h2. Round and round again
 
 The graphs will indicate whether the JMS layer was able to sustain the message load that you have injected. If you see messqges piling up in a 
-particular destination, if the latency id to high, you might want to tune that particular aspect of your JMS environment.
+particular destination, if the latency is to high, you might want to tune that particular aspect of your JMS environment.
 
 So, in a nutshell:
 

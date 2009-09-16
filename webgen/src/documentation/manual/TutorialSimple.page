@@ -112,7 +112,7 @@ After you have run the example above, you might want to look behind the curtain 
 have used. So here it is
 
 {coderay:: {lang: xml, line_numbers: true}} 
-{include_file: {filename: ../src/main/resources/testScripts/simple/benchmarks.xml, process_output: true, escape_html: false}}
+{include_file: {filename: ../jmstester-core/src/main/resources/testScripts/simple/benchmarks.xml, process_output: true, escape_html: false}}
 {coderay}
 
 Let's walk through the configuration file step by step:
