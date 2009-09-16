@@ -3,10 +3,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.fusesource.jmstester</groupId>
 	<artifactId>jmstester-parent</artifactId>
-	<packaging>pom</packaging>
 	<version>1.0-SNAPSHOT</version>
+
+	<packaging>pom</packaging>
 	<name>JMS Test Framework</name>
-	<url>http://forge.fusesource.com/projects/JMSTESTER</url>
+	<url>http://jmstester.fusesource.org</url>
+
+	<description>JMS Tester is a framework for simulating and benchmarking JMS based applications.</description>
 
 	<properties>
 		<java.version>1.5</java.version>		
@@ -19,28 +22,64 @@
 		<testng.version>5.8</testng.version>
 		<mockito.version>1.7</mockito.version>
 	</properties>
+
+	<inceptionYear>2005-2009</inceptionYear>	
 	
 	<issueManagement>
-		<system>JIRA</system>
+		<system>jira</system>
 		<url>http://fusesource.com/issues/browse/JMSTESTER</url>
 	</issueManagement>
-	
-	<scm>
-		<connection>scm:git:ssh://git@forge.fusesource.com/jmstester.git</connection>
-	</scm>
+
+	<mailingLists>
+		<mailingList>
+     		<name>jansi dev</name>
+     		<post>jansi-dev@fusesource.org</post>
+     		<subscribe>jansi-dev-subscribe@fusesource.org</subscribe>
+   		</mailingList>
+   		<mailingList>
+     		<name>jansi commits</name>
+     		<post>jansi-commits@fusesource.org</post>
+     		<subscribe>jansi-commits-subscribe@fusesource.org</subscribe>
+   		</mailingList>
+ 	</mailingLists>
+
+    <scm>
+      <connection>scm:git:git://forge.fusesource.com/jmstester.git</connection>
+      <developerConnection>scm:git:ssh://git@forge.fusesource.com/jmstester.git</developerConnection>
+      <url>http://fusesource.com/forge/gitweb?p=jmstester.git</url>
+    </scm>
 	
 	<organization>
 		<name>FUSESource.com</name>
 		<url>http://www.fusesource.com</url>
 	</organization>
 	
-	<licenses>
-	  <license>
-	    <name>Apache 2.0</name>
-	    <url>http://www.apache.org/licenses/LICENSE-2.0</url>
-	    <distribution>repo</distribution>
-	  </license>
-	</licenses>
+    <licenses>
+      <license>
+        <name>The Apache Software License, Version 2.0</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
+
+    <distributionManagement>
+      <repository>
+        <id>release.fusesource.org</id>
+        <name>RestMQ Release Repository</name>
+        <url>dav:http://fusesource.com/forge/dav/jmstester/repo/release</url>
+      </repository>
+      <snapshotRepository>
+        <uniqueVersion>false</uniqueVersion>
+        <id>snapshot.fusesource.org</id>
+        <name>RestMQ Snapshot Repository</name>
+        <url>dav:http://fusesource.com/forge/dav/jmstester/repo/snapshot</url>
+      </snapshotRepository>
+      <site>
+        <id>website.fusesource.org</id>
+        <name>website</name>
+        <url>dav:http://fusesource.com/forge/dav/jmstester/maven/${artifactId}/${version}</url>
+      </site>
+    </distributionManagement>  
 
 	<modules>
 		<module>jmstester-core</module>
@@ -190,6 +229,13 @@
 	</dependencies>
 
 	<build>
+	    <extensions>
+	      <extension>
+	        <groupId>org.apache.maven.wagon</groupId>
+	        <artifactId>wagon-webdav-jackrabbit</artifactId>
+	        <version>1.0-beta-5</version>
+	      </extension>
+	    </extensions>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -248,8 +294,10 @@
         <reportSets>
           <reportSet>
             <reports>
-              <report>dependencies</report>
+              <report>mailing-list</report>
+              <report>issue-tracking</report>
               <report>license</report>
+              <report>scm</report>
             </reports>
           </reportSet>
         </reportSets>
