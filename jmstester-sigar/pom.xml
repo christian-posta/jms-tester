@@ -12,18 +12,23 @@
 	
 	<packaging>jar</packaging>
 	<name>JMS Test Framework - OS Level probes</name>
-	
-	<dependencies>
+
+  <profiles>
+    <profile>
+      <id>progress</id>
+	   <dependencies>
 		<dependency>
 			<groupId>${groupId}</groupId>
 			<artifactId>jmstester-core</artifactId>
 			<version>${version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.hyperic</groupId>
+			<groupId>org.fusesource.jmstester.hyperic</groupId>
 			<artifactId>sigar</artifactId>
-			<version>1.6.2.7</version>
+			<version>1.6.3</version>
 		</dependency>
-	</dependencies>
-
+  	  </dependencies>
+    </profile>
+  </profiles>
+  
 </project>

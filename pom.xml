@@ -109,17 +109,17 @@
 				<enabled>false</enabled>
 			</releases>
 		</repository>
-		<!-- RRD4J wasn't in a central maven repo, so we keep it in our svn for now -->
-	    <repository>
-	      <id>jrrd4j</id>
-	      <url>http://fusesource.com/forge/svn/jmstester/maven</url>
-    	  <snapshots>
-			<enabled>false</enabled>
-		  </snapshots>
-		  <releases>
-			<enabled>true</enabled>
-		  </releases>
-	    </repository>
+        <repository>
+			<id>open.iona.m2-internal</id>
+			<name>IONA Open Source Community Internal Repository</name>
+			<url>http://repo.fusesource.com/maven2-internal</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+        </repository>
     </repositories>
 	
 	<dependencies>
@@ -328,9 +328,10 @@
     <profile>
       <id>progress</id>
       <modules>
-	<module>jmstester-rrd</module>
-	<module>jmstester-sigar</module>
+	    <module>jmstester-rrd</module>
+	    <module>jmstester-sigar</module>
       </modules>
+      
     </profile>
   </profiles>
 </project>

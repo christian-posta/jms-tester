@@ -13,9 +13,13 @@
 	<packaging>jar</packaging>
 	<name>JMS Test Framework - RRD4J support</name>
 
-	<dependencies>
+	
+  <profiles>
+    <profile>
+      <id>progress</id>
+	   <dependencies>
 		<dependency>
-			<groupId>net.java.dev.rrd4j</groupId>
+			<groupId>org.fusesource.jmstester.rrd4j</groupId>
 			<artifactId>rrd4j</artifactId>
 			<version>2.0.6</version>
 		</dependency>
@@ -24,5 +28,8 @@
 			<artifactId>jmstester-core</artifactId>
 			<version>${version}</version>
 		</dependency>
-	</dependencies>
+	  </dependencies>
+    </profile>
+  </profiles>
+	
 </project>
