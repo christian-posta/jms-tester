@@ -5,54 +5,82 @@ title: Building
 # How to Build {project_name:}
 The way most developers get started contributing to a project.
 
---- name:content 
+--- name:content pipeline:tags,textile
 
-## Building 
+h2. Building 
 
-{project_name:} uses [Maven](http://maven.apache.org/) as its build tool. If you don't fancy using Maven you can use your IDE directly or [Download](download.html) a distribution or JAR.
+{project_name:} uses "Maven":http://maven.apache.org/ as its build tool. If you don't fancy using Maven you can use your IDE directly or "Download":{relocatable: download.html} a distribution or JAR.
 
-### Prequisites
+h3. Prequisites
 
 *Required:*
-* Download and [install Maven](http://maven.apache.org/download.html)
-* Get the latest [Source](source.html)
+* Download and "install Maven":http://maven.apache.org/download.html
+* Get the latest "Source":{relocatable: source.html}
 * Java 1.5
 
-### Maven options
+h3. Additional libraries
+
+If you are not a Progress Software employee, you must dowload and install additional libraries before you can build the complete project. If you omit 
+the additional download, you will only be able to build {project_name:}-core without graphical results and operating system level probes. 
+
+We use "Hyperic's Sigar library":http://www.hyperic.com/products/sigar.html to realise operating system level probes. The code for this is in the {project_name:}-sigar
+module in the source code. Please download the sigar binaries and unzip the archive in a directory of your choice, let's say **$SIGAR_HOME**. 
+
+Then import the *sigar.jar* library into you local maven repository with 
+
+{coderay:: plaintext}
+mvn install:install-file -Dfile=$SIGAR_HOME/sigar-bin/lib/sigar.jar -DartifactId=sigar -Dversion=1.6.3 -DgroupId=org.fusesource.jmstester.hyperic -Dpackaging=jar
+{coderay}
+
+We use "RRD4J":https://rrd4j.dev.java.net/ to create the metric graphs for the benchmarks. You must download the sources of RRD4J and build it with 
+a JDK 5 or higher. Once you have done that, you will find a *rrd4j-2.0.6.jar* in the rrd4j lib directory. You must import that library into your local 
+maven repository using
+
+{coderay:: plaintext}
+mvn install:install-file -Dfile=$PATH_TO_LIIB/rrd4j-2.0.6.jar -DartifactId=rrd4j -Dversion=2.06 -DgroupId=org.fusesource.jmstester.rrd4j -Dpackaging=jar
+{coderay}
+
+h3. Maven options
 
 To build {project_name:} maven has to be configured to use more memory
 
-    set MAVEN_OPTS=-Xmx512m -XX:MaxPermSize=128m
+{coderay:: plaintext}set MAVEN_OPTS=-Xmx512m -XX:MaxPermSize=128m{coderay}
 
-### A normal build
+h3. A normal build
 
-    mvn install
+Assuming that you are either a Progress employee or have downloaded and installed the additional libraries as mentioned above, 
+you can do a full build of {project_name:} with 
 
-### Doing a Quick Build
+{coderay:: plaintext}mvn install -P progress{coderay}
+
+If you haven't installed the additional libraries, you can just rebuild the core of {project_name:} with
+
+{coderay:: plaintext}mvn install{coderay}
+
+h3. Doing a Quick Build
 
 The following avoids running all the unit test cases, we just skip the test running phase and not the building part
 
-    mvn -Dtest=false clean install
+{coderay:: plaintext}mvn -Dtest=false clean install <-P progress>{coderay}
 
-### Using an IDE
+h3. Using an IDE
 
 If you prefer to use an IDE then you can auto-generate the IDE's project files using maven plugins. e.g.
 
-    mvn eclipse:eclipse
+{coderay:: plaintext}mvn eclipse:eclipse{coderay}
   
 or
 
-    mvn idea:idea
+{coderay:: plaintext}mvn idea:idea{coderay}
 
-### Importing into Eclipse
+h3. Importing into Eclipse
 
 If you have not already done so, you will need to make Eclipse aware of the Maven repository so that it can build everything. In the preferences, go to `Java -> Build Path -> Classpath` and define a new Classpath Variable named `M2_REPO` that points to your local Maven repository. i.e. `~/.m2/repository` on Unix and `c:\Documents and Settings\$username\.m2\repository` on Windows).
 
 You can also get Maven to do this for you:
 
-    mvn eclipse:add-maven-repo -Declipse.workspace=/path/to/the/workspace/ 
+{coderay:: plaintext}mvn eclipse:add-maven-repo -Declipse.workspace=/path/to/the/workspace/{coderay}
 
-
-### See Also
+h3. See Also
 
 * [Source](source.html)
