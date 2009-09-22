@@ -82,6 +82,7 @@
     </distributionManagement>  
 
 	<modules>
+	  <module>build-tools</module>
 	  <module>jmstester-core</module>
 	  <module>assembly</module>
 	</modules>
@@ -257,6 +258,16 @@
 					</systemProperties>
 				</configuration>
 			</plugin>
+            <plugin>
+              <artifactId>maven-checkstyle-plugin</artifactId>
+              <dependencies>
+                <dependency>
+                  <groupId>${groupId}</groupId>
+                  <artifactId>jmstester-tools</artifactId>
+                  <version>${version}</version>
+                </dependency>
+              </dependencies>
+            </plugin>
 	    </plugins>
 	</build>
 
@@ -299,6 +310,14 @@
             </reports>
           </reportSet>
         </reportSets>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <configLocation>checkstyle.xml</configLocation>
+        </configuration>
       </plugin>
 
       <plugin>

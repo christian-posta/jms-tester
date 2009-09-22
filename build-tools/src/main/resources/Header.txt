@@ -14,25 +14,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.fusesource.forge.jmstest.benchmark;
-
-public class BenchmarkConfigurationException extends RuntimeException {
-
-  private static final long serialVersionUID = 5077556607340469713L;
-
-  public BenchmarkConfigurationException() {
-    super();
-  }
-
-  public BenchmarkConfigurationException(String message) {
-    super(message);
-  }
-
-  public BenchmarkConfigurationException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public BenchmarkConfigurationException(Throwable cause) {
-    super(cause);
-  }
-}

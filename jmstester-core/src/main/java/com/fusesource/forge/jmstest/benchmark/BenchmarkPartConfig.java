@@ -1,9 +1,18 @@
-/**
- *  Copyright (C) 2008 Progress Software, Inc. All rights reserved.
- *  http://fusesource.com
+/*
+ * Copyright (C) 2009, Progress Software Corporation and/or its
+ * subsidiaries or affiliates.  All rights reserved.
  *
- *  The software in this package is published under the terms of the AGPL license
- *  a copy of which has been included with this distribution in the license.txt file.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.fusesource.forge.jmstest.benchmark;
 
@@ -17,284 +26,279 @@ import com.fusesource.forge.jmstest.config.DeliveryMode;
 
 public class BenchmarkPartConfig implements Serializable {
 
-	private static final long serialVersionUID = -6606481736821036885L;
-	
-	private BenchmarkConfig parent;
-	private String partID = null;
-    private AcknowledgeMode acknowledgeMode;
-	private DeliveryMode deliveryMode;
-    private boolean transacted;
-    private int numConsumers = 1;
-	private String testDestinationName;
-	private int transactionBatchSize = 1;
-	private String profileName;
-	private String consumerClients = "ALL";
-	private String producerClients = "ALL";
-	private Map<String, String> connectionFactoryNames = null;
-	private String jmsDestinationProviderName = null;
-	private String messageFactoryName = null;
-	private int maxConsumerRatePerThread = 1000;
+  private static final long serialVersionUID = -6606481736821036885L;
 
-    public BenchmarkConfig getParent() {
-		return parent;
-	}
+  private BenchmarkConfig parent;
+  private String partID = null;
+  private AcknowledgeMode acknowledgeMode;
+  private DeliveryMode deliveryMode;
+  private boolean transacted;
+  private int numConsumers = 1;
+  private String testDestinationName;
+  private int transactionBatchSize = 1;
+  private String profileName;
+  private String consumerClients = "ALL";
+  private String producerClients = "ALL";
+  private Map<String, String> connectionFactoryNames = null;
+  private String jmsDestinationProviderName = null;
+  private String messageFactoryName = null;
+  private int maxConsumerRatePerThread = 1000;
 
-	public void setParent(BenchmarkConfig parent) {
-		this.parent = parent;
-	}
+  public BenchmarkConfig getParent() {
+    return parent;
+  }
 
-	public String getPartID() {
-		if (partID == null) {
-			partID = UUID.randomUUID().toString();
-		}
-		return partID;
-	}
+  public void setParent(BenchmarkConfig parent) {
+    this.parent = parent;
+  }
 
-	public void setPartID(String partID) {
-		this.partID = partID;
-	}
+  public String getPartID() {
+    if (partID == null) {
+      partID = UUID.randomUUID().toString();
+    }
+    return partID;
+  }
 
-	public boolean isAcceptAllProducers() {
-		return getProducerClients().equalsIgnoreCase("all");
-	}
+  public void setPartID(String partID) {
+    this.partID = partID;
+  }
 
-	public String getProducerClients() {
-		return producerClients;
-	}
+  public boolean isAcceptAllProducers() {
+    return getProducerClients().equalsIgnoreCase("all");
+  }
 
-	public void setProducerClients(String producerClients) {
-		this.producerClients = producerClients;
-	}
+  public String getProducerClients() {
+    return producerClients;
+  }
 
-	public boolean isAcceptAllConsumers() {
-		return getConsumerClients().equalsIgnoreCase("all");
-	}
-	
-	public String getConsumerClients() {
-		return consumerClients;
-	}
+  public void setProducerClients(String producerClients) {
+    this.producerClients = producerClients;
+  }
 
-	public void setConsumerClients(String consumerClients) {
-		this.consumerClients = consumerClients;
-	}
+  public boolean isAcceptAllConsumers() {
+    return getConsumerClients().equalsIgnoreCase("all");
+  }
 
-   public void setAcknowledgeMode(AcknowledgeMode acknowledgeMode) {
-		this.acknowledgeMode = acknowledgeMode;
-	}
-    
-    public AcknowledgeMode getAcknowledgeMode() {
-		return acknowledgeMode;
-	}
+  public String getConsumerClients() {
+    return consumerClients;
+  }
 
-    public void setDeliveryMode(DeliveryMode deliveryMode) {
-		this.deliveryMode = deliveryMode;
-	}
-    
-    public DeliveryMode getDeliveryMode() {
-		return deliveryMode;
-	}
+  public void setConsumerClients(String consumerClients) {
+    this.consumerClients = consumerClients;
+  }
 
-    public void setTransacted(boolean transacted) {
-		this.transacted = transacted;
-	}
-    
-    public boolean isTransacted() {
-		return transacted;
-	}
+  public void setAcknowledgeMode(AcknowledgeMode acknowledgeMode) {
+    this.acknowledgeMode = acknowledgeMode;
+  }
 
-    public int getNumConsumers() {
-		return numConsumers;
-	}
+  public AcknowledgeMode getAcknowledgeMode() {
+    return acknowledgeMode;
+  }
 
-	public void setNumConsumers(int numConsumers) {
-		this.numConsumers = numConsumers;
-	}
+  public void setDeliveryMode(DeliveryMode deliveryMode) {
+    this.deliveryMode = deliveryMode;
+  }
 
-	public String getTestDestinationName() {
-		return testDestinationName;
-	}
+  public DeliveryMode getDeliveryMode() {
+    return deliveryMode;
+  }
 
-	public void setTestDestinationName(String testDestinationName) {
-		this.testDestinationName = testDestinationName;
-	}
+  public void setTransacted(boolean transacted) {
+    this.transacted = transacted;
+  }
 
-	public int getTransactionBatchSize() {
-		return transactionBatchSize;
-	}
+  public boolean isTransacted() {
+    return transacted;
+  }
 
-	public void setTransactionBatchSize(int transactionBatchSize) {
-		this.transactionBatchSize = transactionBatchSize;
-	}
+  public int getNumConsumers() {
+    return numConsumers;
+  }
 
-	public String getProfileName() {
-		return profileName;
-	}
+  public void setNumConsumers(int numConsumers) {
+    this.numConsumers = numConsumers;
+  }
 
-	public void setProfileName(String profileName) {
-		this.profileName = profileName;
-	}
+  public String getTestDestinationName() {
+    return testDestinationName;
+  }
 
-	public Map<String, String> getConnectionFactoryNames() {
-		if (connectionFactoryNames == null) {
-			connectionFactoryNames = new HashMap<String, String>();
-		}
-		return connectionFactoryNames;
-	}
+  public void setTestDestinationName(String testDestinationName) {
+    this.testDestinationName = testDestinationName;
+  }
 
-	public void setConnectionFactoryNames(Map<String, String> connectionFactoryNames) {
-		this.connectionFactoryNames = connectionFactoryNames;
-	}
+  public int getTransactionBatchSize() {
+    return transactionBatchSize;
+  }
 
-	public String getJmsDestinationProviderName() {
-		return jmsDestinationProviderName;
-	}
+  public void setTransactionBatchSize(int transactionBatchSize) {
+    this.transactionBatchSize = transactionBatchSize;
+  }
 
-	public void setJmsDestinationProviderName(String jmsDestinationProviderName) {
-		this.jmsDestinationProviderName = jmsDestinationProviderName;
-	}
+  public String getProfileName() {
+    return profileName;
+  }
 
-	public int getMaxConsumerRatePerThread() {
-		return maxConsumerRatePerThread;
-	}
+  public void setProfileName(String profileName) {
+    this.profileName = profileName;
+  }
 
-	public void setMaxConsumerRatePerThread(int maxConsumerRatePerThread) {
-		this.maxConsumerRatePerThread = maxConsumerRatePerThread;
-	}
+  public Map<String, String> getConnectionFactoryNames() {
+    if (connectionFactoryNames == null) {
+      connectionFactoryNames = new HashMap<String, String>();
+    }
+    return connectionFactoryNames;
+  }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((acknowledgeMode == null) ? 0 : acknowledgeMode.hashCode());
-		result = prime
-				* result
-				+ ((connectionFactoryNames == null) ? 0
-						: connectionFactoryNames.hashCode());
-		result = prime * result
-				+ ((consumerClients == null) ? 0 : consumerClients.hashCode());
-		result = prime * result
-				+ ((deliveryMode == null) ? 0 : deliveryMode.hashCode());
-		result = prime
-				* result
-				+ ((jmsDestinationProviderName == null) ? 0
-						: jmsDestinationProviderName.hashCode());
-		result = prime * result + maxConsumerRatePerThread;
-		result = prime
-				* result
-				+ ((messageFactoryName == null) ? 0 : messageFactoryName
-						.hashCode());
-		result = prime * result + numConsumers;
-		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
-		result = prime * result + ((partID == null) ? 0 : partID.hashCode());
-		result = prime * result
-				+ ((producerClients == null) ? 0 : producerClients.hashCode());
-		result = prime * result
-				+ ((profileName == null) ? 0 : profileName.hashCode());
-		result = prime
-				* result
-				+ ((testDestinationName == null) ? 0 : testDestinationName
-						.hashCode());
-		result = prime * result + (transacted ? 1231 : 1237);
-		result = prime * result + transactionBatchSize;
-		return result;
-	}
+  public void setConnectionFactoryNames(Map<String, String> connectionFactoryNames) {
+    this.connectionFactoryNames = connectionFactoryNames;
+  }
 
-    public String getMessageFactoryName() {
-		return messageFactoryName;
-	}
+  public String getJmsDestinationProviderName() {
+    return jmsDestinationProviderName;
+  }
 
-	public void setMessageFactoryName(String messageFactoryName) {
-		this.messageFactoryName = messageFactoryName;
-	}
+  public void setJmsDestinationProviderName(String jmsDestinationProviderName) {
+    this.jmsDestinationProviderName = jmsDestinationProviderName;
+  }
 
-	@Override
-	public String toString() {
-		return "BenchmarkPartConfig [acknowledgeMode=" + acknowledgeMode
-				+ ", consumerClients=" + consumerClients + ", deliveryMode="
-				+ deliveryMode + ", jmsDestinationProviderName="
-				+ jmsDestinationProviderName + ", messageFactoryName="
-				+ messageFactoryName + ", numConsumers=" + numConsumers
-				+ ", parent=" + parent + ", partID=" + partID
-				+ ", producerClients=" + producerClients + ", profileName="
-				+ profileName + ", testDestinationName=" + testDestinationName
-				+ ", transacted=" + transacted + ", transactionBatchSize="
-				+ transactionBatchSize + "]";
-	}
+  public int getMaxConsumerRatePerThread() {
+    return maxConsumerRatePerThread;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		BenchmarkPartConfig other = (BenchmarkPartConfig) obj;
-		if (acknowledgeMode == null) {
-			if (other.acknowledgeMode != null)
-				return false;
-		} else if (!acknowledgeMode.equals(other.acknowledgeMode))
-			return false;
-		if (connectionFactoryNames == null) {
-			if (other.connectionFactoryNames != null)
-				return false;
-		} else if (!connectionFactoryNames.equals(other.connectionFactoryNames))
-			return false;
-		if (consumerClients == null) {
-			if (other.consumerClients != null)
-				return false;
-		} else if (!consumerClients.equals(other.consumerClients))
-			return false;
-		if (deliveryMode == null) {
-			if (other.deliveryMode != null)
-				return false;
-		} else if (!deliveryMode.equals(other.deliveryMode))
-			return false;
-		if (jmsDestinationProviderName == null) {
-			if (other.jmsDestinationProviderName != null)
-				return false;
-		} else if (!jmsDestinationProviderName
-				.equals(other.jmsDestinationProviderName))
-			return false;
-		if (maxConsumerRatePerThread != other.maxConsumerRatePerThread)
-			return false;
-		if (messageFactoryName == null) {
-			if (other.messageFactoryName != null)
-				return false;
-		} else if (!messageFactoryName.equals(other.messageFactoryName))
-			return false;
-		if (numConsumers != other.numConsumers)
-			return false;
-		if (parent == null) {
-			if (other.parent != null)
-				return false;
-		} else if (!parent.equals(other.parent))
-			return false;
-		if (partID == null) {
-			if (other.partID != null)
-				return false;
-		} else if (!partID.equals(other.partID))
-			return false;
-		if (producerClients == null) {
-			if (other.producerClients != null)
-				return false;
-		} else if (!producerClients.equals(other.producerClients))
-			return false;
-		if (profileName == null) {
-			if (other.profileName != null)
-				return false;
-		} else if (!profileName.equals(other.profileName))
-			return false;
-		if (testDestinationName == null) {
-			if (other.testDestinationName != null)
-				return false;
-		} else if (!testDestinationName.equals(other.testDestinationName))
-			return false;
-		if (transacted != other.transacted)
-			return false;
-		if (transactionBatchSize != other.transactionBatchSize)
-			return false;
-		return true;
-	}
+  public void setMaxConsumerRatePerThread(int maxConsumerRatePerThread) {
+    this.maxConsumerRatePerThread = maxConsumerRatePerThread;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result
+        + ((acknowledgeMode == null) ? 0 : acknowledgeMode.hashCode());
+    result = prime
+        * result
+        + ((connectionFactoryNames == null) ? 0 : connectionFactoryNames
+            .hashCode());
+    result = prime * result
+        + ((consumerClients == null) ? 0 : consumerClients.hashCode());
+    result = prime * result
+        + ((deliveryMode == null) ? 0 : deliveryMode.hashCode());
+    result = prime
+        * result
+        + ((jmsDestinationProviderName == null) ? 0
+            : jmsDestinationProviderName.hashCode());
+    result = prime * result + maxConsumerRatePerThread;
+    result = prime * result
+        + ((messageFactoryName == null) ? 0 : messageFactoryName.hashCode());
+    result = prime * result + numConsumers;
+    result = prime * result + ((parent == null) ? 0 : parent.hashCode());
+    result = prime * result + ((partID == null) ? 0 : partID.hashCode());
+    result = prime * result
+        + ((producerClients == null) ? 0 : producerClients.hashCode());
+    result = prime * result
+        + ((profileName == null) ? 0 : profileName.hashCode());
+    result = prime * result
+        + ((testDestinationName == null) ? 0 : testDestinationName.hashCode());
+    result = prime * result + (transacted ? 1231 : 1237);
+    result = prime * result + transactionBatchSize;
+    return result;
+  }
+
+  public String getMessageFactoryName() {
+    return messageFactoryName;
+  }
+
+  public void setMessageFactoryName(String messageFactoryName) {
+    this.messageFactoryName = messageFactoryName;
+  }
+
+  @Override
+  public String toString() {
+    return "BenchmarkPartConfig [acknowledgeMode=" + acknowledgeMode
+        + ", consumerClients=" + consumerClients + ", deliveryMode="
+        + deliveryMode + ", jmsDestinationProviderName="
+        + jmsDestinationProviderName + ", messageFactoryName="
+        + messageFactoryName + ", numConsumers=" + numConsumers + ", parent="
+        + parent + ", partID=" + partID + ", producerClients="
+        + producerClients + ", profileName=" + profileName
+        + ", testDestinationName=" + testDestinationName + ", transacted="
+        + transacted + ", transactionBatchSize=" + transactionBatchSize + "]";
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    BenchmarkPartConfig other = (BenchmarkPartConfig) obj;
+    if (acknowledgeMode == null) {
+      if (other.acknowledgeMode != null)
+        return false;
+    } else if (!acknowledgeMode.equals(other.acknowledgeMode))
+      return false;
+    if (connectionFactoryNames == null) {
+      if (other.connectionFactoryNames != null)
+        return false;
+    } else if (!connectionFactoryNames.equals(other.connectionFactoryNames))
+      return false;
+    if (consumerClients == null) {
+      if (other.consumerClients != null)
+        return false;
+    } else if (!consumerClients.equals(other.consumerClients))
+      return false;
+    if (deliveryMode == null) {
+      if (other.deliveryMode != null)
+        return false;
+    } else if (!deliveryMode.equals(other.deliveryMode))
+      return false;
+    if (jmsDestinationProviderName == null) {
+      if (other.jmsDestinationProviderName != null)
+        return false;
+    } else if (!jmsDestinationProviderName
+        .equals(other.jmsDestinationProviderName))
+      return false;
+    if (maxConsumerRatePerThread != other.maxConsumerRatePerThread)
+      return false;
+    if (messageFactoryName == null) {
+      if (other.messageFactoryName != null)
+        return false;
+    } else if (!messageFactoryName.equals(other.messageFactoryName))
+      return false;
+    if (numConsumers != other.numConsumers)
+      return false;
+    if (parent == null) {
+      if (other.parent != null)
+        return false;
+    } else if (!parent.equals(other.parent))
+      return false;
+    if (partID == null) {
+      if (other.partID != null)
+        return false;
+    } else if (!partID.equals(other.partID))
+      return false;
+    if (producerClients == null) {
+      if (other.producerClients != null)
+        return false;
+    } else if (!producerClients.equals(other.producerClients))
+      return false;
+    if (profileName == null) {
+      if (other.profileName != null)
+        return false;
+    } else if (!profileName.equals(other.profileName))
+      return false;
+    if (testDestinationName == null) {
+      if (other.testDestinationName != null)
+        return false;
+    } else if (!testDestinationName.equals(other.testDestinationName))
+      return false;
+    if (transacted != other.transacted)
+      return false;
+    if (transactionBatchSize != other.transactionBatchSize)
+      return false;
+    return true;
+  }
 }

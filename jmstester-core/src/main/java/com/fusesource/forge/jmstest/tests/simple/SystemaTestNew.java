@@ -1,12 +1,12 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Copyright (C) 2009, Progress Software Corporation and/or its
+ * subsidiaries or affiliates.  All rights reserved.
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,18 +27,22 @@ import org.testng.annotations.BeforeClass;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.impl.DynamicJMSConnectionProvider;
 
-@ContextConfiguration(locations={
-		"classpath:com/fusesource/forge/jmstest/tests/simple/systema-bsf.xml",
-		"classpath:com/fusesource/forge/jmstest/tests/simple/systema-beans.xml"
+@ContextConfiguration(locations = {
+  "classpath:com/fusesource/forge/jmstest/tests/simple/systema-bsf.xml",
+  "classpath:com/fusesource/forge/jmstest/tests/simple/systema-beans.xml"
 })
 public class SystemaTestNew extends AbstractNetworkOfBrokersTest {
 
-	@BeforeClass
-	public void waitForBrokers() {
-		  try {
-			  Thread.sleep(10000);
-		  } catch (InterruptedException ie) {}
-	}
+  private static final int WAIT_TIME = 10000;
+  
+  @BeforeClass
+  public void waitForBrokers() {
+    try {
+      Thread.sleep(WAIT_TIME);
+    } catch (InterruptedException ie) {
+      // ignore
+    }
+  }
 
 	@Override
 	protected Map<String, JMSConnectionProvider> doGetConnectionProviders() {
