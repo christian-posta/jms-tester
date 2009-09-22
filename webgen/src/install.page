@@ -1,0 +1,43 @@
+---
+title: Install
+in_menu: true
+sort_info: 7
+--- name:overview
+
+# How to get {project_name:} up and running
+Do you really want to execute it ?
+
+--- name:content pipeline:tags,textile
+
+h2. Installing {project_name:}
+
+*Required:*
+* You need a the binaries for {project_name:}. Either you have "built":{relocatable: building.html} yourself from the sources or 
+  you have "downloaded":{relocatable: download.html} a distribution archive.
+* Java 1.5
+
+The first step for the installation is to unzip the {project_name:} archive into a directory of your choice, let's say **JMSTESTER_HOME**.
+
+h2. Additional libraries
+
+We use "Hyperic's Sigar library":http://www.hyperic.com/products/sigar.html to realise operating system level probes. The distribution files already contain
+the necessary classes to leverage *Sigar* in the *jmstester-sigar* library. You need to download and the *sigar* binaries and copy them accordingly. 
+
+Once you have downloaded the sigar binaries, unzip them into a directory of your choice, let's say **$SIGAR_HOME**. Then copy the required libraries 
+
+{coderay:: plaintext}
+cp $SIGAR_HOME/sigar-bin/lib/* $JMSTESTER_HOME/lib
+{coderay}
+
+We use "RRD4J":https://rrd4j.dev.java.net/ to create the metric graphs for the benchmarks. You must download the sources of RRD4J and build it with 
+a JDK 5 or higher. Once you have done that, you will find a *rrd4j-2.0.6.jar* in the rrd4j lib directory. You must copy that jar file into the {project_name:}
+lib directory.
+
+{coderay:: plaintext}
+cp $PATH_TO_LIIB/rrd4j-2.0.6.jar $JMSTESTER_HOME/lib
+{coderay}
+
+h3. See Also
+
+* "Building":{relocatable: building.html}
+* "Download":{relocatable: download.html}

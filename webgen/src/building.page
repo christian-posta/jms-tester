@@ -83,4 +83,4 @@ You can also get Maven to do this for you:
 
 h3. See Also
 
-* [Source](source.html)
+* "Source":{relocatable: source.html}
