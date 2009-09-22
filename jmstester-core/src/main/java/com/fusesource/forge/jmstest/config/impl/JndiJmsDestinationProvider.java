@@ -1,12 +1,12 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+/*
+ * Copyright (C) 2009, Progress Software Corporation and/or its
+ * subsidiaries or affiliates.  All rights reserved.
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,45 +22,48 @@ import javax.naming.Context;
 
 import com.fusesource.forge.jmstest.config.JndiInitialContextFactory;
 
-
 /**
  * Provides lookup of JMS Destination in JNDI store.
- * @author  Andreas Gies
+ *
+ * @author Andreas Gies
  */
 public class JndiJmsDestinationProvider extends AbstractJMSDestinationProvider {
-  /**
- * @uml.property  name="jndiCtxtFactory_"
- * @uml.associationEnd  
- */
-private JndiInitialContextFactory jndiCtxtFactory_ = null;
+
+  private JndiInitialContextFactory jndiCtxtFactory = null;
 
   /**
    * Lookup JMS destination in JNDI store.
-   * 
-   * @param _session
+   *
+   * @param session
    *          not used in this method
-   * @param _dest
+   * @param dest
    *          Lookup(Logical) name of the destination in JNDI
    * @return JMS destination
    * @throws Exception
    *           thrown when JNDI lookup fails
-   * @see com.fusesource.forge.jmstest.config.JMSDestinationProvider.esbx.utils.jms.IJMSDestinationProvider#getDestination(javax.jms.Session, java.lang.String)
+   * @see com.fusesource.forge.jmstest.config.JMSDestinationProvider.esbx.utils.jms.IJMSDestinationProvider#getDestination(javax.jms.Session,
+   *      java.lang.String)
    */
-  public final Destination getDestination(final Session _session, final String _dest) throws Exception {
-      final Context ctxt = getJndiInitialContextFactory().getInitialContext();
-      final Destination dest = (Destination) ctxt.lookup(_dest);
-      return dest;
+  public final Destination getDestination(
+    final Session session,
+    final String dest
+  ) throws Exception {
+    final Context ctxt = getJndiInitialContextFactory().getInitialContext();
+    final Destination destination = (Destination) ctxt.lookup(dest);
+    return destination;
   }
 
   /**
-   * @param _factory
+   * @param factory
    *          JndiInitialContextFactory Object
    */
-  public final void setJndiInitialContextFactory(final JndiInitialContextFactory _factory) {
-    jndiCtxtFactory_ = _factory;
+  public final void setJndiInitialContextFactory(
+    final JndiInitialContextFactory factory) {
+    jndiCtxtFactory = factory;
   }
 
   private JndiInitialContextFactory getJndiInitialContextFactory() {
-    return jndiCtxtFactory_;
+    return jndiCtxtFactory;
+
   }
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2009, Progress Software Corporation and/or its
+ * subsidiaries or affiliates.  All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.fusesource.forge.jmstest.executor;
 
 import java.io.File;
@@ -26,137 +42,149 @@ import com.fusesource.forge.jmstest.benchmark.command.handler.DefaultCommandHand
 
 public class BenchmarkValueRecorder extends AbstractBenchmarkExecutionContainer {
 
-	private String workDirectory = null; 
-	private Log log = null;
-	
-	public String getWorkDirectory() {
-		if (workDirectory == null) {
-			workDirectory = System.getProperty("user.dir");
-		}
-		return workDirectory;
-	}
+  private String workDirectory = null;
+  private Log log = null;
 
-	public void setWorkDirectory(String workDirectory) {
-		this.workDirectory = workDirectory;
-	}
+  public String getWorkDirectory() {
+    if (workDirectory == null) {
+      workDirectory = System.getProperty("user.dir");
+    }
+    return workDirectory;
+  }
 
-	private List<BenchmarkPostProcessor> getPostProcessors() {
-		List<BenchmarkPostProcessor> postProcessors = new ArrayList<BenchmarkPostProcessor>();
-		
-		for(String beanName: getApplicationContext().getBeanNamesForType(BenchmarkPostProcessor.class)) {
-			BenchmarkPostProcessor bpp = (BenchmarkPostProcessor)getApplicationContext().getBean(beanName);
-			log().debug("Found post processor : " + beanName + "(" + bpp.getClass().getSimpleName() + ")");
-			postProcessors.add(bpp);
-		}
-		return postProcessors;
-	}
-	
-	@Override
-	protected void createHandlerChain() {
-		super.createHandlerChain();
-		
-		getConnector().addHandler(new DefaultCommandHandler() {
-			public boolean handleCommand(BenchmarkCommand command) {
-				switch (command.getCommandType()) {
-					case CommandTypes.PREPARE_BENCHMARK:
-						PrepareBenchmarkCommand prepCmd = (PrepareBenchmarkCommand)command;
-						File benchmarkDir = getBenchmarkWorkDirectory(prepCmd.getBenchmarkConfig().getBenchmarkId());
-						try {
-							FileUtils.deleteDirectory(benchmarkDir);
-							benchmarkDir.mkdirs();
-						} catch (IOException e) {
-							log().error("Error creating directory : " + benchmarkDir.getAbsolutePath(), e);
-							e.printStackTrace();
-						}
-						return true;
-					case CommandTypes.REPORT_STATS:
-						ReportStatsCommand stats = (ReportStatsCommand)command;
-						recordStats(stats);
-						return true;
-					case CommandTypes.END_BENCHMARK:
-						EndBenchmarkCommand endCommand = (EndBenchmarkCommand)command;
-						final String benchmarkId = endCommand.getBenchmarkId();
-						final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-						executor.schedule(new Runnable() {
-							public void run() {
-								for(BenchmarkPostProcessor processor : getPostProcessors()) {
-									processor.resetStatistics();
-									processor.setWorkDir(getBenchmarkWorkDirectory(benchmarkId));
-									processor.processData();
-								}
-								executor.shutdown();	
-							}
-						}, 5, TimeUnit.SECONDS);
-						return true;
-					default:
-						return false;
-				}
-			}
-		});
-	}
+  public void setWorkDirectory(String workDirectory) {
+    this.workDirectory = workDirectory;
+  }
 
-	private boolean checkDir(File dir) {
-		if (dir.exists()) {
-			if (!dir.isDirectory()) {
-				log().error(dir.getAbsolutePath() + " is not a directory.");
-				return false;
-			}
-			if (!dir.canWrite()) {
-				log().error(dir.getAbsolutePath() + " is not writable.");
-				return false;
-			}
-		} else {
-			dir.mkdirs();
-		}
-		return true;
-	}
-	
-	private File getBenchmarkWorkDirectory(String benchmarkId) {
-		
-		File workDir = new File(getWorkDirectory());
-		File result = new File(workDir, benchmarkId);
-		checkDir(result);
-		return result;
-	}
+  private List<BenchmarkPostProcessor> getPostProcessors() {
+    List<BenchmarkPostProcessor> postProcessors = new ArrayList<BenchmarkPostProcessor>();
 
-	synchronized private void recordStats(ReportStatsCommand stats) {
-		
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-		
-		OutputStream os = null;
-		ObjectOutputStream oos = null;
-		
-		try {
-			final String dateString = sdf.format(new Date());
-			File targetDir = getBenchmarkWorkDirectory(stats.getClientId().getBenchmarkId());
-			
-			String fileNames[] = targetDir.list(new FilenameFilter() {
-				public boolean accept(File dir, String name) {
-					return name.startsWith(dateString);
-				}
-			});
-			File rawData = new File(getBenchmarkWorkDirectory(stats.getClientId().getBenchmarkId()), sdf.format(new Date()) + "-" + fileNames.length + ".raw");
-			log().debug("Writing benchmark raw data to : " + rawData.getAbsolutePath());
-			os = new FileOutputStream(rawData, false);
-			oos = new ObjectOutputStream(os);
-			oos.writeObject(stats);
-		} catch (Exception e) {
-			log().debug("Error Writing benchmark raw data.");
-		} finally {
-			if (oos != null) {
-				try {
-					oos.close();
-				} catch (IOException e) {
-					// ignore
-				}
-			}
-		}
-	}
+    for (String beanName : getApplicationContext().getBeanNamesForType(
+        BenchmarkPostProcessor.class)) {
+      BenchmarkPostProcessor bpp = (BenchmarkPostProcessor) getApplicationContext()
+          .getBean(beanName);
+      log().debug(
+          "Found post processor : " + beanName + "("
+              + bpp.getClass().getSimpleName() + ")");
+      postProcessors.add(bpp);
+    }
+    return postProcessors;
+  }
 
-	private Log log() {
-		if (log == null) {
-			log = LogFactory.getLog(this.getClass());
-		}
-		return log;
-	}
+  @Override
+  protected void createHandlerChain() {
+    super.createHandlerChain();
+
+    getConnector().addHandler(new DefaultCommandHandler() {
+      public boolean handleCommand(BenchmarkCommand command) {
+        switch (command.getCommandType()) {
+        case CommandTypes.PREPARE_BENCHMARK:
+          PrepareBenchmarkCommand prepCmd = (PrepareBenchmarkCommand) command;
+          File benchmarkDir = getBenchmarkWorkDirectory(prepCmd
+              .getBenchmarkConfig().getBenchmarkId());
+          try {
+            FileUtils.deleteDirectory(benchmarkDir);
+            benchmarkDir.mkdirs();
+          } catch (IOException e) {
+            log().error(
+                "Error creating directory : " + benchmarkDir.getAbsolutePath(),
+                e);
+            e.printStackTrace();
+          }
+          return true;
+        case CommandTypes.REPORT_STATS:
+          ReportStatsCommand stats = (ReportStatsCommand) command;
+          recordStats(stats);
+          return true;
+        case CommandTypes.END_BENCHMARK:
+          EndBenchmarkCommand endCommand = (EndBenchmarkCommand) command;
+          final String benchmarkId = endCommand.getBenchmarkId();
+          final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(
+              1);
+          executor.schedule(new Runnable() {
+            public void run() {
+              for (BenchmarkPostProcessor processor : getPostProcessors()) {
+                processor.resetStatistics();
+                processor.setWorkDir(getBenchmarkWorkDirectory(benchmarkId));
+                processor.processData();
+              }
+              executor.shutdown();
+            }
+          }, 5, TimeUnit.SECONDS);
+          return true;
+        default:
+          return false;
+        }
+      }
+    });
+  }
+
+  private boolean checkDir(File dir) {
+    if (dir.exists()) {
+      if (!dir.isDirectory()) {
+        log().error(dir.getAbsolutePath() + " is not a directory.");
+        return false;
+      }
+      if (!dir.canWrite()) {
+        log().error(dir.getAbsolutePath() + " is not writable.");
+        return false;
+      }
+    } else {
+      dir.mkdirs();
+    }
+    return true;
+  }
+
+  private File getBenchmarkWorkDirectory(String benchmarkId) {
+
+    File workDir = new File(getWorkDirectory());
+    File result = new File(workDir, benchmarkId);
+    checkDir(result);
+    return result;
+  }
+
+  synchronized private void recordStats(ReportStatsCommand stats) {
+
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+
+    OutputStream os = null;
+    ObjectOutputStream oos = null;
+
+    try {
+      final String dateString = sdf.format(new Date());
+      File targetDir = getBenchmarkWorkDirectory(stats.getClientId()
+          .getBenchmarkId());
+
+      String[] fileNames = targetDir.list(new FilenameFilter() {
+        public boolean accept(File dir, String name) {
+          return name.startsWith(dateString);
+        }
+      });
+      File rawData = new File(getBenchmarkWorkDirectory(stats.getClientId()
+          .getBenchmarkId()), sdf.format(new Date()) + "-" + fileNames.length
+          + ".raw");
+      log().debug(
+          "Writing benchmark raw data to : " + rawData.getAbsolutePath());
+      os = new FileOutputStream(rawData, false);
+      oos = new ObjectOutputStream(os);
+      oos.writeObject(stats);
+    } catch (Exception e) {
+      log().debug("Error Writing benchmark raw data.");
+    } finally {
+      if (oos != null) {
+        try {
+          oos.close();
+        } catch (IOException e) {
+          // ignore
+        }
+      }
+    }
+  }
+
+  private Log log() {
+    if (log == null) {
+      log = LogFactory.getLog(this.getClass());
+    }
+    return log;
+  }
 }
