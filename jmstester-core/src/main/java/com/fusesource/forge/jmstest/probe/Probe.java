@@ -27,6 +27,14 @@ public interface Probe {
   public void probe();
 
   public boolean isResetOnRead();
+  
+  public void setActive(boolean active);
+  
+  public boolean isActive();
+  
+  public void setInactiveAfterException(int seconds);
+  
+  public int getInactiveAfterException();
 
   public void reset();
 

@@ -54,7 +54,11 @@ public class ProbeRunner extends LimitedTimeScheduledExecutor {
         log().debug("Gathering probes ...");
         synchronized (probes) {
           for (Probe probe : getProbes()) {
-            probe.probe();
+            if (probe.isActive()) {
+              probe.probe();
+            } else {
+              log().warn("Skipping inactive probe: " + probe.getDescriptor());
+            }
           }
         }
         log().debug("Gathering complete ...");

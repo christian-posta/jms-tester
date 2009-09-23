@@ -60,7 +60,7 @@ public class AMQDestinationProbe extends JMXProbe implements InitializingBean {
 
   public void afterPropertiesSet() throws Exception {
     setObjectNameString(getObjectNamePrefix() + getDestinationName());
-    setName(getDestinationType() + ":" + getDestinationName() + "-"
+    setName(getDestinationType() + "-" + getDestinationName() + "-"
         + getAttributeName());
   }
 

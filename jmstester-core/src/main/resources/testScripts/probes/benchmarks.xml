@@ -4,11 +4,11 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
 
   <bean id="simple" class="com.fusesource.forge.jmstest.benchmark.BenchmarkConfig">
-    <property name="benchmarkId" value="simple" />
+    <property name="benchmarkId" value="probes" />
     <property name="configLocations">
     	<list>
     		<bean class="java.lang.String">
-    		  <constructor-arg value="conf/testScripts/simple/" />
+    		  <constructor-arg value="conf/testScripts/probes/" />
     		</bean>
     	</list>
     </property>
@@ -54,14 +54,14 @@
     <property name="password" value="smx" />
   </bean>
   
-  <bean id="ThreadCounter" class="com.fusesource.forge.jmstest.probe.jmx.JMXProbe">
+  <bean id="ThreadCounter" class="com.fusesource.forge.jmstest.probe.jmx.JMXProbe" scope="prototype">
     <property name="jmxConnectionFactory" ref="JMXConnector" />
     <property name="name" value="ThreadCounter" />
     <property name="objectNameString" value="java.lang:type=Threading" />
     <property name="attributeName" value="ThreadCount" />
   </bean>
   
-  <bean id="test1Size" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
+  <bean id="test1Size" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe" scope="prototype">
     <constructor-arg value="test1" />
     <property name="jmxConnectionFactory" ref="JMXConnector" />
     <property name="attributeName" value="QueueSize" />

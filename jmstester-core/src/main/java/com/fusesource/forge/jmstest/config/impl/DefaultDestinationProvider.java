@@ -55,9 +55,9 @@ public class DefaultDestinationProvider extends AbstractJMSDestinationProvider {
     }
 
     if (objType.equalsIgnoreCase("topic")) {
-      return session.createTopic(destName);
+      return session.createTopic(destination);
     } else {
-      return session.createQueue(destName);
+      return session.createQueue(destination);
     }
   }
 }

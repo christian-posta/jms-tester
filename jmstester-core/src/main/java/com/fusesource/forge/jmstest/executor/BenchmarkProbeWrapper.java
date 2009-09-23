@@ -16,6 +16,7 @@
  */
 package com.fusesource.forge.jmstest.executor;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -54,28 +55,27 @@ public class BenchmarkProbeWrapper extends AbstractBenchmarkClient {
   }
 
   private List<JMXConnectionFactory> getJmxConnectionFactories(
-      BenchmarkProbeConfig probeConfig) {
+    final BenchmarkProbeConfig probeConfig
+  ) {
 
     ArrayList<JMXConnectionFactory> result = new ArrayList<JMXConnectionFactory>();
-    String jmxNamePattern = probeConfig
-        .getPreferredJmxConnectionFactoryName(getContainer().getClientInfo()
-            .getClientName());
+    String jmxNamePattern = probeConfig.getPreferredJmxConnectionFactoryName(
+      getContainer().getClientInfo().getClientName()
+    );
 
-    for (String name : getApplicationContext().getBeanNamesForType(
-        JMXConnectionFactory.class)) {
+    for (String name : getApplicationContext().getBeanNamesForType(JMXConnectionFactory.class)) {
       if (name.matches(jmxNamePattern)) {
         log().debug("Using JMX ConnectionFactory : " + name);
-        result
-            .add((JMXConnectionFactory) getApplicationContext().getBean(name));
+        result.add((JMXConnectionFactory) getApplicationContext().getBean(name));
       }
     }
 
     if (result.isEmpty()) {
       result.add((JMXConnectionFactory) getBean(new String[] {
-          JMXConnectionFactory.DEFAULT_JMX_CONNECTION_FACTORY_NAME + "-"
-              + getContainer().getClientInfo().getClientName(),
-          JMXConnectionFactory.DEFAULT_JMX_CONNECTION_FACTORY_NAME },
-          JMXConnectionFactory.class));
+        JMXConnectionFactory.DEFAULT_JMX_CONNECTION_FACTORY_NAME + "-"
+            + getContainer().getClientInfo().getClientName(),
+        JMXConnectionFactory.DEFAULT_JMX_CONNECTION_FACTORY_NAME },
+        JMXConnectionFactory.class));
     }
 
     if (result.isEmpty()) {
@@ -89,10 +89,26 @@ public class BenchmarkProbeWrapper extends AbstractBenchmarkClient {
     return result;
   }
 
+  private String generateJmxProbeName(String jmxUrl, String probeName) {
+
+    StringBuffer buf = new StringBuffer();
+    String jmxAddress = 
+      jmxUrl.replaceAll("service:jmx:rmi:///jndi/rmi://", "")
+            .replaceAll("/jmxrmi", "")
+            .replace('/', '_')
+            .replace(':', '_');
+
+    buf.append(getClientId().toString());
+    buf.append(jmxAddress);
+    buf.append("-");
+    buf.append(probeName);
+
+    return buf.toString();
+  }
+
   @Override
   public boolean prepare() {
-    for (BenchmarkProbeConfig probeConfig : getConfig()
-        .getProbeConfigurations()) {
+    for (BenchmarkProbeConfig probeConfig : getConfig().getProbeConfigurations()) {
       if (getContainer().matchesClient(probeConfig.getClientNames())) {
 
         String[] probeNames = null;
@@ -102,8 +118,9 @@ public class BenchmarkProbeWrapper extends AbstractBenchmarkClient {
         } else {
           List<String> names = new ArrayList<String>();
 
-          StringTokenizer sTok = new StringTokenizer(probeConfig
-              .getProbeNames(), ",");
+          StringTokenizer sTok = new StringTokenizer(
+            probeConfig.getProbeNames(), ","
+          );
           while (sTok.hasMoreTokens()) {
             names.add(sTok.nextToken());
           }
@@ -111,15 +128,18 @@ public class BenchmarkProbeWrapper extends AbstractBenchmarkClient {
           probeNames = names.toArray(new String[0]);
         }
 
+        log().debug("Trying to resolve " + probeNames.length + " probes.");
+
         for (String probeName : probeNames) {
+          log().debug("Instantiating probe " + probeName);
           try {
-            Probe p = (Probe) getBean(new String[] { probeName }, null);
+            Probe p = (Probe) getBean(new String[] {probeName}, null);
+            log().debug("Found Probe : " + p.getDescriptor());
 
             if (p instanceof JMXProbe) {
               for (JMXConnectionFactory cf : getJmxConnectionFactories(probeConfig)) {
-                Probe jmxProbe = (Probe) getBean(new String[] { probeName },
-                    null);
-                jmxProbe.setName(cf.getUrl().toString() + p.getName());
+                Probe jmxProbe = (Probe) getBean(new String[] {probeName}, null);
+                jmxProbe.setName(generateJmxProbeName(cf.getUrl(), jmxProbe.getName()));
                 jmxProbe.addObserver(getSamplePersistenceAdapter());
                 ((JMXProbe) jmxProbe).setJmxConnectionFactory(cf);
                 getProbeRunner().addProbe(jmxProbe);

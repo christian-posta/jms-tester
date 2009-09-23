@@ -29,6 +29,9 @@ public abstract class AbstractProbe extends Observable implements Probe {
   private ProbeDescriptor descriptor = null;
   private String name;
   private boolean resetOnRead = false;
+  private boolean active = true;
+  private int inactiveAfterException = 5;
+  protected long lastException = Long.MIN_VALUE;
 
   private Log log = null;
 
@@ -41,15 +44,28 @@ public abstract class AbstractProbe extends Observable implements Probe {
   }
 
   public final BenchmarkProbeValue getProbeValue() {
-    BenchmarkProbeValue result = new BenchmarkProbeValue(getDescriptor(),
-        System.currentTimeMillis() / 1000, getValue());
+
+    Number value = null;
+
+    try {
+      value = getValue();
+    } catch (Exception e) {
+      log().warn("Exception reading probe " + getDescriptor());
+      lastException = System.currentTimeMillis();
+      setActive(false);
+    }
+
+    BenchmarkProbeValue result = new BenchmarkProbeValue(
+      getDescriptor(), System.currentTimeMillis() / 1000, value
+    );
+
     if (isResetOnRead()) {
       reset();
     }
     return result;
   }
 
-  protected abstract Number getValue();
+  protected abstract Number getValue() throws Exception;
 
   public void setName(String name) {
     this.name = name;
@@ -58,6 +74,31 @@ public abstract class AbstractProbe extends Observable implements Probe {
 
   public String getName() {
     return name;
+  }
+
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+
+  public boolean isActive() {
+    if (active) {
+      return true;
+    } else {
+      if (System.currentTimeMillis() - lastException > getInactiveAfterException() * 1000L) {
+        setActive(true);
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  public int getInactiveAfterException() {
+    return inactiveAfterException;
+  }
+
+  public void setInactiveAfterException(int inactiveAfterException) {
+    this.inactiveAfterException = inactiveAfterException;
   }
 
   public boolean isResetOnRead() {

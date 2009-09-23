@@ -32,8 +32,6 @@ public class JMXProbe extends AbstractProbe {
   private ObjectName objectName;
   private String attributeName;
 
-  private boolean active = true;
-
   private MBeanServerConnection jmxConnection;
   private Log log = null;
 
@@ -52,7 +50,7 @@ public class JMXProbe extends AbstractProbe {
   }
 
   @Override
-  public Number getValue() {
+  public Number getValue() throws Exception {
     if (!isActive()) {
       log().warn(
           "JMXProbe " + getName()
@@ -68,14 +66,13 @@ public class JMXProbe extends AbstractProbe {
       log().error(
           "Error retrieving Attribute for: " + getObjectName().toString() + "["
               + getAttributeName() + "]", e);
-      setActive(false);
-      return 0.0;
+      throw(e);
     }
 
     if (attribute instanceof Number) {
       return (Number) attribute;
     } else {
-      log.error("Attribute:" + getObjectName().toString() + "["
+      log.warn("Attribute:" + getObjectName().toString() + "["
           + getAttributeName() + "] does not represent a number");
       setActive(false);
       return 0.0;
@@ -88,14 +85,6 @@ public class JMXProbe extends AbstractProbe {
 
   public void setJmxConnectionFactory(JMXConnectionFactory jmxConnFactory) {
     this.jmxConnFactory = jmxConnFactory;
-  }
-
-  public boolean isActive() {
-    return active;
-  }
-
-  public void setActive(boolean active) {
-    this.active = active;
   }
 
   public ObjectName getObjectName() {
@@ -111,7 +100,8 @@ public class JMXProbe extends AbstractProbe {
       this.objectName = new ObjectName(objectName);
     } catch (Exception e) {
       log().error("Error seting ObjectName for Probe: " + objectName);
-      active = false;
+      setActive(false);
+      lastException = Long.MAX_VALUE;
     }
   }
 

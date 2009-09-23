@@ -3,7 +3,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd" >
 
-  <bean id="graphingPostProcessor" class="com.fusesource.forge.jmstest.executor.RrdGraphPostProcessor" />
+  <bean id="graphingPostProcessor" class="com.fusesource.forge.jmstest.persistence.rrd.RrdGraphPostProcessor" />
   <bean id="csvPostProcessor" class="com.fusesource.forge.jmstest.executor.CSVPostProcessor" />
     
 </beans>
