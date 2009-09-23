@@ -88,7 +88,7 @@
 	      <property name="deliveryMode" value="NON_PERSISTENT" />
 	      <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE" />
 	      <property name="transacted" value="false" />
-	      <property name="numConsumers" value="5" />
+	      <property name="numConsumers" value="2" />
 	      <property name="profileName" value="fastProfile" />
 	      <property name="producerClients" value="ERP(.)*" />
 	      <property name="consumerClients" value="(ERP|DWH)(.)*" />

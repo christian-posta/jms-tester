@@ -35,7 +35,7 @@
       <list>
 		  <bean class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration" >
 		    <property name="duration"    value="60"/>
-		    <property name="initialRate" value="500"/>
+		    <property name="initialRate" value="100"/>
 		  </bean>
       </list>
     </property>
@@ -48,7 +48,7 @@
       <list>
 		  <bean class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration" >
 		    <property name="duration"    value="60"/>
-		    <property name="initialRate" value="1000"/>
+		    <property name="initialRate" value="200"/>
 		  </bean>
       </list>
     </property>
@@ -65,7 +65,7 @@
 		  </bean>
 		  <bean class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration" >
 		    <property name="duration"    value="15"/>
-		    <property name="initialRate" value="1000"/>
+		    <property name="initialRate" value="200"/>
 		  </bean>
 		  <bean class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration" >
 		    <property name="duration"    value="30"/>
@@ -96,11 +96,13 @@
   <bean id="ERPToDWH-Size" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
     <constructor-arg value="ERPToDWH" />
     <property name="attributeName" value="QueueSize" />
+    <property name="brokerName" value="*" />
   </bean>
 
   <bean id="DWHToERP-Size" class="com.fusesource.forge.jmstest.probe.jmx.AMQDestinationProbe">
     <constructor-arg value="DWHToERP" />
     <property name="attributeName" value="QueueSize" />
+    <property name="brokerName" value="*" />
   </bean>
 
   <!-- Configure the machine related probes that should be run on ALL machines that host an ActiveMQ broker -->

@@ -17,9 +17,15 @@
 package com.fusesource.forge.jmstest.persistence.rrd;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,50 +39,81 @@ public class RrdGraphPostProcessor extends AbstractRRDPostProcessor {
 
   private Log log = null;
 
+  private void createThumbnail(BufferedImage image, String name, int thumbWidth,int thumbHeight) {
+
+    double thumbRatio = (double)thumbWidth / (double)thumbHeight;
+    int imageWidth = image.getWidth(null);
+    int imageHeight = image.getHeight(null);
+    double imageRatio = (double)imageWidth / (double)imageHeight;
+
+    if (thumbRatio < imageRatio) {
+      thumbHeight = (int)(thumbWidth / imageRatio);
+    } else {
+      thumbWidth = (int)(thumbHeight * imageRatio);
+    }
+    
+    BufferedImage thumbImage = new BufferedImage(thumbWidth,
+    
+    thumbHeight, BufferedImage.TYPE_INT_RGB);
+    Graphics2D graphics2D = thumbImage.createGraphics();
+    graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+    graphics2D.drawImage(image, 0, 0, thumbWidth, thumbHeight, null);
+    
+    File thumbFile = new File(
+        getWorkDir().getAbsolutePath() + "/" + name + "-thumb.png"
+    );
+    
+    try {
+      ImageIO.write(thumbImage, "PNG", thumbFile);
+    } catch (IOException ioe) {
+      log().error("Error creating thumbnail for: " + name);
+    }
+  }
+
   @Override
   public void processData() {
     super.processData();
     RrdDb db = getDatabase().getDatabase();
 
-    try {
-      for (int i = 0; i < db.getArcCount(); i++) {
-        Archive arch = db.getArchive(i);
+    for (int i = 0; i < db.getArcCount(); i++) {
+      Archive arch = db.getArchive(i);
+      try {
         for (String dsName : db.getDsNames()) {
+          String probeName = getDatabase().getDescriptorByPhysicalName(dsName).getName();
+          try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
 
-          String probeName = getDatabase().getDescriptorByPhysicalName(dsName)
-              .getName();
+            StringBuffer title = new StringBuffer(probeName);
+            title.append(" ");
+            title.append(sdf.format(new Date(arch.getStartTime() * 1000)));
+            title.append("-");
+            title.append(sdf.format(new Date(arch.getEndTime() * 1000)));
 
-          SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");
+            log().info("Creating Graph: " + title);
 
-          StringBuffer title = new StringBuffer(probeName);
-          title.append(" ");
-          title.append(sdf.format(new Date(arch.getStartTime() * 1000)));
-          title.append("-");
-          title.append(sdf.format(new Date(arch.getEndTime() * 1000)));
+            RrdGraphDef graphDef = new RrdGraphDef();
 
-          log().info("Creating Graph: " + title);
-
-          RrdGraphDef graphDef = new RrdGraphDef();
-
-          graphDef.setTitle(title.toString());
-          graphDef.setTimeSpan(arch.getStartTime(), arch.getEndTime());
-          graphDef.datasource(dsName, getDbFileName(), dsName,
-              ConsolFun.AVERAGE);
-          graphDef.setStep(arch.getArcStep());
-          graphDef.setWidth(800);
-          graphDef.setHeight(600);
-          graphDef.line(dsName, Color.BLUE, probeName, 2.0f);
-          graphDef.setImageFormat("PNG");
-          graphDef.setFilename(getWorkDir().getAbsolutePath() + "/" + probeName
-              + ".png");
-          RrdGraph graph = new RrdGraph(graphDef);
-          BufferedImage bi = new BufferedImage(100, 100,
-              BufferedImage.TYPE_INT_RGB);
-          graph.render(bi.getGraphics());
+            graphDef.setTitle(title.toString());
+            graphDef.setTimeSpan(arch.getStartTime(), arch.getEndTime());
+            graphDef.datasource(dsName, getDbFileName(), dsName,
+                ConsolFun.AVERAGE);
+            graphDef.setStep(arch.getArcStep());
+            graphDef.setWidth(800);
+            graphDef.setHeight(600);
+            graphDef.line(dsName, Color.BLUE, probeName, 2.0f);
+            graphDef.setImageFormat("PNG");
+            graphDef.setFilename(getWorkDir().getAbsolutePath() + "/" + probeName + ".png");
+            RrdGraph graph = new RrdGraph(graphDef);
+            BufferedImage bi = new BufferedImage(800, 600, BufferedImage.TYPE_INT_RGB);
+            graph.render(bi.getGraphics());
+            createThumbnail(bi, probeName, 40, 30);
+          } catch (Exception e) {
+            log().error("Error generating graph for probe " + probeName, e);
+          }
         }
+      } catch (IOException ioe) {
+        log().error("Error retrieving datasource names from RRD database ", ioe);
       }
-    } catch (Exception e) {
-      log().error("Error while generating graphs.");
     }
   }
 
