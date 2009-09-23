@@ -83,15 +83,16 @@ Once the benchmark has finished, you will note log entries like:
 ... Written probe Values to : /Users/andreasgies/tmp/jmstester-1.0-SNAPSHOT/simple/benchmark.csv
 {coderay}
 
-This is telling you that the benchmark has been finished and that the os-processors have run. One Post-processor 
+This is telling you that the benchmark has been finished and that the post-processors for the have run. One Post-processor 
 has produced a graph for each metric that has been gathered throughout the benchmark, while another one has produced 
 a csv-file containing all the values that have been gathered for further processing with a spreadsheet processor of your choice.
 
-Have a look at the graph below to get an impression of the graphs that will be generated. The graph title is constructed
+Have a look at the graphs below to get an impression of the graphs that will be generated. The graph title is constructed
 from the client type, the benchmark id, the benchmark part id and the name of the metric. The graph title will also contain 
-the timestamps of when the benchmark was started and when the benchmark was finished.
+the timestamps of when the benchmark was started and when the benchmark was finished. (Click on the image for a larger version of the 
+image)
 
-!{relocatable: ../../images/simple/PRODUCER-TestClient-simple-part1-COUNTER.png}!
+{includethumbs: ../../images/simple}
 
 Finally let's have a look at a couple of lines of the generated csv file:
 

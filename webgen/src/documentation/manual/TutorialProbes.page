@@ -1,19 +1,29 @@
 ---
-title: JMSTester Simple Tutorial
---- name:head pipeline:tags
-<link href="{relocatable: book.css}" rel="stylesheet" type="text/css" />
---- name:content pipeline:tags,textile
-h1. Simple run
+title: JMSTester Probes Tutorial
+--- name:overview pipeline:tags,textile
+h1. {title:}
 
-Let us walk through the most simple run for {project_name:}. We simply want to run a one producer and one consumer 
-on a single destination. The producer shall produce 500, 600, 700 during 3 intervals of 10 seconds. We will run 
-this test against an ActiveMQ implementation that consists of only one broker. See "Starting ActiveMQ" for more details
-on how ActiveMQ can be started for our tests.
+Add JMX and OS level probes to your benchmark
+
+--- name:content pipeline:tags,textile
+
+This tutorial walks you though the steps needed to add more probes to your benchmark. Apart from measuring the 
+throughput and latency of your JMS layer, sometime you will need an insight into what the JMS broker(s) is doing
+or how the OS resources are leveraged. 
+
+To do this, we have introduced a felxible probing framework that can be used with {project_name:}. {project_name:}-core
+supports JMX probes. In addition, {project_name:}-sigar supports OS level probes leveraging the *SIGAR* libraries 
+by "Hyperic":http://www.hyperic.com/products/sigar.html. 
+
+h2. Prerequesites
+
+Before you can run this tutorial, make sure that you have completed the "installation":{relocatable: ../../install.html}
+including the installation of the additional libraries. This is required as the *SIGAR* libraries are distributed 
+with a different license, which you must accept before using it. 
 
 h2. Start up the benchmarking framework 
 
-We assume that you have downloaded the binary distribution of {project_name:} and have extracted the downloaded archive 
-in a directory of your choice. We will refer to that directory as *$JMSTESTER_HOME* in this tutorial. 
+So, you have installed a copy of {project_name:} in *$JMSTESTER_HOME* and are ready to go.
 
 In the directory *$JMSTESTER_HOME* you will find a *bin* sub directory that contains all the necessary scripts to work 
 with {project_name:}. The script you need to bring up the framework is called *runBenchmark* (don't worry, we won't 
@@ -47,7 +57,7 @@ Now, that the benchmark framework is sitting there doing nothing, we could just 
 $JMSTESTER_HOME execute
 
 {coderay:: plaintext}
-  ./bin/runCommand -command submit:conf/testScripts/simple
+  ./bin/runCommand -command submit:conf/testScripts/probes
 {coderay}
   
 This will start a simple command line client and read in the spring configuration(s) in the given directory. In those 
@@ -74,35 +84,31 @@ how we achieved this.
 Once the benchmark has finished, you will note log entries like:
 
 {coderay:: plaintext}
-... Creating Graph: CONSUMER-TestClient-simple-part1-0-Counter 2009-09-08-11:09:24-2009-09-08-11:09:54
-... Creating Graph: CONSUMER-TestClient-simple-part1-0-Latency 2009-09-08-11:09:24-2009-09-08-11:09:54
-... Creating Graph: CONSUMER-TestClient-simple-part1-0-MsgSize 2009-09-08-11:09:24-2009-09-08-11:09:54
-... Creating Graph: PRODUCER-TestClient-simple-part1-COUNTER 2009-09-08-11:09:24-2009-09-08-11:09:54
-... Written probe Values to : /Users/andreasgies/tmp/jmstester-1.0-SNAPSHOT/simple/benchmark.csv
+... Creating Graph: CONSUMER-TestClient-probes-part1-0-Counter 2009-09-23-12:45:12-2009-09-23-12:45:42
+... Creating Graph: CONSUMER-TestClient-probes-part1-0-Latency 2009-09-23-12:45:12-2009-09-23-12:45:42
+... Creating Graph: CONSUMER-TestClient-probes-part1-0-MsgSize 2009-09-23-12:45:12-2009-09-23-12:45:42
+... Creating Graph: PROBER-TestClient-probes-CpuMonitor 2009-09-23-12:45:12-2009-09-23-12:45:42
+... Creating Graph: PROBER-TestClient-probes-localhost_1099-Queue-test1-QueueSize 2009-09-23-12:45:12-2009-09-23-12:45:42
+... Creating Graph: PROBER-TestClient-probes-localhost_1099-ThreadCounter 2009-09-23-12:45:12-2009-09-23-12:45:42
+... Creating Graph: PRODUCER-TestClient-probes-part1-COUNTER 2009-09-23-12:45:12-2009-09-23-12:45:42
+... Written probe Values to : /Users/andreasgies/tmp/jmstester-1.0-SNAPSHOT/probes/benchmark.csv
 {coderay}
 
-This is telling you that the benchmark has been finished and that the os-processors have run. One Post-processor 
+This is telling you that the benchmark has been finished and that the post-processors for the data have run. One Post-processor 
 has produced a graph for each metric that has been gathered throughout the benchmark, while another one has produced 
 a csv-file containing all the values that have been gathered for further processing with a spreadsheet processor of your choice.
 
-Have a look at the graph below to get an impression of the graphs that will be generated. The graph title is constructed
+If you have also worked through the simple tutorial, you will see, that in addition 3 graphs have been created with names starting 
+with *PROBER*. These graphs are the JMX and OS level metric graphs.
+
+Have a look at the graphs below to get an impression of the graphs that will be generated. The graph title is constructed
 from the client type, the benchmark id, the benchmark part id and the name of the metric. The graph title will also contain 
-the timestamps of when the benchmark was started and when the benchmark was finished.
+the timestamps of when the benchmark was started and when the benchmark was finished. (Click on the image for a larger version of the 
+image)
 
-!{relocatable: ../../images/simple/PRODUCER-TestClient-simple-part1-COUNTER.png}!
+{includethumbs: ../../images/probes}
 
-Finally let's have a look at a couple of lines of the generated csv file:
-
-{coderay:: plaintext}
-Timestamp,Date,CONSUMER-TestClient-simple-part1-0-Counter,CONSUMER-TestClient-simple-part1-0-Latency,CONSUMER-TestClient-simple-part1-0-MsgSize,PRODUCER-TestClient-simple-part1-COUNTER
-1252400964,2009-09-08-11:09:24,0,0.0,0.0,0
-1252400965,2009-09-08-11:09:25,492,0.7174796747967485,1000.0,493
-1252400966,2009-09-08-11:09:26,992,0.5389221556886223,1000.0,993
-...
-{coderay}
-
-The csv file contains a column for the raw time stamp (the number of seconds that have passed since January, 1st 1970 0:00), the time stamp in human readable form
-and a column for each metric that has been gathered.
+Accordingly, the generated csv file has 3 more columns than in the simple example.
 
 h2. The benchmark configuration
 
@@ -110,37 +116,19 @@ After you have run the example above, you might want to look behind the curtain 
 have used. So here it is
 
 {coderay:: {lang: xml, line_numbers: true}} 
-{include_file: {filename: ../jmstester-core/src/main/resources/testScripts/simple/benchmarks.xml, process_output: true, escape_html: false}}
+{include_file: {filename: ../jmstester-core/src/main/resources/testScripts/probes/benchmarks.xml, process_output: true, escape_html: false}}
 {coderay}
 
-Let's walk through the configuration file step by step:
+Let's have a look at the differences of this configuration and the configuration in the "simple Tutorial":{relocatable: TutorialSimple.html}:
 
-# The most important thing the definition of the BenchmarkConfig in line 7, which contains references to all other objects (or their 
-  name if needed. 
-  ** First, we give the benchmark a name in line 8. The name of the benchmark will be part of the names for all metrics that will be 
-     gathered and also this is the name of a subdirectory the recorder will create to hold this benchmarks data.
-  ** The next option might seem a bit strange as it points to the configuration locations for this benchmark. You may think "hold on a 
-     second - config locations as properties when I am already in this object?" - Yes, consider a more complex scenario where you might 
-     want to keep the benchmark definitions separate from the profiles and/or the accompanying objects. Then you would have knowledge 
-     about the file containing the benchmark configuration file as such, but not necessarily about the other objects. 
-     <br/>
-     At the end of the day, the *configLocations* property holds a list of file and directory names, that is used to search for xml 
-     files, which would in turn be used to create a benchmark specific spring application context. 
-  ** In line 17 the ultimate definition of the benchmark starts. As you can see, a benchmark consists of one or more parts, where each part 
-     would specify the benchmark execution on one JMS destination. Having more than one part would allow you to simulate simultaneous 
-     traffic on various destinations in one benchmark. 
-     <br/>
-     As you can see the benchmark configuration allows you to set some basic JMS parameters. Note the number of consumers, 
-     this is the number of consumer for each client participating in the benchmark that is relevant for this benchmark part. 
-     If more than one producer client is identified, each of them will inject the message load defined in the profile. 
-     <br/>
-     The profile name references the bean name of a spring bean that implements *BenchmarkIteration*. 
-     <br/>
-     Further, the benchmark part references relevant clients by name. In our simple example we have started only one client named *TestClient*
-     and we use the special name *All*, so that all clients would be matched for consumers and producers.
-# I n line 34 you find the definition of a JMS connection factory object with the bean name *connectionFactory*. If the benchmark 
-  has no special settings regarding the connection factory to be used, the framework looks for the bean named *connectionFactory* 
-  and uses that for establishing JMS connections.
-# Last not least you see the definition of the load profile in line 38. Note that the profile has a name *testProfile1* which matches
-  the *profileName* attribute in the benchmark configuration. Apart from that the definition is straight forward: the profile 
-  starts at 500 msg/s and iterates to 700 msg/s in steps of 100 msg/s. Each iteration lasts 10 seconds. 
+# The main difference here is that the benchmark configuration now populates the probeConfigurations attribute. This attribute contains a list 
+  of specifications which probes should be run on which host. The default configuration is to run all probes on all clients that are connected 
+  to the controller. You can refer to the "distributed Tutorial":{relocatable: TutorialDistributed.html} to see a more complex configuration. 
+# From line 58ff. you see 3 bean definitions. These beans are the probes that will be executed with this configuration. If the bean names are 
+  not explicitly stated in the probeConfigurations attribute of the benchmark config {project_name:} will resolve those beans by their type.
+  All beans implementing *com.fusesource.forge.jmstest.probe.Probe* will be used in that case.
+  ** The *ThreadCounter* is a JMX probe simply reporting the number of threads in the JVM the probe is executed upon.  
+  ** The *test1Size* probe is an *ActiveMQDestinationProbe*. This class simply inherits from JMXProbe, but uses Active MQ specific 
+     attributes to calculate the JMX object name of the MBean to query.
+  ** The *CpuMonitor* is an example for a OS level probe. A full list of examples is included in the "distributed Tutorial":{relocatable: TutorialDistributed.html}.
+# The *JMXConnector* in line 52 specifies the JMX connection that will be used to execute the JMX probes.  

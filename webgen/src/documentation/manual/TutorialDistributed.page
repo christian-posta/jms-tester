@@ -25,9 +25,9 @@ are called *ERP* and *DWH*.
 The applications shall be tested for the following traffic:
 
 |_.From|_.To|_.Type|_.Destination|_.Message Rate|
-|ERP|DHW|Queue|ERP2DWH|500, with peeks to 1000 msg/s every for 15 seconds / minute|
-|DWH|ERP|Queue|ERP2DWH|500 flat|
-|ERP|DWH|Topic|Event|1000 flat|
+|ERP|DHW|Queue|ERP2DWH|50, with peeks to 100 msg/s every for 15 seconds / minute|
+|DWH|ERP|Queue|ERP2DWH|50 flat|
+|ERP|DWH|Topic|Event|100 flat|
 
 In addition we want to monitor the queue size for each queue on each broker throughout the benchmark. 
 
@@ -321,7 +321,7 @@ h2. Evaluate the benchmark
 
 The benchmark will run for about a minute and at the end of the benchmark you will see, that the recorder instance generates all the graphs you have requested:
 
-*INSERT GRAPHS HERE*
+{includethumbs: ../../images/distributed}
 
 h2. Round and round again
 
