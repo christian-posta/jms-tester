@@ -12,9 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-discoveryURI=multicast://224.1.2.3:6255?group=NodeA
-dynamicOnly=true
-networkTTL=3
-networkPrefetchSize=1
-decreaseConsumerPrio=true
+\--- !omap
+- /development.html:
+    title: Development
+    in_menu: true
+    sort_info: 60
+    url: http://jmstester.fusesource.org/maven/
