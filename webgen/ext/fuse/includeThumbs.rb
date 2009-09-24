@@ -24,7 +24,7 @@ module Fuse
         picFileName = thumbFileName.sub("-" + thumbName, "")
         
         linkText = '<a href="' + dirname + "/" + picFileName + '">'
-        linkText += '<img src="' + dirname + "/" + thumbFileName  + '"/>'
+        linkText += '<img src="' + dirname + "/" + thumbFileName  + '" alt="' + picFileName.sub(extension, "") + '"/>'
         linkText += '</a>'        
         
         content.push(linkText)
