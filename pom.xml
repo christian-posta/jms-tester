@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.fusesource.jmstester</groupId>
 	<artifactId>jmstester-parent</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 
 	<packaging>pom</packaging>
 	<name>JMS Test Framework</name>
@@ -251,23 +251,13 @@
 					<argLine>-Xms256m -Xmx768m</argLine>
 					<systemProperties>
 						<property>
-							<name>org.apache.activemq.default.directory.prefix</name>
-							<value>target/</value>
+						  <name>org.apache.activemq.default.directory.prefix</name>
+						  <value>target/</value>
 						</property>
 					</systemProperties>
 				</configuration>
 			</plugin>
-            <plugin>
-              <artifactId>maven-checkstyle-plugin</artifactId>
-              <dependencies>
-                <dependency>
-                  <groupId>${groupId}</groupId>
-                  <artifactId>jmstester-tools</artifactId>
-                  <version>${version}</version>
-                </dependency>
-              </dependencies>
-            </plugin>
-	    </plugins>
+ 	    </plugins>
 	</build>
 
   <reporting>
@@ -309,14 +299,6 @@
             </reports>
           </reportSet>
         </reportSets>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <configLocation>checkstyle.xml</configLocation>
-        </configuration>
       </plugin>
 
       <plugin>
