@@ -28,6 +28,8 @@ import org.apache.commons.logging.LogFactory;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCommand;
 import com.fusesource.forge.jmstest.benchmark.command.CommandTypes;
 import com.fusesource.forge.jmstest.benchmark.command.handler.DefaultCommandHandler;
+import com.fusesource.forge.jmstest.threading.ReleaseManager;
+import com.fusesource.forge.jmstest.threading.Releaseable;
 
 public class AbstractBenchmarkExecutionContainer 
   extends AbstractBenchmarkExecutor

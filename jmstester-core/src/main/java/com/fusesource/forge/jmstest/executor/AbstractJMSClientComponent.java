@@ -25,6 +25,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
+import com.fusesource.forge.jmstest.threading.ReleaseManager;
+import com.fusesource.forge.jmstest.threading.Releaseable;
 
 public abstract class AbstractJMSClientComponent implements Releaseable {
 

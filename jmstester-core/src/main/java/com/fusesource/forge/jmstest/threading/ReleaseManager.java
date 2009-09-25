@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.fusesource.forge.jmstest.executor;
+package com.fusesource.forge.jmstest.threading;
 
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 
 /**
  * This class is a utility class where resources with cleanup requirements can be registered.
@@ -29,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  * shutdown hook is triggered, the <code>release()</code> method of all releasables
  * will be executed.
  *
- * @author andreasgies
+ * @author Andreas Gies
  * @see Releaseable
  */
 public class ReleaseManager extends Thread {

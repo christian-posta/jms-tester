@@ -32,8 +32,8 @@ import com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig;
 import com.fusesource.forge.jmstest.benchmark.command.handler.DefaultCommandHandler;
 import com.fusesource.forge.jmstest.benchmark.command.transport.CommandTransport;
 import com.fusesource.forge.jmstest.executor.BenchmarkRunStatus;
-import com.fusesource.forge.jmstest.executor.ReleaseManager;
-import com.fusesource.forge.jmstest.executor.Releaseable;
+import com.fusesource.forge.jmstest.threading.ReleaseManager;
+import com.fusesource.forge.jmstest.threading.Releaseable;
 
 public class BenchmarkCoordinator extends DefaultCommandHandler 
   implements Releaseable {

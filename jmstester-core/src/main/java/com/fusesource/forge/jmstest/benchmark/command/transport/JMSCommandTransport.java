@@ -35,8 +35,8 @@ import org.apache.commons.logging.LogFactory;
 import com.fusesource.forge.jmstest.benchmark.command.BenchmarkCommand;
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.config.JMSDestinationProvider;
-import com.fusesource.forge.jmstest.executor.ReleaseManager;
-import com.fusesource.forge.jmstest.executor.Releaseable;
+import com.fusesource.forge.jmstest.threading.ReleaseManager;
+import com.fusesource.forge.jmstest.threading.Releaseable;
 
 public class JMSCommandTransport extends AbstractCommandTransport implements
     MessageListener, Releaseable, ExceptionListener {

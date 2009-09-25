@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class Counter extends AbstractSteppable {
   
-  final static private int MAX_COUNTER = 10;
+  final static private int MAX_COUNTER = 100;
   private int count = 0;
   
   private Log log = null;

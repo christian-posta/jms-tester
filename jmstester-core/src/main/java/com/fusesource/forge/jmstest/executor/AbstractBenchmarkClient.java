@@ -33,6 +33,8 @@ import com.fusesource.forge.jmstest.probe.Probe;
 import com.fusesource.forge.jmstest.probe.ProbeDescriptor;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
 import com.fusesource.forge.jmstest.scenario.BenchmarkIteration;
+import com.fusesource.forge.jmstest.threading.ReleaseManager;
+import com.fusesource.forge.jmstest.threading.Releaseable;
 
 public abstract class AbstractBenchmarkClient implements Releaseable {
 

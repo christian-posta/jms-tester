@@ -30,8 +30,9 @@ public class SteppableTest {
   @Test
   public void counterTest() {
     log().info("Starting Counter Test.");
-    SteppablePool pool = new SteppablePool();
-    for(int i=0; i<100; i++) {
+    
+    SteppablePool pool = new SteppablePool(5000L);
+    for(int i=0; i<50; i++) {
       pool.submit(new Counter("TestCounter[" + i + "]")); 
     }
     pool.waitUntilFinished();

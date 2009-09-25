@@ -62,7 +62,7 @@ public abstract class AbstractSteppable implements Steppable {
   }
 
   final public void abort() {
-    if (state == SteppableState.RUNNING) {
+    if (state == SteppableState.RUNNING || state == SteppableState.INITIALIZED) {
       log().debug("Aborting " + getClass().getSimpleName() + "(" + getName() + ")");
       doAbort();
       state = SteppableState.ABORTED;

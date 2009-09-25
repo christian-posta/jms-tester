@@ -28,6 +28,7 @@ import com.fusesource.forge.jmstest.benchmark.command.SubmitBenchmarkCommand;
 import com.fusesource.forge.jmstest.config.BrokerServicesFactory;
 import com.fusesource.forge.jmstest.frontend.Benchmark;
 import com.fusesource.forge.jmstest.frontend.CommandLineClient;
+import com.fusesource.forge.jmstest.threading.ReleaseManager;
 
 public class AbstractTestNGSpringJMSTest extends
     AbstractTestNGSpringContextTests {

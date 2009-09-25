@@ -32,6 +32,7 @@ import com.fusesource.forge.jmstest.peristence.BenchmarkSamplePersistenceAdapter
 import com.fusesource.forge.jmstest.probe.AveragingProbe;
 import com.fusesource.forge.jmstest.probe.CountingProbe;
 import com.fusesource.forge.jmstest.probe.ProbeRunner;
+import com.fusesource.forge.jmstest.threading.Releaseable;
 
 public class BenchmarkConsumer extends AbstractJMSClientComponent implements
     MessageListener, Releaseable {

@@ -24,11 +24,11 @@ import java.util.Observable;
 import java.util.TreeMap;
 
 import com.fusesource.forge.jmstest.benchmark.command.ClientId;
-import com.fusesource.forge.jmstest.executor.ReleaseManager;
-import com.fusesource.forge.jmstest.executor.Releaseable;
 import com.fusesource.forge.jmstest.probe.BenchmarkProbeValue;
 import com.fusesource.forge.jmstest.probe.Probe;
 import com.fusesource.forge.jmstest.probe.ProbeDescriptor;
+import com.fusesource.forge.jmstest.threading.ReleaseManager;
+import com.fusesource.forge.jmstest.threading.Releaseable;
 
 public abstract class CachingSamplePersistenceAdapter implements Releaseable,
     BenchmarkSamplePersistenceAdapter {

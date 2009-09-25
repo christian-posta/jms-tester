@@ -18,6 +18,7 @@ package com.fusesource.forge.jmstest.threading;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -25,8 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
 
 public class SteppablePool {
   
@@ -39,17 +38,18 @@ public class SteppablePool {
   
   private Log log = null;
   
-  public SteppablePool() {
+  public SteppablePool(long idleTimeout) {
+    this.idleTimeout = idleTimeout;
     controller = new Runnable() {
       public void run() {
         log().info("Steppable pool is started.");
         while(true) {
           if (isIdle()) {
-            if (System.currentTimeMillis() - lastUnidle > idleTimeout) {
+            if (System.currentTimeMillis() - lastUnidle > getIdleTimeout()) {
               break;
             } else {
               try {
-                Thread.sleep(idleTimeout);
+                Thread.sleep(getIdleTimeout());
               } catch (InterruptedException ie) {
                 break;
               }
@@ -80,7 +80,7 @@ public class SteppablePool {
   
   public ExecutorService getExecutor() {
     if (executor == null) {
-      executor = new ThreadPoolExecutor(10, 20, 5, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+      executor = new ThreadPoolExecutor(10, 20, getIdleTimeout(), TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
     }
     return executor;
   }
@@ -109,6 +109,10 @@ public class SteppablePool {
       lastUnidle = System.currentTimeMillis();
     }
     return (tasks.isEmpty());
+  }
+  
+  private long getIdleTimeout() {
+    return idleTimeout;
   }
   
   private Log log() {
