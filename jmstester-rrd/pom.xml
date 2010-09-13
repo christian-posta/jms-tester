@@ -63,7 +63,7 @@
       <id>progress</id>
 	   <dependencies>
 		<dependency>
-			<groupId>org.fusesource.jmstester.rrd4j</groupId>
+			<groupId>org.rrd4j.rrd4j</groupId>
 			<artifactId>rrd4j</artifactId>
 			<version>2.0.6</version>
 		</dependency>
