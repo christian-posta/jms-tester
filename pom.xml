@@ -47,14 +47,14 @@
 
 	<mailingLists>
 		<mailingList>
-     		<name>jansi dev</name>
-     		<post>jansi-dev@fusesource.org</post>
-     		<subscribe>jansi-dev-subscribe@fusesource.org</subscribe>
+     		<name>jmstester dev</name>
+     		<post>jmstester-dev@fusesource.org</post>
+     		<subscribe>jmstester-dev-subscribe@fusesource.org</subscribe>
    		</mailingList>
    		<mailingList>
-     		<name>jansi commits</name>
-     		<post>jansi-commits@fusesource.org</post>
-     		<subscribe>jansi-commits-subscribe@fusesource.org</subscribe>
+     		<name>jmstester commits</name>
+     		<post>jmstester-commits@fusesource.org</post>
+     		<subscribe>jmstester-commits-subscribe@fusesource.org</subscribe>
    		</mailingList>
  	</mailingLists>
 
@@ -80,13 +80,13 @@
     <distributionManagement>
       <repository>
         <id>release.fusesource.org</id>
-        <name>RestMQ Release Repository</name>
+        <name>JMSTester Release Repository</name>
         <url>dav:http://fusesource.com/forge/dav/jmstester/repo/release</url>
       </repository>
       <snapshotRepository>
         <uniqueVersion>false</uniqueVersion>
         <id>snapshot.fusesource.org</id>
-        <name>RestMQ Snapshot Repository</name>
+        <name>JMSTester Snapshot Repository</name>
         <url>dav:http://fusesource.com/forge/dav/jmstester/repo/snapshot</url>
       </snapshotRepository>
       <site>
