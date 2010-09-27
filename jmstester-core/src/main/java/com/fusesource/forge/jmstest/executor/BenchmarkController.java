@@ -33,7 +33,7 @@ import com.fusesource.forge.jmstest.benchmark.command.BenchmarkGetClientInfo;
 import com.fusesource.forge.jmstest.benchmark.command.CommandTypes;
 import com.fusesource.forge.jmstest.benchmark.command.handler.DefaultCommandHandler;
 
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CountDownLatch;
 
 public class BenchmarkController extends AbstractBenchmarkExecutionContainer {
 

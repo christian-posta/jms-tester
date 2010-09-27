@@ -16,7 +16,7 @@
  */
 package com.fusesource.forge.jmstest.probe;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class AveragingProbe extends AbstractProbe {
 
