@@ -25,6 +25,8 @@ public abstract class AbstractSteppable implements Steppable {
   private SteppablePool pool = null;
   private SteppableState state = SteppableState.CREATED;
   
+  private Runnable stepper = null;
+  
   private Log log = null;
   
   public AbstractSteppable(String name) {
@@ -42,9 +44,14 @@ public abstract class AbstractSteppable implements Steppable {
   protected void doInitialize() {
   }
   
-  final public void initialize() {
+  synchronized final public void initialize() {
     if (state == SteppableState.CREATED) {
       log().debug("Initializing " + getClass().getSimpleName() + "(" + getName() + ")");
+      stepper = new Runnable() {
+        public void run() {
+          step();
+        }
+      };
       doInitialize();
       state = SteppableState.INITIALIZED;
       pool.getExecutor().submit(new Runnable() {
@@ -61,7 +68,7 @@ public abstract class AbstractSteppable implements Steppable {
   protected void doAbort() {
   }
 
-  final public void abort() {
+  synchronized final public void abort() {
     if (state == SteppableState.RUNNING || state == SteppableState.INITIALIZED) {
       log().debug("Aborting " + getClass().getSimpleName() + "(" + getName() + ")");
       doAbort();
@@ -80,17 +87,13 @@ public abstract class AbstractSteppable implements Steppable {
   protected void doTerminate() {
   }
 
-  final public void terminate() {
+  synchronized final public void terminate() {
     if (state == SteppableState.RUNNING || state == SteppableState.FAILED || state == SteppableState.ABORTED) {
       log().debug("Terminating " + getClass().getSimpleName() + "(" + getName() + ")");
       doTerminate();
       state = SteppableState.FINISHED;
-      pool.getExecutor().submit(new Runnable() {
-        public void run() {
-          release();
-        }
-      });
-      pool.touch();
+      
+      release();
     } else {
       log().debug("Call to terminate ignored for " + getClass().getSimpleName() + "(" + getName() + ")");
     }
@@ -99,7 +102,7 @@ public abstract class AbstractSteppable implements Steppable {
   protected void doPause() {
   }
 
-  final public void pause() {
+  synchronized final public void pause() {
     if (state == SteppableState.RUNNING) {
       log().debug("Pausing " + getClass().getSimpleName() + "(" + getName() + ")");
       doPause();
@@ -113,12 +116,13 @@ public abstract class AbstractSteppable implements Steppable {
   protected void doRelease() {
   }
 
-  public void release() {
+  synchronized public void release() {
     if (state == SteppableState.FINISHED) {
       log().debug("Releasing " + getClass().getSimpleName() + "(" + getName() + ")");
       doRelease();
-      state = SteppableState.RELEASED;
       pool.touch();
+      state = SteppableState.RELEASED;
+      pool.remove(this);
     } else {
       log().debug("Call to release ignored for " + getClass().getSimpleName() + "(" + getName() + ")");
     }
@@ -127,16 +131,12 @@ public abstract class AbstractSteppable implements Steppable {
   protected void doStart() {
   }
 
-  public void start() {
+  synchronized public void start() {
     if (state == SteppableState.INITIALIZED) {
       log().debug("Starting " + getClass().getSimpleName() + "(" + getName() + ")");
       doStart();
       state = SteppableState.RUNNING;
-      pool.getExecutor().submit(new Runnable() {
-        public void run() {
-          step();
-        }
-      });
+      pool.getExecutor().submit(stepper);
       pool.touch();
     } else {
       log().debug("Call to start ignored for " + getClass().getSimpleName() + "(" + getName() + ")");
@@ -152,15 +152,15 @@ public abstract class AbstractSteppable implements Steppable {
     if (state == SteppableState.RUNNING) {
       log().debug("Running " + getClass().getSimpleName() + "(" + getName() + ")");
       doStep();
-      pool.getExecutor().submit(new Runnable() {
-        public void run() {
-          if (needsMoreSteps()) {
-            step();
-          } else {
+      if (needsMoreSteps()) {
+        pool.getExecutor().submit(stepper);
+      } else {
+        pool.getExecutor().submit(new Runnable() {
+          public void run() {
             terminate();
           }
-        }
-      });
+        });
+      }
       state = SteppableState.RUNNING;
       pool.touch();
     } else {

@@ -18,21 +18,20 @@ package com.fusesource.forge.jmstest.threading;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.testng.annotations.Test;
-
-import com.fusesource.forge.jmstest.threading.Counter;
-import com.fusesource.forge.jmstest.threading.SteppablePool;
 
 public class SteppableTest {
 
   private Log log = null;
 
-  @Test
-  public void counterTest() {
+  public static void main(String[] args) {
+    new SteppableTest().run();
+  }
+  
+  private void run() {
     log().info("Starting Counter Test.");
     
-    SteppablePool pool = new SteppablePool(5000L);
-    for(int i=0; i<50; i++) {
+    SteppablePool pool = new SteppablePool(5000L, 20, 50);
+    for(long i=0; i < 2000000L; i++) {
       pool.submit(new Counter("TestCounter[" + i + "]")); 
     }
     pool.waitUntilFinished();

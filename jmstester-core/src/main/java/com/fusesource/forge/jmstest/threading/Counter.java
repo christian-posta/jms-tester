@@ -21,7 +21,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class Counter extends AbstractSteppable {
   
-  final static private int MAX_COUNTER = 100;
+  final static private int MAX_COUNTER = 30;
   private int count = 0;
   
   private Log log = null;
@@ -32,7 +32,9 @@ public class Counter extends AbstractSteppable {
 
   protected void doStep() {
     count++;
-    log().info("Counter(" + getName() + ") :" + count);
+    //if (count % 25 == 0) {
+    //  log().info("Counter(" + getName() + ") :" + count);
+    //}
   }
 
   @Override

@@ -17,7 +17,9 @@
 package com.fusesource.forge.jmstest.threading;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -30,16 +32,22 @@ import org.apache.commons.logging.LogFactory;
 public class SteppablePool {
   
   private ExecutorService executor = null;
-  private List<Steppable> tasks = new ArrayList<Steppable>();
+  private Map<String, Steppable> tasks = new HashMap<String, Steppable>();
   private Runnable controller = null;
   private long idleTimeout = 5000;
+  private int minPoolSize = 10;
+  private int maxPoolSize = 20;
   private long lastUnidle = System.currentTimeMillis();
+  private long lastCount = Long.MIN_VALUE;
   private List<CountDownLatch> latches = new ArrayList<CountDownLatch>();
   
   private Log log = null;
   
-  public SteppablePool(long idleTimeout) {
+  public SteppablePool(long idleTimeout, int minPoolSize, int maxPoolSize) {
     this.idleTimeout = idleTimeout;
+    this.minPoolSize = minPoolSize;
+    this.maxPoolSize = maxPoolSize;
+    
     controller = new Runnable() {
       public void run() {
         log().info("Steppable pool is started.");
@@ -47,19 +55,21 @@ public class SteppablePool {
           if (isIdle()) {
             if (System.currentTimeMillis() - lastUnidle > getIdleTimeout()) {
               break;
-            } else {
-              try {
-                Thread.sleep(getIdleTimeout());
-              } catch (InterruptedException ie) {
-                break;
-              }
             }
+          } else {
+            log.debug("Steppable pool is still busy.");
+          }
+          try {
+            Thread.sleep(getIdleTimeout());
+          } catch (InterruptedException ie) {
+            break;
           }
         }
         log().info("Steppable pool is finished.");
         for(CountDownLatch latch: latches) {
           latch.countDown();
         }
+        executor.shutdown();
       }
     };
     new Thread(controller).start();
@@ -80,13 +90,23 @@ public class SteppablePool {
   
   public ExecutorService getExecutor() {
     if (executor == null) {
-      executor = new ThreadPoolExecutor(10, 20, getIdleTimeout(), TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+      executor = new ThreadPoolExecutor(minPoolSize, maxPoolSize, getIdleTimeout(), TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
     }
     return executor;
   }
  
-  synchronized public void submit(final Steppable s) {
-    tasks.add(s);
+  public void remove(final Steppable s) {
+    synchronized (tasks) {
+      if (s.getState() == SteppableState.RELEASED) {
+        tasks.remove(s.getName());
+      }
+    }
+  }
+  
+  public void submit(final Steppable s) {
+    synchronized(tasks) {
+      tasks.put(s.getName(), s);
+    }
     s.setPool(this);
     getExecutor().submit(new Runnable() {
       public void run() {
@@ -95,20 +115,21 @@ public class SteppablePool {
     });
   }
   
-  synchronized private boolean isIdle() {
-    if (!tasks.isEmpty()) {
-      List<Steppable> revisedTasks = new ArrayList<Steppable>();
-      for(Steppable s: tasks) {
-        if (s.getState() != SteppableState.RELEASED) {
-          revisedTasks.add(s);
-        }
+  private boolean isIdle() {
+    synchronized(tasks) {
+      if (tasks.size() > 0) {
+        lastUnidle = System.currentTimeMillis();
       }
-      tasks = revisedTasks;
+      log().info("Pool still has " + (tasks.size()) + " tasks.");
+      if (tasks.size() == lastCount) {
+        for(Steppable s: tasks.values()) {
+          log.info("Task : " + s.getName() + ":" + s.getState());
+        }
+      } else {
+        lastCount = tasks.size();
+      }
+      return (tasks.size() <= 0);
     }
-    if (!tasks.isEmpty()) {
-      lastUnidle = System.currentTimeMillis();
-    }
-    return (tasks.isEmpty());
   }
   
   private long getIdleTimeout() {
