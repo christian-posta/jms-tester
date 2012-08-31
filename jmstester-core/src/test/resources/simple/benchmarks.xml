@@ -1,0 +1,107 @@
+<!--
+ Copyright (C) 2009, Progress Software Corporation and/or its
+ subsidiaries or affiliates.  All rights reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ 
+     http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <bean id="simple" class="com.fusesource.forge.jmstest.benchmark.BenchmarkConfig">
+
+        <!--
+        First, we give the benchmark a name. The name of the benchmark will be part of the names for all metrics that
+        will be gathered and also this is the name of a subdirectory the recorder will create to hold this benchmarks
+        data.
+        -->
+        <property name="benchmarkId" value="simple"/>
+
+        <!--
+        Explanation of this thing:
+
+        The next option might seem a bit strange as it points to the configuration locations for this benchmark.
+        You may think “hold on a second – config locations as properties when I am already in this object?” – Yes,
+        consider a more complex scenario where you might want to keep the benchmark definitions separate from the
+        profiles and/or the accompanying objects. Then you would have knowledge about the file containing the benchmark
+        configuration file as such, but not necessarily about the other objects.
+
+        At the end of the day, the configLocations property holds a list of file and directory names, that is used to
+        search for xml files, which would in turn be used to create a benchmark specific spring application context.
+        -->
+        <property name="configLocations">
+            <list>
+                <bean class="java.lang.String">
+                    <constructor-arg value="conf/testScripts/simple/"/>
+                </bean>
+            </list>
+        </property>
+
+        <!--
+        The ultimate definition of the benchmark starts. As you can see, a benchmark consists of one or more
+        parts, where each part would specify the benchmark execution on one JMS destination. Having more than one part
+        would allow you to simulate simultaneous traffic on various destinations in one benchmark.
+
+        As you can see the benchmark configuration allows you to set some basic JMS parameters. Note the number of
+        consumers, this is the number of consumer for each client participating in the benchmark that is relevant for
+        this benchmark part. If more than one producer client is identified, each of them will inject the message load
+        defined in the profile.
+
+        The profile name references the bean name of a spring bean that implements BenchmarkIteration.
+
+        Further, the benchmark part references relevant clients by name. In our simple example we have started only one
+        client named TestClient and we use the special name All, so that all clients would be matched for consumers and
+        producers.
+        -->
+        <property name="benchmarkParts">
+            <list>
+                <bean class="com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig">
+                    <property name="partID" value="part1"/>
+                    <property name="testDestinationName" value="queue:test1"/>
+                    <property name="deliveryMode" value="NON_PERSISTENT"/>
+                    <property name="acknowledgeMode" value="AUTO_ACKNOWLEDGE"/>
+                    <property name="transacted" value="false"/>
+                    <property name="numConsumers" value="1"/>
+                    <property name="profileName" value="testProfile1"/>
+                    <property name="producerClients" value="all"/>
+                    <property name="consumerClients" value="all"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <!--
+     The definition of a JMS connection factory object with the bean name connectionFactory. If the benchmark has no
+     special settings regarding the connection factory to be used, the framework looks for the bean named
+     connectionFactory and uses that for establishing JMS connections.
+    -->
+    <bean id="connectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="tcp://localhost:61616"/>
+    </bean>
+
+    <!--
+    Last not least you see the definition of the load profile. Note that the profile has a name testProfile1 which
+    matches the profileName attribute in the benchmark configuration. Apart from that the definition is straight
+    forward: the profile starts at 500 msg/s and iterates to 700 msg/s in steps of 100 msg/s.
+    Each iteration lasts 10 seconds.
+    -->
+    <bean id="testProfile1" class="com.fusesource.forge.jmstest.scenario.SimpleBenchmarkIteration" scope="prototype">
+        <property name="name" value="testProfile1"/>
+        <property name="duration" value="10"/>
+        <property name="initialRate" value="500"/>
+        <property name="maxRate" value="700"/>
+        <property name="increment" value="100"/>
+    </bean>
+
+</beans>

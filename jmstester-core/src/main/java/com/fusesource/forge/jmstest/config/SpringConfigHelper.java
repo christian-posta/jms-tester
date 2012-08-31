@@ -44,7 +44,7 @@ public class SpringConfigHelper {
     springConfigLocations = new ArrayList<String>();
 
     for (String location : locations) {
-      File f = new File(getBaseDir(), location);
+      File f = new File(location);
       if (f.exists()) {
         if (f.canRead()) {
           if (f.isDirectory()) {
