@@ -34,6 +34,26 @@
 			<artifactId>jmstester-core</artifactId>
 			<version>${version}</version>
 		</dependency>
+        <dependency>
+            <groupId>${groupId}</groupId>
+            <artifactId>jmstester-rrd</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.rrd4j</groupId>
+            <artifactId>rrd4j</artifactId>
+            <version>2.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>${groupId}</groupId>
+            <artifactId>jmstester-sigar</artifactId>
+            <version>${version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fusesource</groupId>
+            <artifactId>sigar</artifactId>
+            <version>1.6.4</version>
+        </dependency>
 	</dependencies>
 
   <build>
@@ -59,21 +79,4 @@
 	</plugins>
   </build>
 
-  <profiles>
-    <profile>
-      <id>progress</id>
-      <dependencies>
-	<dependency>
-  	  <groupId>${groupId}</groupId>
-	  <artifactId>jmstester-rrd</artifactId>
-	  <version>${version}</version>
-	</dependency>
-	<dependency>
-	  <groupId>${groupId}</groupId>
-	  <artifactId>jmstester-sigar</artifactId>
-	  <version>${version}</version>
-	  </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
 </project>
