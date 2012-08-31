@@ -138,7 +138,7 @@ public class Rrd4jSamplePersistenceAdapter extends ProbeAwarePeristenceAdapter {
         }
         writeSample.update();
       } catch (Exception e) {
-        log().error("Error flusging sample.", e);
+        log().error("Error flushing sample.", e);
       }
     }
   }
@@ -151,7 +151,7 @@ public class Rrd4jSamplePersistenceAdapter extends ProbeAwarePeristenceAdapter {
     } catch (IOException e) {
     }
     super.release();
-    log().info("Wriiten probe values to rrd database : " + getFileName());
+    log().info("Written probe values to rrd database : " + getFileName());
   }
 
   private Log log() {
