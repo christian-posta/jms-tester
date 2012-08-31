@@ -94,7 +94,7 @@ public class AbstractBenchmarkExecutionContainer
 
   public void run() {
     init();
-    log().info("Running Benchmarking framework ...");
+    log().info("Benchmark framework has started...");
     latch = new CountDownLatch(1);
     execute();
 

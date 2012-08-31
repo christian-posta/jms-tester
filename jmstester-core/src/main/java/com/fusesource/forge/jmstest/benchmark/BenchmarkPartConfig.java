@@ -162,6 +162,7 @@ public class BenchmarkPartConfig implements Serializable {
     this.jmsDestinationProviderName = jmsDestinationProviderName;
   }
 
+//  todo:ceposta this should be changed to "max Producer Rate Per Thread" since that's how it's used
   public int getMaxConsumerRatePerThread() {
     return maxConsumerRatePerThread;
   }
