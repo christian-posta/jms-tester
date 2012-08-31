@@ -36,9 +36,9 @@
   	          <version>2.3</version>
               <dependencies>
                 <dependency>
-                  <groupId>${groupId}</groupId>
+                  <groupId>${project.groupId}</groupId>
                   <artifactId>jmstester-tools</artifactId>
-                  <version>${version}</version>
+                  <version>${project.version}</version>
                 </dependency>
               </dependencies>
             </plugin>
@@ -60,9 +60,9 @@
 	
     <dependencies>
         <dependency>
-            <groupId>${groupId}</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>jmstester-core</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.fusesource</groupId>
