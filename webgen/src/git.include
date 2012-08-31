@@ -5,15 +5,15 @@ If you are new to Git you might like to try the [Git guide for subversion users]
 
 The Git repository is here:
 
-* **git://forge.fusesource.com/{project_id:}.git**
+* **http://fusesource.com/forge/git/{project_id:}.git**
 
-You can [browse the repository online](http://fusesource.com/forge/gitweb?p={project_id:}.git;a=tree) if you prefer.
+You can [browse the repository online](http://fusesource.com/forge/git/{project_id:}.git) if you prefer.
 
 ## How to Checkout
 
 You must first install a [Git client](http://git-scm.com/download). Then you clone the repository using the Git URL:
 
-    git clone git://forge.fusesource.com/{project_id:}.git
+    git clone http://fusesource.com/forge/git/{project_id:}.git
     cd {project_id:}
 
 ## Committer access
