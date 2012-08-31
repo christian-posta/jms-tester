@@ -53,7 +53,7 @@ public class CommandLineClient extends AbstractBenchmarkExecutor {
     }
   }
 
-  private void run(String[] args) {
+  void run(String[] args) {
     commands = new ArrayList<BenchmarkCommand>();
     handleArguments(args);
     for (BenchmarkCommand cmd : commands) {
