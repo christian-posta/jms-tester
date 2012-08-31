@@ -16,13 +16,15 @@
  */
 package com.fusesource.forge.jmstest.probe;
 
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import static org.junit.Assert.assertTrue;
+
 
 public class ProbeRunnerTest implements Observer {
 
@@ -52,7 +54,6 @@ public class ProbeRunnerTest implements Observer {
       e.printStackTrace();
     }
 
-    Assert.assertTrue((RUN_COUNT - 1 <= p.getValue().intValue())
-        && (p.getValue().intValue() <= RUN_COUNT + 1));
+    assertTrue((RUN_COUNT - 1 <= p.getValue().intValue()) && (p.getValue().intValue() <= RUN_COUNT + 1));
   }
 }

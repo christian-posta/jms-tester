@@ -23,12 +23,15 @@ import javax.jms.ConnectionFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfig;
 import com.fusesource.forge.jmstest.benchmark.BenchmarkPartConfig;
@@ -38,10 +41,14 @@ import com.fusesource.forge.jmstest.executor.BenchmarkJMSConsumerWrapper;
 import com.fusesource.forge.jmstest.executor.BenchmarkProbeWrapper;
 import com.fusesource.forge.jmstest.probe.jmx.JMXConnectionFactory;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+@RunWith(SpringJUnit4ClassRunner.class)
+
 @ContextConfiguration(locations = {
     "classpath:testScripts/distributed/benchmarks.xml",
     "classpath:testScripts/distributed/beans.xml" })
-public class BenchmarkConfigTestManual extends AbstractTestNGSpringContextTests {
+public class BenchmarkConfigTestManual extends AbstractJUnit4SpringContextTests {
 
   private String[] clientNames = { "ERP-1", "ERP-2", "DWH-1", "DWH-2",
       "Monitor-1", "Monitor-2" };
@@ -51,7 +58,7 @@ public class BenchmarkConfigTestManual extends AbstractTestNGSpringContextTests 
   private int jmsPort = 62626;
   private Log log = null;
 
-  @BeforeTest
+  @Before
   public void startTest() throws Exception {
     controller = new BenchmarkController();
     controller.setHostname("0.0.0.0");
@@ -61,7 +68,7 @@ public class BenchmarkConfigTestManual extends AbstractTestNGSpringContextTests 
     jmsPort = controller.getJmsPort();
   }
 
-  @AfterTest
+  @After
   public void stopTest() {
     controller.stop();
   }
@@ -92,12 +99,12 @@ public class BenchmarkConfigTestManual extends AbstractTestNGSpringContextTests 
 
     for (String partId : queuePartIDs) {
       log().info("Checking partID: " + partId);
-      Assert.assertTrue(partNames.contains(partId));
+      assertTrue(partNames.contains(partId));
     }
 
     for (String partId : topicPartIDs) {
       log().info("Checking partID: " + partId);
-      Assert.assertTrue(partNames.contains(partId));
+      assertTrue(partNames.contains(partId));
     }
   }
 
@@ -142,18 +149,18 @@ public class BenchmarkConfigTestManual extends AbstractTestNGSpringContextTests 
   private void checkBenchmarkParts() {
     for (BenchmarkPartConfig part : getConfig().getBenchmarkParts()) {
       log().info("Analyzing Benchmark Part: " + part.getPartID());
-      Assert.assertTrue(part.getTestDestinationName()
-          .endsWith(part.getPartID()));
+      assertTrue(part.getTestDestinationName()
+              .endsWith(part.getPartID()));
 
       int consumerCount = matchingClients(0, part).size();
       int producerCount = matchingClients(1, part).size();
 
       if (part.getTestDestinationName().startsWith("topic:")) {
-        Assert.assertEquals(consumerCount, 4);
-        Assert.assertEquals(producerCount, 2);
+        assertEquals(consumerCount, 4);
+        assertEquals(producerCount, 2);
       } else {
-        Assert.assertEquals(consumerCount, 2);
-        Assert.assertEquals(producerCount, 1);
+        assertEquals(consumerCount, 2);
+        assertEquals(producerCount, 1);
       }
 
       checkClients(part);
@@ -168,8 +175,8 @@ public class BenchmarkConfigTestManual extends AbstractTestNGSpringContextTests 
         BenchmarkJMSConsumerWrapper bcw = new BenchmarkJMSConsumerWrapper(
             client, partConfig);
         String connFactoryName = bcw.getPreferredConnectionFactoryName();
-        Assert.assertTrue(connFactoryName.startsWith("node"
-            + clientName.substring(clientName.length())));
+        assertTrue(connFactoryName.startsWith("node"
+                + clientName.substring(clientName.length())));
       }
     }
   }
@@ -178,16 +185,16 @@ public class BenchmarkConfigTestManual extends AbstractTestNGSpringContextTests 
   public void testBenchmarkConfig() {
     String[] beanNames = getConfig().getApplicationContext()
         .getBeanNamesForType(JMXConnectionFactory.class);
-    Assert.assertEquals(beanNames.length, 2);
+    assertEquals(beanNames.length, 2);
 
     beanNames = getConfig().getApplicationContext().getBeanNamesForType(
         ConnectionFactory.class);
-    Assert.assertEquals(beanNames.length, 2);
+    assertEquals(beanNames.length, 2);
 
     checkPartNames();
     checkBenchmarkParts();
 
-    Assert.assertEquals(matchingClients(2, null).size(), 2);
+    assertEquals(matchingClients(2, null).size(), 2);
   }
 
   private Log log() {

@@ -16,21 +16,23 @@
  */
 package com.fusesource.forge.jmstest.probe;
 
-import org.testng.Assert;
-import org.testng.annotations.Test;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class ProbesTest {
 
   @Test
   public void testCountingProbe() {
     CountingProbe probe = new CountingProbe();
-    Assert.assertEquals(probe.getValue(), new Long(0L));
+    assertEquals(probe.getValue(), new Long(0L));
 
     probe.increment();
-    Assert.assertEquals(probe.getValue(), new Long(1L));
+    assertEquals(probe.getValue(), new Long(1L));
 
     probe.increment(10L);
-    Assert.assertEquals(probe.getValue(), new Long(11L));
+    assertEquals(probe.getValue(), new Long(11L));
   }
 
   @Test
@@ -39,17 +41,17 @@ public class ProbesTest {
     int count = 100;
 
     AveragingProbe probe = new AveragingProbe();
-    Assert.assertEquals(probe.getValue(), 0.0);
+    assertEquals(probe.getValue(), 0.0);
 
     for (int i = 0; i < count; i++) {
       probe.addValue(1);
     }
-    Assert.assertEquals(probe.getValue(), 1.0);
+    assertEquals(probe.getValue(), 1.0);
 
     probe.addValue(count);
-    Assert.assertEquals(probe.getValue(), 200.0 / (count + 1));
+    assertEquals(probe.getValue(), 200.0 / (count + 1));
 
     probe.reset();
-    Assert.assertEquals(probe.getValue(), 0.0);
+    assertEquals(probe.getValue(), 0.0);
   }
 }

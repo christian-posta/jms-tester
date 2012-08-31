@@ -29,7 +29,7 @@
 	<properties>
 		<java.version>1.5</java.version>		
 		<amq-version>5.5.1-fuse-07-11</amq-version>
-		<spring-version>2.5.6</spring-version>
+		<spring-version>3.0.3.RELEASE</spring-version>
 		<xbean-version>3.1.0.3</xbean-version>
 		<logging.version>1.1.1</logging.version>
 		<io.version>1.4</io.version>
@@ -102,6 +102,7 @@
         <module>assembly</module>
         <module>jmstester-rrd</module>
         <module>jmstester-sigar</module>
+        <!--<module>jmstester-itests</module>-->
     </modules>
 
     <repositories>

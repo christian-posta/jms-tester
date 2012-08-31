@@ -21,11 +21,13 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 
 public class BenchmarkIterationTest {
-
   private final static int DURATION = 10;
 
   private Log log = null;
@@ -112,11 +114,11 @@ public class BenchmarkIterationTest {
     for (int i = 0; i < sequence.length; i++) {
       long rate = bi.nextEffectiveRate();
       log().info(i + " " + rate);
-      Assert.assertTrue(rate == sequence[i]);
-      Assert.assertTrue(bi.needsMoreRuns() == (i < sequence.length - 1));
+      assertTrue(rate == sequence[i]);
+      assertTrue(bi.needsMoreRuns() == (i < sequence.length - 1));
     }
 
-    Assert.assertEquals(bi.getTotalDuration(), sequence.length * DURATION);
+    assertEquals(bi.getTotalDuration(), sequence.length * DURATION);
   }
 
   private Log log() {
