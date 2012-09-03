@@ -32,9 +32,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.context.ApplicationContext;
-import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 
 import com.fusesource.forge.jmstest.config.JMSConnectionProvider;
 import com.fusesource.forge.jmstest.executor.AbstractTestNGSpringJMSTest;
@@ -42,7 +39,7 @@ import com.fusesource.forge.jmstest.tests.AsyncClient;
 import com.fusesource.forge.jmstest.tests.AsyncConsumer;
 import com.fusesource.forge.jmstest.tests.AsyncProducer;
 
-public abstract class AbstractNetworkOfBrokersTest extends
+public abstract class AbstractNetworkOfBrokersTest{/* extends
     AbstractTestNGSpringJMSTest {
 
   protected static final int INTERVAL = 60; // seconds
@@ -278,6 +275,6 @@ public abstract class AbstractNetworkOfBrokersTest extends
       }
       log().info("===== Replier Grp " + name + " finished =====");
     }
-  }
+  }*/
 
 }

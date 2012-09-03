@@ -19,9 +19,9 @@ package com.fusesource.forge.jmstest.executor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+//import org.testng.Assert;
+//import org.testng.annotations.AfterClass;
+//import org.testng.annotations.BeforeClass;
 
 import com.fusesource.forge.jmstest.benchmark.BenchmarkConfig;
 import com.fusesource.forge.jmstest.benchmark.command.SubmitBenchmarkCommand;
@@ -30,7 +30,7 @@ import com.fusesource.forge.jmstest.frontend.Benchmark;
 import com.fusesource.forge.jmstest.frontend.CommandLineClient;
 import com.fusesource.forge.jmstest.threading.ReleaseManager;
 
-public class AbstractTestNGSpringJMSTest extends
+public class AbstractTestNGSpringJMSTest{ /*extends
     AbstractTestNGSpringContextTests {
 
   private Benchmark benchmark = null;
@@ -108,5 +108,5 @@ public class AbstractTestNGSpringJMSTest extends
       log = LogFactory.getLog(this.getClass());
     }
     return log;
-  }
+  }*/
 }

@@ -23,8 +23,8 @@ import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;
 import org.rrd4j.core.FetchRequest;
 import org.rrd4j.core.RrdDb;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+//import org.testng.Assert;
+//import org.testng.annotations.Test;
 
 import com.fusesource.forge.jmstest.persistence.rrd.Rrd4jSamplePersistenceAdapter;
 import com.fusesource.forge.jmstest.probe.AbstractProbe;
@@ -34,7 +34,7 @@ import com.fusesource.forge.jmstest.probe.RandomProbe;
 
 public class SimpleRRDTest {
 
-  private final static int NUM_VALUES = 30;
+/*  private final static int NUM_VALUES = 30;
 
   @Test
   public void rrdTest() {
@@ -77,5 +77,5 @@ public class SimpleRRDTest {
     } catch (Exception e) {
       Assert.fail("Error accessing RRD database", e);
     }
-  }
+  }*/
 }
