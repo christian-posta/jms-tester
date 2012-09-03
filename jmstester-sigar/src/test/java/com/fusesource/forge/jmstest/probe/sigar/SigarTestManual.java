@@ -18,15 +18,17 @@ package com.fusesource.forge.jmstest.probe.sigar;
 
 import java.io.File;
 
-import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+
 
 import com.fusesource.forge.jmstest.probe.sigar.IOStat.IOStatType;
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class SigarTestManual {
 
-  @BeforeTest
+  @Before
   public void addSigarLibs() {
     String libPath = System.getProperty("java.library.path")
         + File.pathSeparator + "src/main/lib";
@@ -37,7 +39,7 @@ public class SigarTestManual {
   public void testCpuStatProbe() {
     CpuStat cs = new CpuStat("CPU");
     Number n = cs.getValue();
-    Assert.assertTrue(n.doubleValue() >= 0.0 && n.doubleValue() <= 100.0);
+    assertTrue(n.doubleValue() >= 0.0 && n.doubleValue() <= 100.0);
   }
 
   @Test
