@@ -45,17 +45,25 @@ public abstract class AbstractBenchmarkExecutor {
     getCmdTransport().sendCommand(command);
   }
 
-  public void setJmsPort(int jmsPort) {
+  void setJmsPort(int jmsPort) {
     getConnector().setPort(jmsPort);
   }
 
-  public int getJmsPort() {
+  int getJmsPort() {
     return getConnector().getPort();
   }
 
   public void setHostname(String hostname) {
     getConnector().setHostName(hostname);
   }
+
+    public String getHostname() {
+        return getConnector().getHostname();
+    }
+
+    public String getDestinationName(){
+        return getConnector().getDestinationName();
+    }
 
   public void setDestinationName(String destinationName) {
     getConnector().setDestinationName(destinationName);
