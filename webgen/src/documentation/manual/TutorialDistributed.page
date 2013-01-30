@@ -287,10 +287,10 @@ recorder is the module that will collect all probe metrics and runs the post pro
 You can start these two components from a command line positioned in *JMSTESTER_HOME* with 
 
 {coderay:: plaintext}
-./bin/runBenchmark -controller -recorder -springConfigLocations conf/testScripts
+./bin/runBenchmark -controller -recorder -spring conf/testScripts
 {coderay}
 
-The *springConfigLocations* parameter in this case points to a directory. The recorder will read the xml files in this directory
+The *spring* parameter in this case points to a directory. The recorder will read the xml files in this directory
 and execute all BenchmarkPostProcessors found in the configuration files after each benchmark. In our case we have configured the graph 
 and the csv post processors. 
 

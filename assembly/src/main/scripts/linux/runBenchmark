@@ -27,7 +27,12 @@ if [ "x$JMST_DEBUG" != "x" ]; then
     JVM_FLAGS="${JVM_FLAGS} -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"
 fi
 
+# Set jvm memory configuration
+if [ -z "$JMSTESTER_OPTS_MEMORY" ] ; then
+    JMSTESTER_OPTS_MEMORY="-Xms256M -Xmx256M"
+fi
+
 export PATH=$PATH:$APP_HOME/../lib
 
-java $JVM_FLAGS -classpath $APPCP com.fusesource.forge.jmstest.frontend.Benchmark $@
+java $JMSTESTER_OPTS_MEMORY $JVM_FLAGS -classpath $APPCP com.fusesource.forge.jmstest.frontend.Benchmark $@
 

@@ -102,7 +102,7 @@
         <module>assembly</module>
         <module>jmstester-rrd</module>
         <module>jmstester-sigar</module>
-        <module>jmstester-scala-tests</module>
+        <!--<module>jmstester-scala-tests</module>-->
         <!--<module>jmstester-itests</module>-->
     </modules>
 

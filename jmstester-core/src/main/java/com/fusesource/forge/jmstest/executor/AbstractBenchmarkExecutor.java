@@ -69,7 +69,8 @@ public abstract class AbstractBenchmarkExecutor {
     getConnector().setDestinationName(destinationName);
   }
 
-  public void setSpringConfigLocations(String springConfigDirs) {
+  public void setSpring(String springConfigDirs) {
+      log().debug("Setting a location for the config files");
     this.springConfigHelper.setSpringConfigLocations(springConfigDirs);
   }
 

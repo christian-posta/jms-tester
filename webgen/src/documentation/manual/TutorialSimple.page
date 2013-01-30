@@ -24,7 +24,7 @@ break anything by executing it - yet;) ).
 So, from $JMSTESTER_HOME execute:
 
 {coderay:: plaintext}
-  ./bin/runBenchmark -controller -clientNames TestClient -recorder -springConfigLocations conf/testScripts
+  ./bin/runBenchmark -controller -clientNames TestClient -recorder -spring conf/testScripts
 {coderay}
   
 You will see the benchmarking framework start -- and do nothing, so what have we actually done? - Well, we have started
@@ -39,7 +39,7 @@ a JVM hosting the components of the benchmarking framework.
 * Now we have a client and a controller instance, but these would not do any reporting. To enable reporting we also need 
   to start the reporting engine using the *recorder* flag. The recorder will then record all data sent from the clients
   in raw format and execute post-processors on the data after the benchmark has finished. You might be asking, which 
-  post-processors? - We have defined those with the *springConfigLocations* flag. This points at a directory containing 
+  post-processors? - We have defined those with the *spring* flag. This points at a directory containing
   one or more xml-files that are interpreted as spring configuration files. The recorder will execute all post-processors
   that fulfill the BenchmarkPostProcessor interface. 
 
