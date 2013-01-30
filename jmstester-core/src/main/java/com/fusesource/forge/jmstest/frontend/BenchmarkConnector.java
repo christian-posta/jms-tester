@@ -32,14 +32,16 @@ import com.fusesource.forge.jmstest.config.impl.DefaultJMSConnectionProvider;
 
 public class BenchmarkConnector {
 
+    public static final int DEFAULT_PORT = 62626;
+    public static final String DEFAULT_DESTINATION = "topic:benchmark.command";
   private CommandTransport cmdTransport = null;
 
   private JMSConnectionProvider jmsConnectionProvider = null;
   private JMSDestinationProvider jmsDestinationProvider = null;
-  private String destinationName = "topic:benchmark.command";
+  private String destinationName = DEFAULT_DESTINATION;
 
   private String hostName = null;;
-  private int port = 62626;
+  private int port = DEFAULT_PORT;
 
   private BenchmarkCommandChainHandler handler = new BenchmarkCommandChainHandler();
 

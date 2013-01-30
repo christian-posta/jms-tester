@@ -60,13 +60,19 @@ public class BenchmarkController extends AbstractBenchmarkExecutionContainer {
       }
     });
 
-    coordinator = new BenchmarkCoordinator();
-    coordinator.setCommandTransport(getCmdTransport());
-    coordinator.start();
-    getConnector().addHandler(coordinator);
+
   }
 
-  public void refreshClientInfos() {
+    @Override
+    protected void execute() {
+        super.execute();
+        coordinator = new BenchmarkCoordinator();
+        coordinator.setCommandTransport(getCmdTransport());
+        coordinator.start();
+        getConnector().addHandler(coordinator);
+    }
+
+    public void refreshClientInfos() {
     synchronized (clients) {
       clients.clear();
     }
@@ -127,7 +133,7 @@ public class BenchmarkController extends AbstractBenchmarkExecutionContainer {
       log().info("Clients can connect to " + connector.getUri().toString());
       setJmsPort(connector.getUri().getPort());
       broker.setPersistent(false);
-      broker.setUseJmx(false);
+      broker.setUseJmx(true);
       broker.start();
       broker.waitUntilStarted();
     }

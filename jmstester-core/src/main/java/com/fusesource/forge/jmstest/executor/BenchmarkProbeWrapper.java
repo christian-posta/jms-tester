@@ -107,59 +107,63 @@ public class BenchmarkProbeWrapper extends AbstractBenchmarkClient {
 
   @Override
   public boolean prepare() {
-    for (BenchmarkProbeConfig probeConfig : getConfig().getProbeConfigurations()) {
-      if (getContainer().matchesClient(probeConfig.getClientNames())) {
-
-        String[] probeNames = null;
-
-        if (probeConfig.getProbeNames().equalsIgnoreCase("all")) {
-          probeNames = getApplicationContext().getBeanNamesForType(Probe.class);
-        } else {
-          List<String> names = new ArrayList<String>();
-
-          StringTokenizer sTok = new StringTokenizer(
-            probeConfig.getProbeNames(), ","
-          );
-          while (sTok.hasMoreTokens()) {
-            names.add(sTok.nextToken());
-          }
-
-          probeNames = names.toArray(new String[0]);
-        }
-
-        log().debug("Trying to resolve " + probeNames.length + " probes.");
-
-        for (String probeName : probeNames) {
-          log().debug("Instantiating probe " + probeName);
-          try {
-            Probe p = (Probe) getBean(new String[] {probeName}, null);
-            log().debug("Found Probe : " + p.getDescriptor());
-
-            if (p instanceof JMXProbe) {
-              for (JMXConnectionFactory cf : getJmxConnectionFactories(probeConfig)) {
-                Probe jmxProbe = (Probe) getBean(new String[] {probeName}, null);
-                jmxProbe.setName(generateJmxProbeName(cf.getUrl(), jmxProbe.getName()));
-                jmxProbe.addObserver(getSamplePersistenceAdapter());
-                ((JMXProbe) jmxProbe).setJmxConnectionFactory(cf);
-                getProbeRunner().addProbe(jmxProbe);
-              }
-            } else {
-              p.setName(getClientId().toString() + p.getName());
-              p.addObserver(getSamplePersistenceAdapter());
-              getProbeRunner().addProbe(p);
-            }
-          } catch (Exception e) {
-            log().error("Could not create probe: " + probeName, e);
-          }
-        }
+      if (getConfig().getProbeConfigurations() == null) {
+          log().warn("Cannot prepare prob configuration, there are none");
+          return false;
       }
-    }
+      for (BenchmarkProbeConfig probeConfig : getConfig().getProbeConfigurations()) {
+          if (getContainer().matchesClient(probeConfig.getClientNames())) {
 
-    if (getProbeRunner().getProbes().size() == 0) {
-      return false;
-    }
+              String[] probeNames = null;
 
-    return super.prepare();
+              if (probeConfig.getProbeNames().equalsIgnoreCase("all")) {
+                  probeNames = getApplicationContext().getBeanNamesForType(Probe.class);
+              } else {
+                  List<String> names = new ArrayList<String>();
+
+                  StringTokenizer sTok = new StringTokenizer(
+                          probeConfig.getProbeNames(), ","
+                  );
+                  while (sTok.hasMoreTokens()) {
+                      names.add(sTok.nextToken());
+                  }
+
+                  probeNames = names.toArray(new String[0]);
+              }
+
+              log().debug("Trying to resolve " + probeNames.length + " probes.");
+
+              for (String probeName : probeNames) {
+                  log().debug("Instantiating probe " + probeName);
+                  try {
+                      Probe p = (Probe) getBean(new String[]{probeName}, null);
+                      log().debug("Found Probe : " + p.getDescriptor());
+
+                      if (p instanceof JMXProbe) {
+                          for (JMXConnectionFactory cf : getJmxConnectionFactories(probeConfig)) {
+                              Probe jmxProbe = (Probe) getBean(new String[]{probeName}, null);
+                              jmxProbe.setName(generateJmxProbeName(cf.getUrl(), jmxProbe.getName()));
+                              jmxProbe.addObserver(getSamplePersistenceAdapter());
+                              ((JMXProbe) jmxProbe).setJmxConnectionFactory(cf);
+                              getProbeRunner().addProbe(jmxProbe);
+                          }
+                      } else {
+                          p.setName(getClientId().toString() + p.getName());
+                          p.addObserver(getSamplePersistenceAdapter());
+                          getProbeRunner().addProbe(p);
+                      }
+                  } catch (Exception e) {
+                      log().error("Could not create probe: " + probeName, e);
+                  }
+              }
+          }
+      }
+
+      if (getProbeRunner().getProbes().size() == 0) {
+          return false;
+      }
+
+      return super.prepare();
   }
 
   private Log log() {
