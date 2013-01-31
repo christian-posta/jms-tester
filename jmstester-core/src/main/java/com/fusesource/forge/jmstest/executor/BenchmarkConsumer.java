@@ -16,13 +16,7 @@
  */
 package com.fusesource.forge.jmstest.executor;
 
-import javax.jms.BytesMessage;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.TextMessage;
+import javax.jms.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -125,21 +119,48 @@ public class BenchmarkConsumer extends AbstractJMSClientComponent implements
     this.adapter = adapter;
   }
 
-  // TODO: simulate slow subscriber
-  public void prepare() {
-    try {
-      // TODO: Handle Durable subscribers
-      Destination dest = getDestinationProvider().getDestination(getSession(),
-          getContainer().getPartConfig().getTestDestinationName());
-      messageConsumer = getSession().createConsumer(dest);
-      messageConsumer.setMessageListener(this);
-    } catch (Exception e) {
-      throw new BenchmarkConfigurationException(
-          "Unable to initialise JMS connection", e);
-    }
-  }
+    @Override
+    public Connection getConnection() throws Exception {
+        Connection connection = super.getConnection();
+        assert connection != null;
 
-  public void start() {
+        // should have this usually, but definitely for durable subscriber
+        if (connection.getClientID() == null || connection.getClientID().isEmpty()) {
+            log().info("Setting client ID!! yip yip");
+            connection.setClientID(getClientId());
+        }
+        return connection;
+    }
+
+    // TODO: simulate slow subscriber
+    public void prepare() {
+        try {
+
+            Destination dest = getDestinationProvider().getDestination(getSession(),
+                    getContainer().getPartConfig().getTestDestinationName());
+            if (isDurable() && isTopic(dest)) {
+                messageConsumer = getSession().createDurableSubscriber((Topic) dest, getClientId() + "_Durable_Subscriber");
+                log().info("setting durable subscriber");
+            }else {
+                messageConsumer = getSession().createConsumer(dest);
+            }
+            assert messageConsumer != null;
+            messageConsumer.setMessageListener(this);
+        } catch (Exception e) {
+            throw new BenchmarkConfigurationException(
+                    "Unable to initialise JMS connection", e);
+        }
+    }
+
+    private boolean isTopic(Destination dest) {
+        return dest instanceof Topic;
+    }
+
+    private boolean isDurable() {
+        return getContainer().getPartConfig().isDurableSubscription();
+    }
+
+    public void start() {
     try {
       if (getConnection() != null) {
         getConnection().start();

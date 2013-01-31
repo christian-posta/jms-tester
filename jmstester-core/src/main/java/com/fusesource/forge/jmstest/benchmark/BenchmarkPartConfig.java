@@ -33,6 +33,7 @@ public class BenchmarkPartConfig implements Serializable {
   private AcknowledgeMode acknowledgeMode;
   private DeliveryMode deliveryMode;
   private boolean transacted;
+  private boolean durableSubscription;
   private int numConsumers = 1;
   private String testDestinationName;
   private int transactionBatchSize = 1;
@@ -48,7 +49,15 @@ public class BenchmarkPartConfig implements Serializable {
     return parent;
   }
 
-  public void setParent(BenchmarkConfig parent) {
+    public boolean isDurableSubscription() {
+        return durableSubscription;
+    }
+
+    public void setDurableSubscription(boolean durableSubscription) {
+        this.durableSubscription = durableSubscription;
+    }
+
+    public void setParent(BenchmarkConfig parent) {
     this.parent = parent;
   }
 
@@ -171,40 +180,7 @@ public class BenchmarkPartConfig implements Serializable {
     this.maxConsumerRatePerThread = maxConsumerRatePerThread;
   }
 
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result
-        + ((acknowledgeMode == null) ? 0 : acknowledgeMode.hashCode());
-    result = prime
-        * result
-        + ((connectionFactoryNames == null) ? 0 : connectionFactoryNames
-            .hashCode());
-    result = prime * result
-        + ((consumerClients == null) ? 0 : consumerClients.hashCode());
-    result = prime * result
-        + ((deliveryMode == null) ? 0 : deliveryMode.hashCode());
-    result = prime
-        * result
-        + ((jmsDestinationProviderName == null) ? 0
-            : jmsDestinationProviderName.hashCode());
-    result = prime * result + maxConsumerRatePerThread;
-    result = prime * result
-        + ((messageFactoryName == null) ? 0 : messageFactoryName.hashCode());
-    result = prime * result + numConsumers;
-    result = prime * result + ((parent == null) ? 0 : parent.hashCode());
-    result = prime * result + ((partID == null) ? 0 : partID.hashCode());
-    result = prime * result
-        + ((producerClients == null) ? 0 : producerClients.hashCode());
-    result = prime * result
-        + ((profileName == null) ? 0 : profileName.hashCode());
-    result = prime * result
-        + ((testDestinationName == null) ? 0 : testDestinationName.hashCode());
-    result = prime * result + (transacted ? 1231 : 1237);
-    result = prime * result + transactionBatchSize;
-    return result;
-  }
+
 
   public String getMessageFactoryName() {
     return messageFactoryName;
@@ -227,79 +203,57 @@ public class BenchmarkPartConfig implements Serializable {
         + transacted + ", transactionBatchSize=" + transactionBatchSize + "]";
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    BenchmarkPartConfig other = (BenchmarkPartConfig) obj;
-    if (acknowledgeMode == null) {
-      if (other.acknowledgeMode != null)
-        return false;
-    } else if (!acknowledgeMode.equals(other.acknowledgeMode))
-      return false;
-    if (connectionFactoryNames == null) {
-      if (other.connectionFactoryNames != null)
-        return false;
-    } else if (!connectionFactoryNames.equals(other.connectionFactoryNames))
-      return false;
-    if (consumerClients == null) {
-      if (other.consumerClients != null)
-        return false;
-    } else if (!consumerClients.equals(other.consumerClients))
-      return false;
-    if (deliveryMode == null) {
-      if (other.deliveryMode != null)
-        return false;
-    } else if (!deliveryMode.equals(other.deliveryMode))
-      return false;
-    if (jmsDestinationProviderName == null) {
-      if (other.jmsDestinationProviderName != null)
-        return false;
-    } else if (!jmsDestinationProviderName
-        .equals(other.jmsDestinationProviderName))
-      return false;
-    if (maxConsumerRatePerThread != other.maxConsumerRatePerThread)
-      return false;
-    if (messageFactoryName == null) {
-      if (other.messageFactoryName != null)
-        return false;
-    } else if (!messageFactoryName.equals(other.messageFactoryName))
-      return false;
-    if (numConsumers != other.numConsumers)
-      return false;
-    if (parent == null) {
-      if (other.parent != null)
-        return false;
-    } else if (!parent.equals(other.parent))
-      return false;
-    if (partID == null) {
-      if (other.partID != null)
-        return false;
-    } else if (!partID.equals(other.partID))
-      return false;
-    if (producerClients == null) {
-      if (other.producerClients != null)
-        return false;
-    } else if (!producerClients.equals(other.producerClients))
-      return false;
-    if (profileName == null) {
-      if (other.profileName != null)
-        return false;
-    } else if (!profileName.equals(other.profileName))
-      return false;
-    if (testDestinationName == null) {
-      if (other.testDestinationName != null)
-        return false;
-    } else if (!testDestinationName.equals(other.testDestinationName))
-      return false;
-    if (transacted != other.transacted)
-      return false;
-    if (transactionBatchSize != other.transactionBatchSize)
-      return false;
-    return true;
-  }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BenchmarkPartConfig that = (BenchmarkPartConfig) o;
+
+        if (durableSubscription != that.durableSubscription) return false;
+        if (maxConsumerRatePerThread != that.maxConsumerRatePerThread) return false;
+        if (numConsumers != that.numConsumers) return false;
+        if (transacted != that.transacted) return false;
+        if (transactionBatchSize != that.transactionBatchSize) return false;
+        if (acknowledgeMode != that.acknowledgeMode) return false;
+        if (connectionFactoryNames != null ? !connectionFactoryNames.equals(that.connectionFactoryNames) : that.connectionFactoryNames != null)
+            return false;
+        if (consumerClients != null ? !consumerClients.equals(that.consumerClients) : that.consumerClients != null)
+            return false;
+        if (deliveryMode != that.deliveryMode) return false;
+        if (jmsDestinationProviderName != null ? !jmsDestinationProviderName.equals(that.jmsDestinationProviderName) : that.jmsDestinationProviderName != null)
+            return false;
+        if (messageFactoryName != null ? !messageFactoryName.equals(that.messageFactoryName) : that.messageFactoryName != null)
+            return false;
+        if (parent != null ? !parent.equals(that.parent) : that.parent != null) return false;
+        if (partID != null ? !partID.equals(that.partID) : that.partID != null) return false;
+        if (producerClients != null ? !producerClients.equals(that.producerClients) : that.producerClients != null)
+            return false;
+        if (profileName != null ? !profileName.equals(that.profileName) : that.profileName != null) return false;
+        if (testDestinationName != null ? !testDestinationName.equals(that.testDestinationName) : that.testDestinationName != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = parent != null ? parent.hashCode() : 0;
+        result = 31 * result + (partID != null ? partID.hashCode() : 0);
+        result = 31 * result + (acknowledgeMode != null ? acknowledgeMode.hashCode() : 0);
+        result = 31 * result + (deliveryMode != null ? deliveryMode.hashCode() : 0);
+        result = 31 * result + (transacted ? 1 : 0);
+        result = 31 * result + (durableSubscription ? 1 : 0);
+        result = 31 * result + numConsumers;
+        result = 31 * result + (testDestinationName != null ? testDestinationName.hashCode() : 0);
+        result = 31 * result + transactionBatchSize;
+        result = 31 * result + (profileName != null ? profileName.hashCode() : 0);
+        result = 31 * result + (consumerClients != null ? consumerClients.hashCode() : 0);
+        result = 31 * result + (producerClients != null ? producerClients.hashCode() : 0);
+        result = 31 * result + (connectionFactoryNames != null ? connectionFactoryNames.hashCode() : 0);
+        result = 31 * result + (jmsDestinationProviderName != null ? jmsDestinationProviderName.hashCode() : 0);
+        result = 31 * result + (messageFactoryName != null ? messageFactoryName.hashCode() : 0);
+        result = 31 * result + maxConsumerRatePerThread;
+        return result;
+    }
 }
